@@ -21,34 +21,24 @@ knitr::opts_chunk$set(
 [![codecov.io](https://codecov.io/github/mrc-ide/safir/coverage.svg?branch=main)](https://codecov.io/github/mrc-ide/safir?branch=main)
 <!-- badges: end -->
 
-The goal of safir is to enable SQUIRE to be run on an individual basis rather than aggregate
+**safir**: **s**quire **a**nd **f**riends **i**ndividual **r**ewrite (and maintains
+the squire naming [theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir))
 
 ## Installation
 
 ``` r
-install_github('mrc-ide/individual')
-library(individual)
+install_github('mrc-ide/safir')
+library(safir)
 ```
 
-## Example
-Get parameters from SQUIRE
-```{r, simulation, echo = FALSE}
-  R0 <- 2
-  time_period <- 1000
-  tt_contact_matrix <- 0
-  contact_matrix_set <- squire::contact_matrices[[1]]
+Documentation
+-------------
 
-  pop <- safir:::get_population("Afghanistan")
+[`{safir}`](https://github.com/mrc-ide/safir) is documented on a [dedicated website](https://mrc-ide.github.io/safir).
 
-  psq <- safir:::get_parameters(
-    population = pop$n,
-    R0 = R0,
-    time_period = time_period,
-    contact_matrix_set = contact_matrix_set,
-    tt_contact_matrix = tt_contact_matrix
-  )
+This includes the following vignettes:
 
-```
+- **`Validation`**: general introduction and comparison to [`{squire}`](https://github.com/mrc-ide/squire)
 
 ## License
 

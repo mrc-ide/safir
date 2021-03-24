@@ -132,11 +132,12 @@ test_that("run 2 models with run_simulation sequentially on real data", {
 
   repetitions <- 2
 
-  overrides <-list(pop = list(pop, pop2), parameters = list(psq, psq2))
+  overrides <- list(pop = list(pop, pop2), parameters = list(psq, psq2))
 
   dfs <- run_simulation_replicate(
-    repetitions,
-    overrides
+    repetitions = repetitions,
+    overrides = overrides,
+    parallel = FALSE
   )
 
   expect_equal(length(dfs), 18)
@@ -146,5 +147,23 @@ test_that("run 2 models with run_simulation sequentially on real data", {
   expect_equal(dfs$repetition[1], 1)
   expect_equal(dfs$timestep[1], 1)
   expect_equal(dfs$timestep[2], 2)
+
+
+  # and with parallel
+  options("mc.cores" = 2)
+  dfs <- run_simulation_replicate(
+    repetitions = repetitions,
+    overrides = overrides,
+    parallel = TRUE
+  )
+
+  expect_equal(length(dfs), 18)
+  expect_equal(length(dfs$timestep), 2000)
+  expect_equal(dfs$human_S_count[1], 952)
+  expect_equal(dfs$human_E_count[1], 20)
+  expect_equal(dfs$repetition[1], 1)
+  expect_equal(dfs$timestep[1], 1)
+  expect_equal(dfs$timestep[2], 2)
+
 
 })

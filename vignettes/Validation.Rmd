@@ -20,6 +20,7 @@ options("dplyr.summarise.inform" = FALSE)
 Set up our parameters for running
 
 ```{r}
+library(safir)
 
 # Create our population
 iso3c <- "ATG"
@@ -111,7 +112,7 @@ And check this is working properly with multiple reps
 reps <- 10
 saf_reps <- safir::run_simulation_replicate(
   repetitions = reps, 
-  overrides = rep_list(list("pop" = pop, "parameters" = parameters), reps)
+  overrides = safir:::rep_list(list("pop" = pop, "parameters" = parameters), reps)
   )
 
 saf <- saf_reps %>% 
@@ -156,10 +157,12 @@ json_path <- file.path(file_path,iso3c,"input_params.json")
 json <- jsonlite::read_json(json_path)
 betas <- vapply(json, "[[", FUN.VALUE = numeric(1), "beta_set")
 
+# build a 100th of UK pop for simplicity
 uk_pop <- safir:::get_population(iso3c)
-div <- 50
+div <- 100
 uk_pop$n <- as.integer(uk_pop$n / div)
 
+# get first 365 days of fit
 uk_parameters <- safir::get_parameters(
   population = uk_pop$n,
   contact_matrix_set = squire::get_mixing_matrix(iso3c = iso3c),
@@ -172,12 +175,16 @@ uk_parameters <- safir::get_parameters(
   time_period = length(head(betas, 365))
 )
 
+# run on 4 cores
 reps <- 4
+options("mc.cores" = 2)
 saf_reps_uk <- safir::run_simulation_replicate(
   repetitions = reps, 
-  overrides = rep_list(list("pop" = uk_pop, "parameters" = uk_parameters), reps)
+  overrides = safir:::rep_list(list("pop" = uk_pop, "parameters" = uk_parameters), reps),
+  parallel = TRUE
   )
 
+# sort results and just filter to cumulative 
 saf <- saf_reps_uk %>% 
   dplyr::mutate(human_IMild_count = human_IMild_count + human_IAsymp_count) %>% 
   dplyr::select(-human_IAsymp_count) %>% 
@@ -185,10 +192,24 @@ saf <- saf_reps_uk %>%
   dplyr::mutate(name = gsub("(^human_)(\\w*)(_count)", "\\2", name), 
                 model = "safir") %>% 
   dplyr::rename(t = timestep, compartment = name, y = value) %>% 
-  dplyr::select(t, compartment, y, model, repetition)
+  dplyr::select(t, compartment, y, model, repetition) %>% 
+  dplyr::filter(compartment == "D")
 
-ggplot2::ggplot(saf, ggplot2::aes(t, y*div, color = model, group = repetition)) +
-  ggplot2::geom_line() +
-  ggplot2::facet_wrap(~compartment, scales = "free")
+# real deaths in the UK
+real <- data.frame(
+  "date" = as.Date(vapply(json, "[[", FUN.VALUE = character(1), "date"))[1:365], 
+  "deaths" = cumsum(vapply(json, function(x){ if(!is.null(x$deaths)) x$deaths else  0}, numeric(1))[1:365]),
+  "t" = 1:365
+)
+
+# join and plot
+dplyr::left_join(saf, real, "t") %>% 
+ggplot2::ggplot(ggplot2::aes(date, y*div, group = repetition)) +
+  ggplot2::geom_bar(ggplot2::aes(date, deaths, group = "real"), fill = "red", 
+                    stat = "identity", position=ggplot2::position_dodge(width = 0)) +
+  ggplot2::geom_line(color = "black") +
+  ggplot2::ylab("Cumulative Deaths") +
+  ggplot2::xlab("Date") +
+  ggplot2::theme_bw()
 
 ```

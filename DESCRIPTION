@@ -1,8 +1,8 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
 Version: 0.1.0
-Authors@R: c(person("Carol", "Brickley", role = c("aut", "cre"),
-                    email = "c.brickley@imperial.ac.uk"),
+Authors@R: c(person("OJ", "Watson", role = c("aut", "cre"),
+                    email = "o.watson15@imperial.ac.uk"),
              person("Imperial College of Science, Technology and Medicine",
                     role = "cph"))
 Description: Implements an individual-based model of COVID-19 transmission.
@@ -10,7 +10,7 @@ Description: Implements an individual-based model of COVID-19 transmission.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Remotes:  
+Remotes: 
     mrc-ide/individual@0.0.9,
     mrc-ide/squire@odin-1-1-0
 Roxygen: list(markdown = TRUE)
@@ -22,7 +22,8 @@ Suggests:
     xml2,
     rvest,
     knitr,
-    rmarkdown
+    rmarkdown,
+    jsonlite
 Imports:
     individual (>= 0.0.9),
     Rcpp,
@@ -30,10 +31,10 @@ Imports:
     ggplot2,
     tibble,
     tidyr,
-    dplyr
+    dplyr,
+    magrittr
 Depends: 
     R (>= 2.10)
 RcppModules: 
     individual_cpp
 VignetteBuilder: knitr
-

@@ -11,25 +11,26 @@ status](https://github.com/mrc-ide/safir/workflows/R-CMD-check/badge.svg)](https
 [![codecov.io](https://codecov.io/github/mrc-ide/safir/coverage.svg?branch=main)](https://codecov.io/github/mrc-ide/safir?branch=main)
 <!-- badges: end -->
 
-The goal of safir is to enable SQUIRE to be run on an individual basis
-rather than aggregate
+**safir**: **s**quire **a**nd **f**riends **i**ndividual **r**ewrite
+(and maintains the squire naming
+[theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir))
 
 ## Installation
 
 ``` r
-install_github('mrc-ide/individual')
-library(individual)
+install_github('mrc-ide/safir')
+library(safir)
 ```
 
-## Example
+## Documentation
 
-Get parameters from SQUIRE
+[`{safir}`](https://github.com/mrc-ide/safir) is documented on a
+[dedicated website](https://mrc-ide.github.io/safir).
 
-## Contributing
+This includes the following vignettes:
 
-We follow [RESIDE's PR guidelines](https://reside-ic.github.io/articles/pull-requests/).
-
-Please read [TESTING.md](https://github.com/mrc-ide/safir/blob/main/TESTING.md) for testing guidelines.
+  - **`Validation`**: general introduction and comparison to
+    [`{squire}`](https://github.com/mrc-ide/squire)
 
 ## License
 

@@ -95,12 +95,13 @@ x <- c(0,10)
 end <- 20
 
 want <- interp_input_par(x, y)
-
+expect_equal(dim(want)[3], 11)
 
 y <- c(1,3)
 x <- c(0,10)
 end <- 20
 
 want <- interp_input_par(x, y)
+expect_equal(length(want), 11)
 
 })

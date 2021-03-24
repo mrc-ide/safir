@@ -74,7 +74,7 @@ get_asymptomatic <- function() {
   # will be supplied later
   prob_asymp <- c(0.3, 0.3, rep(0.2, 15))
   IAsymp_0 <- c(rep(0L, 17))
-  dur_IAsymp <- squire:::default_durations()$dur_IMild
+  dur_IAsymp <- squire::default_durations()$dur_IMild
 
   list(
     prob_asymp = prob_asymp,

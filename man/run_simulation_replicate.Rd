@@ -4,12 +4,14 @@
 \alias{run_simulation_replicate}
 \title{Run the simulation with repetitions}
 \usage{
-run_simulation_replicate(repetitions, overrides = list())
+run_simulation_replicate(repetitions, overrides = list(), parallel = FALSE)
 }
 \arguments{
 \item{repetitions}{n times to run the simulation}
 
 \item{overrides}{a named list of parameters to use instead of defaults}
+
+\item{parallel}{Should it be run in parallel}
 }
 \value{
 data frame for runs

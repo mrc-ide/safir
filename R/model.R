@@ -39,12 +39,13 @@ run_simulation <- function(pop, parameters) {
 #' @export
 run_simulation_replicate <- function(
   repetitions,
-  parallel = FALSE,
-  overrides = list()
+  overrides = list(),
+  parallel = FALSE
 ) {
 
   # check the overrides
   assert_in(c("pop", "parameters"), names(overrides))
+  assert_logical(parallel)
 
   # check lengths
   assert_eq(repetitions, length(overrides$pop))

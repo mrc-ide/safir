@@ -59,6 +59,7 @@ test_that("infection_process does not schedule when no-one infects by chance", {
       N_age = 3,
       beta = .3
     )),
+    get_timestep = mockery::mock(1),
     schedule = mockery::mock()
   )
 
@@ -103,6 +104,7 @@ test_that("infection_process gives correct lambda for infections", {
       N_age = 3,
       beta = .3
     )),
+    get_timestep = mockery::mock(1),
     schedule = mockery::mock()
   )
 
