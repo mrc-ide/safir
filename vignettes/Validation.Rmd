@@ -43,7 +43,7 @@ parameters <- safir::get_parameters(
 
 ```
 
-Run our simulation - default timesteps = 200
+Run our simulation
 
 ```{r}
 
