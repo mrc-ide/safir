@@ -12,6 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Remotes: 
     mrc-ide/individual@0.0.9,
+    mrc-ide/squire
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests:
