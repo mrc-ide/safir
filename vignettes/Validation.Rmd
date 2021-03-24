@@ -29,7 +29,7 @@ pop <- safir:::get_population(iso3c)
 # Scale it for speed
 pop$n <- as.integer(pop$n / 10)
 
-# Create our equivalent parameters
+# Create our simulation parameters
 R0 <- 2
 time_period <- 200
 
