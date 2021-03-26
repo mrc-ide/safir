@@ -1,4 +1,4 @@
-#' @ Create events
+#' @title Create events
 #'
 #' @return a named list of individual::Event
 #' @noRd
@@ -32,7 +32,7 @@ create_events <- function(parameters) {
 #' @title Update the state of an individual as infection events occur
 #' @description Moves individuals towards the later stages of disease
 #'
-#' @param human the handle for the human individuals
+#' @param variables the handle for the variables
 #' @param to_state the destination disease state
 #' @noRd
 create_infection_update_listener <- function(
@@ -46,6 +46,7 @@ create_infection_update_listener <- function(
 #' @title Schedule progression of human disease at the start of the simulation
 #' @description Schedules infection events using Erlang
 #'
+#' @param variables the handle for the variables
 #' @param event the event to schedule
 #' @param from_state the state this event applies to
 #' @param duration the average time spent in this state
@@ -75,8 +76,6 @@ create_progression_listener <- function(event, duration, shift = 0, func = r_erl
 #' @title Modelling the progression to either IMild or ICase
 #' @description Age dependent outcome of exposure
 #'
-#' @param human the handle for the human individuals
-#' @param states the available human states
 #' @param events a list of events in the model
 #' @param variables the available human variables
 #' @param parameters model parameters
@@ -130,7 +129,6 @@ create_exposure_update_listener <- function(
 #' @title Attach listeners to events
 #' @description defines processes for events that can be scheduled in the future
 #'
-#' @param states a list of states in the model
 #' @param variables list of variables in the model
 #' @param events a list of events in the model
 #' @param parameters the model parameters

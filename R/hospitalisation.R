@@ -1,9 +1,7 @@
 #' @title Simulate hospitilisation flow
 #' @description
 #' Allocated individuals to hospital resources upon arrival
-#' @param hospitalised vector of individuals who need hospitalisation
-#' @param discrete_age the discrete age variable
-#' @param human humans
+#' @param parameters Model parameters
 #' @param states a list of all of the model states
 #' @param events a list of all of the model events
 #' @noRd
@@ -101,8 +99,7 @@ hospitilisation_flow_process <- function(
 #' sample a subset of individuals who will receive treatment. The subset is
 #' allways smaller than the limit of treatments available minus those already
 #' receiving treatment
-#' @param api simulation api
-#' @param human humans
+#' @param variables Model variables
 #' @param need_treatment a vector of individuals who need treatment
 #' @param treated_state a list states for individuals receiving treatment
 #' @param limit the number of individuals who can receive treatment
@@ -130,7 +127,6 @@ allocate_treatment <- function(
 #' @description
 #' schedule individuals into follow up events based based on bernoulli draws of
 #' `prob_successful`
-#' @param api simulation api
 #' @param target the individuals to draw from
 #' @param prob_successful the probability each target individual is successful
 #' @param success_event will be scheduled on success
@@ -158,7 +154,6 @@ schedule_outcome <- function(
 #' @title Probability of outcome
 #' @description
 #' get the probabilities of an outcome for a target population
-#' @param target the individuals of interest
 #' @param age the discrete age group of all individuals
 #' @param probs the probabilities per age group
 #' @noRd

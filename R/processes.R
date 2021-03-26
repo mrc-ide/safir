@@ -1,8 +1,7 @@
 #' @title Define event based processes at initialisation
 #' @description Defines processes for events for states at initialisation
 #'
-#' @param human humans
-#' @param states a list of states in the model
+#' @param parameters model parameters
 #' @param events a list of events in the model
 #' @param variables list of variables in the model
 #' @noRd

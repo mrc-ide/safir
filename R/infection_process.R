@@ -2,7 +2,9 @@
 #'
 #' @description calculating the FOI and infection process
 #'
-#' @param exposure event for covid exposure
+#' @param paramaters Model parameters
+#' @param varaibles Model variable
+#' @param events Model events
 #' @noRd
 infection_process <- function(parameters, variables, events) {
 
