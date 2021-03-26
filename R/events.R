@@ -2,26 +2,30 @@
 #'
 #' @return a named list of individual::Event
 #' @noRd
-create_events <- function() {
+create_events <- function(parameters) {
+
+  # pop size
+  N <- sum(parameters$population)
+
   list(
     # Human infection events
-    exposure = individual::Event$new('exposure'),
-    mild_infection = individual::Event$new('mild_infection'),
-    asymp_infection = individual::Event$new('asymp_infection'),
-    severe_infection = individual::Event$new('severe_infection'), # requiring hospital eventually
-    hospitilisation = individual::Event$new('hospitilisation'), # either ICU or MV
-    imv_get_live = individual::Event$new('imv_get_live'),
-    imv_get_die = individual::Event$new('imv_get_die'),
-    iox_get_live = individual::Event$new('iox_get_live'),
-    iox_get_die = individual::Event$new('iox_get_die'),
-    imv_not_get_live = individual::Event$new('imv_not_get_live'),
-    imv_not_get_die = individual::Event$new('imv_not_get_die'),
-    iox_not_get_live = individual::Event$new('iox_not_get_live'),
-    iox_not_get_die = individual::Event$new('iox_not_get_die'),
-    stepdown = individual::Event$new('stepdown'),
-    recovery = individual::Event$new('recovery'),
-    immunity_loss = individual::Event$new('immunity_loss'),
-    death = individual::Event$new('death')
+    exposure = individual::TargetedEvent$new(N),
+    mild_infection = individual::TargetedEvent$new(N),
+    asymp_infection = individual::TargetedEvent$new(N),
+    severe_infection = individual::TargetedEvent$new(N), # requiring hospital eventually
+    hospitilisation = individual::TargetedEvent$new(N), # either ICU or MV
+    imv_get_live = individual::TargetedEvent$new(N),
+    imv_get_die = individual::TargetedEvent$new(N),
+    iox_get_live = individual::TargetedEvent$new(N),
+    iox_get_die = individual::TargetedEvent$new(N),
+    imv_not_get_live = individual::TargetedEvent$new(N),
+    imv_not_get_die = individual::TargetedEvent$new(N),
+    iox_not_get_live = individual::TargetedEvent$new(N),
+    iox_not_get_die = individual::TargetedEvent$new(N),
+    stepdown = individual::TargetedEvent$new(N),
+    recovery = individual::TargetedEvent$new(N),
+    immunity_loss = individual::TargetedEvent$new(N),
+    death = individual::TargetedEvent$new(N)
   )
 }
 
@@ -128,3 +132,282 @@ create_exposure_update_listener <- function(
   }
 }
 
+
+#' @title Attach listeners to events
+#' @description defines processes for events that can be scheduled in the future
+#'
+#' @param human humans
+#' @param states a list of states in the model
+#' @param variables list of variables in the model
+#' @param events a list of events in the model
+#' @param parameters the model parameters
+#' @noRd
+attach_event_listeners <- function(
+  human,
+  states,
+  variables,
+  events,
+  parameters
+) {
+
+  # STATE UPDATES
+  # These events cause the infection state to change at the end of the timestep
+  # ---------------------
+  # Exposure events
+  events$exposure$add_listener(
+    create_infection_update_listener(
+      human,
+      states$E
+    )
+  )
+
+  # IMild events
+  events$mild_infection$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IMild
+    )
+  )
+
+  # IAsymp events
+  events$asymp_infection$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IAsymp
+    )
+  )
+
+  # ICase events
+  events$severe_infection$add_listener(
+    create_infection_update_listener(
+      human,
+      states$ICase
+    )
+  )
+
+  # IMV events
+  events$imv_get_live$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IMVGetLive
+    )
+  )
+
+  events$imv_get_die$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IMVGetDie
+    )
+  )
+
+  events$imv_not_get_live$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IMVNotGetLive
+    )
+  )
+
+  events$imv_not_get_die$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IMVNotGetDie
+    )
+  )
+
+  # IOx events
+  events$iox_get_live$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IOxGetLive
+    )
+  )
+
+  events$iox_get_die$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IOxGetDie
+    )
+  )
+
+  events$iox_not_get_live$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IOxNotGetLive
+    )
+  )
+
+  events$iox_not_get_die$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IOxNotGetDie
+    )
+  )
+
+  # Recovery events
+  events$recovery$add_listener(
+    create_infection_update_listener(
+      human,
+      states$R
+    )
+  )
+
+  # Stepdown events
+  events$stepdown$add_listener(
+    create_infection_update_listener(
+      human,
+      states$IRec
+    )
+  )
+
+  # Death events
+  events$death$add_listener(
+    create_infection_update_listener(
+      human,
+      states$D
+    )
+  )
+
+  # Loss of immunity
+  events$immunity_loss$add_listener(
+    create_infection_update_listener(
+      human,
+      states$S
+    )
+  )
+
+  # STATE SCHEDULES
+  # These events trigger the scheduling for infection state changes
+  # ----------------------------
+
+  # Exposure events
+  events$exposure$add_listener(
+    create_exposure_update_listener(
+      human,
+      states,
+      events,
+      variables,
+      parameters
+    )
+  )
+
+  # Mild Infection events
+  events$mild_infection$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_IMild,
+      func = r_exp
+    )
+  )
+
+  # Asymptomatic Infection events
+  events$asymp_infection$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_IAsymp,
+      func = r_exp
+    )
+  )
+
+  # Severe Infection events
+  events$severe_infection$add_listener(
+    create_progression_listener(
+      event = events$hospitilisation,
+      duration = parameters$dur_ICase
+    )
+  )
+
+  # Hospitalisation
+  events$hospitilisation$add_listener(
+    hospitilisation_flow_process(
+      variables$discrete_age,
+      human,
+      states,
+      events
+    )
+  )
+
+  # MV outcomes
+  events$imv_get_live$add_listener(
+    create_progression_listener(
+      event = events$stepdown,
+      duration = parameters$dur_get_mv_survive,
+      shift = 1
+    )
+  )
+
+  events$imv_get_die$add_listener(
+    create_progression_listener(
+      event = events$death,
+      duration = parameters$dur_get_mv_die,
+      shift = 1
+    )
+  )
+
+  events$imv_not_get_live$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_not_get_mv_survive,
+      shift = 1
+    )
+  )
+
+  events$imv_not_get_die$add_listener(
+    create_progression_listener(
+      event = events$death,
+      duration = parameters$dur_not_get_mv_die,
+      shift = 1
+    )
+  )
+
+  # Ox outcomes
+  events$iox_get_live$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_get_ox_survive,
+      shift = 1
+    )
+  )
+
+  events$iox_get_die$add_listener(
+    create_progression_listener(
+      event = events$death,
+      duration = parameters$dur_get_ox_die,
+      shift = 1
+    )
+  )
+
+  events$iox_not_get_live$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_not_get_ox_survive,
+      shift = 1
+    )
+  )
+
+  events$iox_not_get_die$add_listener(
+    create_progression_listener(
+      event = events$death,
+      duration = parameters$dur_not_get_ox_die,
+      shift = 1
+    )
+  )
+
+  # Stepdown
+  events$stepdown$add_listener(
+    create_progression_listener(
+      event = events$recovery,
+      duration = parameters$dur_rec
+    )
+  )
+
+  # Loss of Immunity
+  if (is.finite(parameters$dur_R)) {
+    events$recovery$add_listener(
+      create_progression_listener(
+        event = events$immunity_loss,
+        duration = parameters$dur_R
+      )
+    )
+  }
+
+}

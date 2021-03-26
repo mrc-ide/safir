@@ -10,10 +10,10 @@
 run_simulation <- function(pop, parameters) {
 
   variables <- create_variables(pop, parameters)
-  states <- create_states(parameters)
   events <- create_events()
+  states <- create_states(parameters)
   human <- create_human(states, variables, events)
-  create_event_based_processes(human, states, variables, events, parameters)
+  attach_event_listeners(human, states, variables, events, parameters)
 
   individual::simulate(
     individuals = list(human),

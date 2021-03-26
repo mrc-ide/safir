@@ -1,3 +1,45 @@
+#' @title Create variables
+#' @description Create all individual variables for humans
+#'
+#' @param pop population list
+#' @param parameters model parameters
+#'
+#' @return named list of individual::Variable
+#' @noRd
+create_variables <- function(pop, parameters) {
+
+  c(
+    create_age_variables(pop, parameters),
+    states = create_state_variables(parameters)
+  )
+}
+
+
+#' @title Create age variables
+#' @description Create individual variables for continuous and discrete age
+#'
+#' @param pop population list
+#' @param parameters model parameters
+#' @noRd
+#' @return named list of individual::Variable
+create_age_variables <- function(pop, parameters) {
+
+  cont_age <- create_continuous_age_variable(pop, parameters$max_age)
+
+  discrete_age <- create_discrete_age_variable(cont_age, pop)
+
+  swaps <- identify_ages_to_adjust(discrete_age, parameters)
+
+  discrete_age <- swap_ages(swaps, discrete_age)
+
+  cont_age <- swap_ages(swaps, cont_age)
+
+  list(
+    age = individual::IntegerVariable$new(cont_age),
+    discrete_age = individual::IntegerVariable$new(discrete_age)
+  )
+}
+
 #' @title Continuous age variable
 #' @description Create a continuous age variable for the population
 #'
@@ -72,42 +114,7 @@ get_age_bins <- function(groups) {
   )
 }
 
-#' @title Create age variables
-#' @description Create individual variables for continuous and discrete age
-#'
-#' @param pop population list
-#' @param parameters model parameters
-#' @noRd
-#' @return named list of individual::Variable
-create_age_variables <- function(pop, parameters) {
 
-  cont_age <- create_continuous_age_variable(pop, parameters$max_age)
-
-  discrete_age <- create_discrete_age_variable(cont_age, pop)
-
-  swaps <- identify_ages_to_adjust(discrete_age, parameters)
-
-  discrete_age <- swap_ages(swaps, discrete_age)
-
-  cont_age <- swap_ages(swaps, cont_age)
-
-  list(
-    age = individual::Variable$new("age", cont_age),
-    discrete_age = individual::Variable$new("discrete_age", discrete_age)
-  )
-}
-
-#' @title Create variables
-#' @description Create all individual variables for humans
-#'
-#' @param pop population list
-#' @param parameters model parameters
-#'
-#' @return named list of individual::Variable
-#' @noRd
-create_variables <- function(pop, parameters) {
-  create_age_variables(pop, parameters)
-}
 
 #' @title Identify ages to adjust
 #'
