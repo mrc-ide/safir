@@ -7,55 +7,44 @@
 #' @param variables list of variables in the model
 #' @noRd
 create_setup_process <- function(
-  human,
-  states,
+  parameters,
   events,
   variables
 ) {
-  function(api) {
-    parameters <- api$get_parameters()
-    exposed <- api$get_state(human, states$E)
-    age <- api$get_variable(human, variables$discrete_age, exposed)
-    prob_hosp <- parameters$prob_hosp[as.integer(age)]
-    hosp <- bernoulli_multi_p(prob_hosp)
+  exposed <- variables$states$get_index_of("E")
+  disc_ages <- variables$discrete_age$get_values(exposed)
+  prob_hosp <- parameters$prob_hosp[disc_ages]
+  hosp <- bernoulli_multi_p(prob_hosp)
 
-    # Get those who have severe infections
-    if(sum(hosp) > 0) {
-      api$schedule(
-        event = events$severe_infection,
-        target = exposed[hosp],
-        delay = r_erlang(length(exposed[hosp]), parameters$dur_E)
-      )
+  # Get those who have severe infections
+  if(sum(hosp) > 0) {
+    to_hosp <- individual::filter_bitset(exposed, which(hosp))
+    events$severe_infection$schedule(to_hosp,
+                                     delay = r_erlang(to_hosp$size(), parameters$dur_E))
+  }
+
+  if(sum(!hosp) > 0) {
+    # Get individuals not going to hospital
+    no_hosp <- which(!hosp)
+    not_to_hosp <- individual::filter_bitset(exposed, no_hosp)
+    prob_asymp <- parameters$prob_asymp[disc_ages[no_hosp]]
+    asymp <- bernoulli_multi_p(prob_asymp)
+
+    # Get those who are asymptomatic
+    if (sum(asymp) > 0){
+      to_asymp <- individual::filter_bitset(not_to_hosp, which(asymp))
+      events$asymp_infection$schedule(to_asymp,
+                                      delay = r_erlang(to_asymp$size(),
+                                                       parameters$dur_E) )
+    }
+    # Get those who have mild infections
+    if (sum(!asymp) > 0){
+      not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
+      events$mild_infection$schedule(not_to_asymp,
+                                     delay = r_erlang(not_to_asymp$size(),
+                                                      parameters$dur_E) + 1)
     }
 
-    if(sum(!hosp) > 0) {
-
-      no_hosp <- which(!hosp)
-      prob_asymp <-
-        parameters$prob_asymp[variables$discrete_age$initial_values[no_hosp]]
-      asymp <- bernoulli_multi_p(prob_asymp)
-
-      # Get those who are asymptomatic
-      if (sum(asymp) > 0){
-        api$schedule(
-          event = events$asymp_infection,
-          target = exposed[no_hosp][asymp],
-          delay = r_erlang(length(exposed[no_hosp][asymp]),
-                           parameters$dur_E)
-        )
-      }
-      # Get those who have mild infections
-      if (sum(!asymp) > 0){
-        api$schedule(
-          event = events$mild_infection,
-          target = exposed[no_hosp][!asymp],
-          delay = r_erlang(length(exposed[no_hosp][!asymp]),
-                           parameters$dur_E)
-        )
-
-      }
-
-    }
   }
 }
 
@@ -71,25 +60,19 @@ create_setup_process <- function(
 #' @param parameters a list of parameters in the model
 #' @noRd
 create_processes <- function(
-  human,
-  states,
   events,
   variables,
-  parameters
+  parameters,
+  renderer
 ) {
 
   list(
     infection_process(
-      human,
-      states,
-      variables$discrete_age,
-      events$exposure,
-      parameters$mix_mat_set
+      parameters,
+      variables,
+      events
     ),
-    individual::state_count_renderer_process(
-      human$name,
-      unlist(lapply(states, "[[", "name"))
-    )
+    individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
   )
 
 }
