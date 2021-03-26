@@ -8,37 +8,32 @@
 #' @param events a list of all of the model events
 #' @noRd
 hospitilisation_flow_process <- function(
-   discrete_age,
-   human,
-   states,
+   parameters,
+   variables,
    events
 ) {
-  function(api, hospitalised) {
-    parameters <- api$get_parameters()
-    disc_ages <- api$get_variable(human, discrete_age)
-    prob_severe <- prob_outcome(hospitalised, disc_ages,
+  function(timestep, hospitalised) {
+    disc_ages <- variables$discrete_age$get_values(hospitalised)
+    prob_severe <- prob_outcome(disc_ages,
                                 parameters$prob_severe)
 
     # 1. Who needs a MV
     mv_success <- bernoulli_multi_p(prob_severe)
-    need_mv <- hospitalised[mv_success]
-    if(length(need_mv) > 0) {
+    need_mv <- individual::filter_bitset(hospitalised, which(mv_success))
+    if(need_mv$size() > 0) {
        mv_get <- allocate_treatment(
-         api = api,
-         human = human,
+         variables,
          need_treatment = need_mv,
-         treated_state = states[c('IMVGetDie', 'IMVGetLive')],
+         treated_state = c('IMVGetDie', 'IMVGetLive'),
          limit = parameters$ICU_beds
        )
 
        # schedule for those getting mv
-       if (length(mv_get) > 0) {
+       if (mv_get$size() > 0) {
          schedule_outcome(
-           api = api,
            target = mv_get,
            prob_successful = prob_outcome(
-             mv_get,
-             disc_ages,
+             variables$discrete_age$get_values(mv_get),
              parameters$prob_severe_death_treatment
            ),
            success_event = events$imv_get_die,
@@ -47,14 +42,12 @@ hospitilisation_flow_process <- function(
        }
 
        # schedule for those not getting mv
-       mv_not_get <- setdiff(need_mv, mv_get)
+       mv_not_get <- need_mv$set_difference(mv_get)
        if (length(mv_not_get) > 0) {
          schedule_outcome(
-           api = api,
            target = mv_not_get,
            prob_successful = prob_outcome(
-             mv_not_get,
-             disc_ages,
+             variables$discrete_age$get_values(mv_not_get),
              parameters$prob_severe_death_no_treatment
            ),
            success_event = events$imv_not_get_die,
@@ -64,41 +57,35 @@ hospitilisation_flow_process <- function(
     }
 
     # 2. Who needs Ox
-    need_ox <- hospitalised[!mv_success]
-    if (length(need_ox) > 0) {
+    need_ox <- individual::filter_bitset(hospitalised, which(!mv_success))
+    if (need_ox$size() > 0) {
 
       ox_get <- allocate_treatment(
-        api = api,
-        human = human,
+        variables,
         need_treatment = need_ox,
-        treated_state = states[c('IOxGetDie', 'IOxGetLive', 'IRec')],
+        treated_state = c('IOxGetDie', 'IOxGetLive', 'IRec'),
         limit = parameters$hosp_beds
       )
 
       # schedule for those getting ox
-      if (length(ox_get) > 0) {
+      if (ox_get$size() > 0) {
         schedule_outcome(
-          api = api,
           target = ox_get,
           prob_successful = prob_outcome(
-            ox_get,
-            disc_ages,
+            variables$discrete_age$get_values(ox_get),
             parameters$prob_non_severe_death_treatment
           ),
           success_event = events$iox_get_die,
           failure_event = events$iox_get_live
         )
       }
-
       # schedule for those not getting ox
-      ox_not_get <- setdiff(need_ox, ox_get)
-      if (length(ox_not_get) > 0) {
+      ox_not_get <- need_ox$set_difference(ox_get)
+      if (ox_not_get$size() > 0) {
         schedule_outcome(
-          api = api,
           target = ox_not_get,
           prob_successful = prob_outcome(
-            ox_not_get,
-            disc_ages,
+            variables$discrete_age$get_values(ox_not_get),
             parameters$prob_non_severe_death_no_treatment
           ),
           success_event = events$iox_not_get_die,
@@ -121,22 +108,22 @@ hospitilisation_flow_process <- function(
 #' @param limit the number of individuals who can receive treatment
 #' @noRd
 allocate_treatment <- function(
-  api,
-  human,
+  variables,
   need_treatment,
   treated_state,
   limit
 ) {
   # mv bed allocation
-  occupied <- api$get_state(human, treated_state)
-  available <- limit - length(occupied)
+  occupied <- variables$states$get_index_of(treated_state)
+  available <- limit - occupied$size()
 
   # who is getting an mv from available
-  if (length(need_treatment) <= available) {
+  if (need_treatment$size() <= available) {
     return(need_treatment)
   }
 
-  need_treatment[sample.int(length(need_treatment), available)]
+  get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
+  return(need_treatment)
 }
 
 #' @title Schedule outcome
@@ -150,7 +137,6 @@ allocate_treatment <- function(
 #' @param failure_event will be scheduled on failure
 #' @noRd
 schedule_outcome <- function(
-  api,
   target,
   prob_successful,
   success_event,
@@ -159,19 +145,13 @@ schedule_outcome <- function(
   success <- bernoulli_multi_p(prob_successful)
 
   if(sum(success) > 0) {
-    api$schedule(
-      event = success_event,
-      target = target[success],
-      delay = 0
-    )
+    to_success <- individual::filter_bitset(target, which(success))
+    success_event$schedule(to_success, delay = 0)
   }
 
   if(sum(!success) > 0) {
-    api$schedule(
-      event = failure_event,
-      target = target[!success],
-      delay = 0
-    )
+    to_failure <- individual::filter_bitset(target, which(!success))
+    failure_event$schedule(to_failure, delay = 0)
   }
 }
 
@@ -183,9 +163,8 @@ schedule_outcome <- function(
 #' @param probs the probabilities per age group
 #' @noRd
 prob_outcome <- function(
-  target,
   age,
   probs
 ) {
-  probs[as.integer(age[target])]
+  probs[age]
 }
