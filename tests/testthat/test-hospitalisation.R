@@ -43,6 +43,25 @@ test_that('schedule_outcome can schedule both successes and failures', {
 })
 
 test_that('allocate_treatment can allocate when limit is not exceeded', {
+  pop <- get_population("ATG")
+
+  pop$n <- as.integer(pop$n / 100)
+
+  parameters <- get_parameters(
+    iso3c = "ATG",
+    population = pop$n,
+    R0 = 2,
+    time_period = 100,
+    tt_contact_matrix = 0
+  )
+
+  events <- create_events(parameters)
+  variables <- create_variables(pop, parameters)
+  attach_event_listeners(
+    variables,
+    events,
+    parameters
+  )
 
   variables$states <- mock_category(c("S", 'IOxGetDie', 'IOxGetLive', 'IRec'),
                                     c("S", "S", "S", "S", "S"))
@@ -60,6 +79,25 @@ test_that('allocate_treatment can allocate when limit is not exceeded', {
 })
 
 test_that('allocate_treatment can allocate when limit is exceeded', {
+  pop <- get_population("ATG")
+
+  pop$n <- as.integer(pop$n / 100)
+
+  parameters <- get_parameters(
+    iso3c = "ATG",
+    population = pop$n,
+    R0 = 2,
+    time_period = 100,
+    tt_contact_matrix = 0
+  )
+
+  events <- create_events(parameters)
+  variables <- create_variables(pop, parameters)
+  attach_event_listeners(
+    variables,
+    events,
+    parameters
+  )
 
   variables$states <- mock_category(c("S", 'IOxGetDie', 'IOxGetLive', 'IRec'),
                                     c("S", "S", "IRec", "IRec", "IRec"))
@@ -94,7 +132,7 @@ test_that('hospitilisation_flow_process can integrate a mix of mv and ox', {
   attach_event_listeners(
     variables,
     events,
-    psq
+    parameters
   )
 
   process <- hospitilisation_flow_process(

@@ -41,7 +41,7 @@ create_setup_process <- function(
       not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
       events$mild_infection$schedule(not_to_asymp,
                                      delay = r_erlang(not_to_asymp$size(),
-                                                      parameters$dur_E) + 1)
+                                                      parameters$dur_E))
     }
 
   }
