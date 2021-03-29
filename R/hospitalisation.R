@@ -120,7 +120,7 @@ allocate_treatment <- function(
   }
 
   get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
-  return(need_treatment)
+  return(get_treatment)
 }
 
 #' @title Schedule outcome
