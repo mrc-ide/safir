@@ -7,7 +7,7 @@
 \format{
 A dataframe of 3 elements:
 
-\code{$iso3c_ages}: A dataframe of admin units and their seasonal parameters
+\code{$iso3c_ages}: A dataframe of iso3c countries and median ages
 \itemize{
 \item country: Country name string
 \item age: Median population age numeric

@@ -8,26 +8,29 @@
 #' @param parameters model parameters
 #' @export
 run_simulation <- function(pop, parameters) {
-
+  timesteps <- parameters$time_period
   variables <- create_variables(pop, parameters)
-  events <- create_events()
-  states <- create_states(parameters)
-  human <- create_human(states, variables, events)
-  attach_event_listeners(human, states, variables, events, parameters)
-
-  individual::simulate(
-    individuals = list(human),
-    processes = create_processes(
-      human,
-      states,
-      events,
-      variables,
-      parameters
-    ),
-    end_timestep  = parameters$time_period,
-    parameters = parameters,
-    initialisation = create_setup_process(human, states, events, variables)
+  events <- create_events(parameters)
+  attach_event_listeners(variables, events, parameters)
+  renderer <- individual::Render$new(timesteps)
+  processes = create_processes(
+    events,
+    variables,
+    parameters,
+    renderer
   )
+  create_setup_process(
+    parameters,
+    events,
+    variables
+  )
+
+  individual::simulation_loop(variables = variables,
+                              events = events,
+                              processes = processes,
+                              timesteps = timesteps)
+  output <- renderer$to_dataframe()
+  return(output)
 }
 
 #' @title Run the simulation with repetitions

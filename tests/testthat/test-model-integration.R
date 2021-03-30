@@ -1,7 +1,7 @@
 test_that("run_simulation can parameterise and run an Afghan model for 10 days", {
 
   R0 <- 2
-  time_period <- 1000
+  time_period <- 10
   tt_contact_matrix <- 0
 
   iso3c <- "AFG"
@@ -18,11 +18,11 @@ test_that("run_simulation can parameterise and run an Afghan model for 10 days",
 
   output <- run_simulation(pop, psq)
 
-  expect_equal(length(output$timestep), 1000)
-  expect_equal(nrow(output), 1000)
-  expect_equal(length(output$human_E_count), 1000)
-  expect_equal(length(output$human_IMild_count), 1000)
-  expect_equal(length(output$human_IMVNotGetLive_count), 1000)
+  expect_equal(length(output$timestep), 10)
+  expect_equal(nrow(output), 10)
+  expect_equal(length(output$E_count), 10)
+  expect_equal(length(output$IMild_count), 10)
+  expect_equal(length(output$IMVNotGetLive_count), 10)
 
 })
 
@@ -103,7 +103,7 @@ test_that("run_simulation is called with the correct arguments", {
 test_that("run 2 models with run_simulation sequentially on real data", {
 
   R0 <- 2
-  time_period <- 1000
+  time_period <- 10
   tt_contact_matrix <- 0
 
   iso3c <- "ATG"
@@ -141,9 +141,9 @@ test_that("run 2 models with run_simulation sequentially on real data", {
   )
 
   expect_equal(length(dfs), 18)
-  expect_equal(length(dfs$timestep), 2000)
-  expect_equal(dfs$human_S_count[1], 952)
-  expect_equal(dfs$human_E_count[1], 20)
+  expect_equal(length(dfs$timestep), 20)
+  expect_equal(dfs$S_count[1], 952)
+  expect_equal(dfs$E_count[1], 20)
   expect_equal(dfs$repetition[1], 1)
   expect_equal(dfs$timestep[1], 1)
   expect_equal(dfs$timestep[2], 2)
@@ -158,9 +158,9 @@ test_that("run 2 models with run_simulation sequentially on real data", {
   )
 
   expect_equal(length(dfs), 18)
-  expect_equal(length(dfs$timestep), 2000)
-  expect_equal(dfs$human_S_count[1], 952)
-  expect_equal(dfs$human_E_count[1], 20)
+  expect_equal(length(dfs$timestep), 20)
+  expect_equal(dfs$S_count[1], 952)
+  expect_equal(dfs$E_count[1], 20)
   expect_equal(dfs$repetition[1], 1)
   expect_equal(dfs$timestep[1], 1)
   expect_equal(dfs$timestep[2], 2)

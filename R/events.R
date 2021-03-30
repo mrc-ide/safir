@@ -1,4 +1,4 @@
-#' @ Create events
+#' @title Create events
 #'
 #' @return a named list of individual::Event
 #' @noRd
@@ -32,29 +32,29 @@ create_events <- function(parameters) {
 #' @title Update the state of an individual as infection events occur
 #' @description Moves individuals towards the later stages of disease
 #'
-#' @param human the handle for the human individuals
+#' @param variables the handle for the variables
 #' @param to_state the destination disease state
 #' @noRd
 create_infection_update_listener <- function(
-  human,
+  variables,
   to_state) {
-  function(api, to_move) {
-    api$queue_state_update(human, to_state, to_move)
+  function(timestep, to_move) {
+    variables$states$queue_update(to_state, to_move)
   }
 }
 
 #' @title Schedule progression of human disease at the start of the simulation
 #' @description Schedules infection events using Erlang
 #'
+#' @param variables the handle for the variables
 #' @param event the event to schedule
-#' @param human the human handle
 #' @param from_state the state this event applies to
 #' @param duration the average time spent in this state
 #' @noRd
-initialise_progression <- function(event, human, from_state, duration) {
-  function(api, target) {
-    target <- api$get_state(human, from_state)
-    api$schedule(event, target, r_erlang(length(target), duration))
+initialise_progression <- function(variables, event, from_state, duration) {
+  function(timestep) {
+    target <- variables$state$get_index_of(from_state)
+    event$schedule(target, r_erlang(target$size(), duration))
   }
 }
 
@@ -68,64 +68,57 @@ initialise_progression <- function(event, human, from_state, duration) {
 #' Default = [r_erlang]
 #' @noRd
 create_progression_listener <- function(event, duration, shift = 0, func = r_erlang) {
-  function(api, target) {
-    api$schedule(event, target, func(length(target), duration) + shift)
+  function(timestep, target) {
+    event$schedule(target, func(target$size(), duration) + shift)
   }
 }
 
 #' @title Modelling the progression to either IMild or ICase
 #' @description Age dependent outcome of exposure
 #'
-#' @param human the handle for the human individuals
-#' @param states the available human states
 #' @param events a list of events in the model
 #' @param variables the available human variables
 #' @param parameters model parameters
 #' @noRd
 create_exposure_update_listener <- function(
-  human,
-  states,
   events,
   variables,
   parameters) {
-  function(api, to_move) {
-    disc_ages <- api$get_variable(human, variables$discrete_age, to_move)
-    prob_hosp <- parameters$prob_hosp[as.integer(disc_ages)]
+  function(timestep, to_move) {
+    disc_ages <- variables$discrete_age$get_values(to_move)
+    prob_hosp <- parameters$prob_hosp[disc_ages]
     hosp <- bernoulli_multi_p(prob_hosp)
 
     # Severe infections
     if(sum(hosp) > 0) {
-      api$schedule(
-        event = events$severe_infection,
-        target = to_move[hosp],
-        delay = r_erlang(length(to_move[hosp]), parameters$dur_E) + 1
-      )
+      to_hosp <- individual::filter_bitset(to_move, which(hosp))
+      events$severe_infection$schedule(to_hosp,
+                                       delay = r_erlang(to_hosp$size(), parameters$dur_E) + 1)
     }
 
     # Non severe infections
     if(sum(!hosp) > 0){
       # Get individuals not going to hospital
       no_hosp <- which(!hosp)
-      prob_asymp <- parameters$prob_asymp[as.integer(disc_ages[no_hosp])]
+      not_to_hosp <- individual::filter_bitset(to_move, no_hosp)
+      prob_asymp <- parameters$prob_asymp[disc_ages[no_hosp]]
       asymp <- bernoulli_multi_p(prob_asymp)
 
       # Get those who are asymptomatic
       if (sum(asymp) > 0){
-        api$schedule(
-          event = events$asymp_infection,
-          target = to_move[no_hosp][asymp],
-          delay = r_erlang(length(to_move[no_hosp][asymp]),
-                           parameters$dur_E) + 1
-        )
+        to_asymp <- individual::filter_bitset(not_to_hosp, which(asymp))
+        events$asymp_infection$schedule(to_asymp,
+                                        delay = r_erlang(to_asymp$size(),
+                                                         parameters$dur_E) + 1)
+
       }
       # Get those who have mild infections
       if (sum(!asymp) > 0){
-        api$schedule(
-          event = events$mild_infection,
-          target = to_move[no_hosp][!asymp],
-          delay = r_erlang(length(to_move[no_hosp][!asymp]),
-                           parameters$dur_E) + 1
-        )
+        not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
+        events$mild_infection$schedule(not_to_asymp,
+                                       delay = r_erlang(not_to_asymp$size(),
+                                                        parameters$dur_E) + 1)
+
       }
 
     }
@@ -136,15 +129,11 @@ create_exposure_update_listener <- function(
 #' @title Attach listeners to events
 #' @description defines processes for events that can be scheduled in the future
 #'
-#' @param human humans
-#' @param states a list of states in the model
 #' @param variables list of variables in the model
 #' @param events a list of events in the model
 #' @param parameters the model parameters
 #' @noRd
 attach_event_listeners <- function(
-  human,
-  states,
   variables,
   events,
   parameters
@@ -156,122 +145,122 @@ attach_event_listeners <- function(
   # Exposure events
   events$exposure$add_listener(
     create_infection_update_listener(
-      human,
-      states$E
+      variables,
+      "E"
     )
   )
 
   # IMild events
   events$mild_infection$add_listener(
     create_infection_update_listener(
-      human,
-      states$IMild
+      variables,
+      "IMild"
     )
   )
 
   # IAsymp events
   events$asymp_infection$add_listener(
     create_infection_update_listener(
-      human,
-      states$IAsymp
+      variables,
+      "IAsymp"
     )
   )
 
   # ICase events
   events$severe_infection$add_listener(
     create_infection_update_listener(
-      human,
-      states$ICase
+      variables,
+      "ICase"
     )
   )
 
   # IMV events
   events$imv_get_live$add_listener(
     create_infection_update_listener(
-      human,
-      states$IMVGetLive
+      variables,
+      "IMVGetLive"
     )
   )
 
   events$imv_get_die$add_listener(
     create_infection_update_listener(
-      human,
-      states$IMVGetDie
+      variables,
+      "IMVGetDie"
     )
   )
 
   events$imv_not_get_live$add_listener(
     create_infection_update_listener(
-      human,
-      states$IMVNotGetLive
+      variables,
+      "IMVNotGetLive"
     )
   )
 
   events$imv_not_get_die$add_listener(
     create_infection_update_listener(
-      human,
-      states$IMVNotGetDie
+      variables,
+      "IMVNotGetDie"
     )
   )
 
   # IOx events
   events$iox_get_live$add_listener(
     create_infection_update_listener(
-      human,
-      states$IOxGetLive
+      variables,
+      "IOxGetLive"
     )
   )
 
   events$iox_get_die$add_listener(
     create_infection_update_listener(
-      human,
-      states$IOxGetDie
+      variables,
+      "IOxGetDie"
     )
   )
 
   events$iox_not_get_live$add_listener(
     create_infection_update_listener(
-      human,
-      states$IOxNotGetLive
+      variables,
+      "IOxNotGetLive"
     )
   )
 
   events$iox_not_get_die$add_listener(
     create_infection_update_listener(
-      human,
-      states$IOxNotGetDie
+      variables,
+      "IOxNotGetDie"
     )
   )
 
   # Recovery events
   events$recovery$add_listener(
     create_infection_update_listener(
-      human,
-      states$R
+      variables,
+      "R"
     )
   )
 
   # Stepdown events
   events$stepdown$add_listener(
     create_infection_update_listener(
-      human,
-      states$IRec
+      variables,
+      "IRec"
     )
   )
 
   # Death events
   events$death$add_listener(
     create_infection_update_listener(
-      human,
-      states$D
+      variables,
+      "D"
     )
   )
 
   # Loss of immunity
   events$immunity_loss$add_listener(
     create_infection_update_listener(
-      human,
-      states$S
+      variables,
+      "S"
     )
   )
 
@@ -282,8 +271,6 @@ attach_event_listeners <- function(
   # Exposure events
   events$exposure$add_listener(
     create_exposure_update_listener(
-      human,
-      states,
       events,
       variables,
       parameters
@@ -319,9 +306,8 @@ attach_event_listeners <- function(
   # Hospitalisation
   events$hospitilisation$add_listener(
     hospitilisation_flow_process(
-      variables$discrete_age,
-      human,
-      states,
+      parameters,
+      variables,
       events
     )
   )

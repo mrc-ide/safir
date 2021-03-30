@@ -87,10 +87,10 @@ Get the actual comparative outputs. Add IAsymp to IMild for squire.
 ```{r}
 
 saf <- df %>% 
-  dplyr::mutate(human_IMild_count = human_IMild_count + human_IAsymp_count) %>% 
-  dplyr::select(-human_IAsymp_count) %>% 
+  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
+  dplyr::select(-IAsymp_count) %>% 
   tidyr::pivot_longer(-timestep) %>% 
-  dplyr::mutate(name = gsub("(^human_)(\\w*)(_count)", "\\2", name), 
+  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
                 model = "safir") %>% 
   dplyr::rename(t = timestep, compartment = name, y = value) %>% 
   dplyr::select(t, compartment, y, model)
@@ -116,10 +116,10 @@ saf_reps <- safir::run_simulation_replicate(
   )
 
 saf <- saf_reps %>% 
-  dplyr::mutate(human_IMild_count = human_IMild_count + human_IAsymp_count) %>% 
-  dplyr::select(-human_IAsymp_count) %>% 
+  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
+  dplyr::select(-IAsymp_count) %>% 
   tidyr::pivot_longer(-c(timestep, repetition)) %>% 
-  dplyr::mutate(name = gsub("(^human_)(\\w*)(_count)", "\\2", name), 
+  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
                 model = "safir") %>% 
   dplyr::rename(t = timestep, compartment = name, y = value) %>% 
   dplyr::select(t, compartment, y, model, repetition) %>% 
@@ -186,10 +186,10 @@ saf_reps_uk <- safir::run_simulation_replicate(
 
 # sort results and just filter to cumulative 
 saf <- saf_reps_uk %>% 
-  dplyr::mutate(human_IMild_count = human_IMild_count + human_IAsymp_count) %>% 
-  dplyr::select(-human_IAsymp_count) %>% 
+  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
+  dplyr::select(-IAsymp_count) %>% 
   tidyr::pivot_longer(-c(timestep, repetition)) %>% 
-  dplyr::mutate(name = gsub("(^human_)(\\w*)(_count)", "\\2", name), 
+  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
                 model = "safir") %>% 
   dplyr::rename(t = timestep, compartment = name, y = value) %>% 
   dplyr::select(t, compartment, y, model, repetition) %>% 
