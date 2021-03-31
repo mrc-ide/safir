@@ -11,7 +11,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Remotes: 
-    mrc-ide/individual@0.0.9,
+    mrc-ide/individual,
     mrc-ide/squire
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
@@ -25,7 +25,7 @@ Suggests:
     rmarkdown,
     jsonlite
 Imports:
-    individual (>= 0.0.9),
+    individual (>= 0.1.0),
     Rcpp,
     squire (>= 0.6.4),
     ggplot2,

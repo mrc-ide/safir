@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 scripts
+test_scripts/
+doc
+Meta
