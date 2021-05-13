@@ -93,7 +93,7 @@ create_exposure_update_listener <- function(
     if(sum(hosp) > 0) {
       to_hosp <- individual::filter_bitset(to_move, which(hosp))
       events$severe_infection$schedule(to_hosp,
-                                       delay = r_erlang(to_hosp$size(), parameters$dur_E) + 1)
+                                       delay = r_erlang(to_hosp$size(), parameters$dur_E) + 0)
     }
 
     # Non severe infections
@@ -109,7 +109,7 @@ create_exposure_update_listener <- function(
         to_asymp <- individual::filter_bitset(not_to_hosp, which(asymp))
         events$asymp_infection$schedule(to_asymp,
                                         delay = r_erlang(to_asymp$size(),
-                                                         parameters$dur_E) + 1)
+                                                         parameters$dur_E) + 0)
 
       }
       # Get those who have mild infections
@@ -117,7 +117,7 @@ create_exposure_update_listener <- function(
         not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
         events$mild_infection$schedule(not_to_asymp,
                                        delay = r_erlang(not_to_asymp$size(),
-                                                        parameters$dur_E) + 1)
+                                                        parameters$dur_E) + 0)
 
       }
 

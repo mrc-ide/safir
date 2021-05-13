@@ -1,0 +1,23 @@
+---
+title: "Code Design"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CodeDesign}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+It's nice to know how the code works. Let's keep a diary of sorts as we work on this.
+
+The model only has one "process" that queues up further events, this is `infection_process` (infection_process.R). It may queue
+
+```{r}
+library(DiagrammeR)
+```

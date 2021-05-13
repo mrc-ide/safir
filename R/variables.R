@@ -20,9 +20,10 @@ create_variables <- function(pop, parameters) {
 #'
 #' @param pop population list
 #' @param parameters model parameters
+#' @param continuous return both age by year and bin?
 #' @noRd
 #' @return named list of individual::Variable
-create_age_variables <- function(pop, parameters) {
+create_age_variables <- function(pop, parameters, continuous = FALSE) {
 
   cont_age <- create_continuous_age_variable(pop, parameters$max_age)
 
@@ -34,10 +35,18 @@ create_age_variables <- function(pop, parameters) {
 
   cont_age <- swap_ages(swaps, cont_age)
 
-  list(
-    age = individual::IntegerVariable$new(cont_age),
-    discrete_age = individual::IntegerVariable$new(discrete_age)
-  )
+  if (continuous) {
+    return(
+      list(
+        age = individual::IntegerVariable$new(cont_age),
+        discrete_age = individual::IntegerVariable$new(discrete_age)
+      )
+    )
+  } else {
+    list(
+      discrete_age = individual::IntegerVariable$new(discrete_age)
+    )
+  }
 }
 
 #' @title Continuous age variable
