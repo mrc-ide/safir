@@ -11,8 +11,8 @@ create_events_zzz <- function(parameters, vaccines = FALSE) {
 
     list(
         # Human infection events
-        # exposure = individual::TargetedEvent$new(N), # S->E, scheduled by S_process_zzz
-        mild_infection = individual::TargetedEvent$new(N), # E->IMild, scheduled by create_exposure_update_listener 
+        exposure = individual::TargetedEvent$new(N), # S->E, scheduled by infection_process_zzz
+        mild_infection = individual::TargetedEvent$new(N), # E->IMild, scheduled by create_exposure_update_listener
         asymp_infection = individual::TargetedEvent$new(N),
         severe_infection = individual::TargetedEvent$new(N),
         hospitilisation = individual::TargetedEvent$new(N),
@@ -50,7 +50,7 @@ attach_event_listeners_zzz <- function(
 
     # Exposure ----------
 
-    # state update  
+    # state update
     events$exposure$add_listener(
         create_infection_update_listener(
         variables,
@@ -78,7 +78,7 @@ attach_event_listeners_zzz <- function(
     )
 
     # Mild Infection events
-    
+
     # event scheduling
     events$mild_infection$add_listener(
         create_progression_listener(
