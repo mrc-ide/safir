@@ -4,7 +4,7 @@
 \alias{make_rerlang}
 \title{Make Erlang waiting time distribution}
 \usage{
-make_rerlang(mu, dt, shape = 2)
+make_rerlang(mu, dt, shape = 2, shift = 0)
 }
 \arguments{
 \item{mu}{Mean duration}

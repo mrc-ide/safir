@@ -1,6 +1,6 @@
 
 
-
+# this is run before anything else runs in the time step
 vaccination_process_zzz <- function(parameters, variables, events) {
 
   function(timestep) {

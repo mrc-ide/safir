@@ -13,13 +13,13 @@
 #' @param dt Size of time step
 #' @param shape Shape parameter of Erlang distribution
 #' @importFrom stats rnbinom
-make_rerlang <- function(mu, dt, shape = 2) {
+make_rerlang <- function(mu, dt, shape = 2, shift = 0) {
   assert_pos(mu, zero_allowed = FALSE)
   assert_pos(dt, zero_allowed = FALSE)
   assert_pos(shape, zero_allowed = FALSE)
   r <- shape / mu
   function(n) {
-    rgamma(n = n, shape = shape, rate = r) / dt # possibility of 0 delay
+    floor(rgamma(n = n, shape = shape, rate = r) / dt) + shift # possibility of 0 delay
   }
 }
 
@@ -32,13 +32,13 @@ make_rerlang <- function(mu, dt, shape = 2) {
 #' @param mu Mean duration
 #' @param dt Size of time step
 #' @importFrom stats rgeom pexp
-make_rexp <- function(mu, dt) {
+make_rexp <- function(mu, dt, shift = 1L) {
   assert_pos(mu, zero_allowed = FALSE)
   assert_pos(dt, zero_allowed = FALSE)
   R <- 1 / mu
   r <- log(1 + (R*dt)) / dt
   p <- pexp(q = r * dt)
   function(n) {
-    rgeom(n = n, prob = p) + 1L
+    rgeom(n = n, prob = p) + shift
   }
 }
