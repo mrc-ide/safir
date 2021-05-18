@@ -13,7 +13,7 @@
 #' @param dt Size of time step
 #' @param shape Shape parameter of Erlang distribution
 #' @importFrom stats rnbinom
-make_rerlang <- function(mu, dt, shape = 2, shift = 0) {
+make_rerlang <- function(mu, dt, shape = 2, shift = 0L) {
   assert_pos(mu, zero_allowed = FALSE)
   assert_pos(dt, zero_allowed = FALSE)
   assert_pos(shape, zero_allowed = FALSE)
@@ -37,6 +37,22 @@ make_rexp <- function(mu, dt, shift = 0L) {
   assert_pos(dt, zero_allowed = FALSE)
   R <- 1 / mu
   r <- log(1 + (R*dt)) / dt
+  p <- pexp(q = r * dt)
+  function(n) {
+    rgeom(n = n, prob = p) + shift
+  }
+}
+
+
+#' Make discretized exponential waiting time distribution (simple)
+#'
+#' @param mu Mean duration
+#' @param dt Size of time step
+#' @importFrom stats rgeom pexp
+make_rexp_simple <- function(mu, dt, shift = 0L) {
+  assert_pos(mu, zero_allowed = FALSE)
+  assert_pos(dt, zero_allowed = FALSE)
+  r <- 1 / mu
   p <- pexp(q = r * dt)
   function(n) {
     rgeom(n = n, prob = p) + shift

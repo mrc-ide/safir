@@ -31,6 +31,21 @@ create_events_zzz <- function(parameters, vaccines = FALSE) {
     )
 }
 
+#' @title A listener to schedule future events
+#' @description a listener to be attached to a \code{\link[individual]{TargetedEvent}}
+#' to schedule a future event when it is called.
+#' @param event the future event to be schedule
+#' @param duration mean duration of waiting time to be scheduled
+#' @param func either \code{\link{make_rerlang}} or \code{\link{make_rexp}}
+#' @param shift add integer number of time steps to sampled value
+#' @param dt size of time step
+#' @noRd
+create_update_scheduler <- function(event, duration, func, shift, dt) {
+  dwell <- func(mu = duration, dt = dt, shift = shift)
+  function(timestep, target) {
+    event$schedule(target = target, delay = dwell(n = target$size()))
+  }
+}
 
 
 

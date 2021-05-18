@@ -49,6 +49,8 @@ create_exposure_scheduler <- function(events, variables, parameters, dt, vaccine
         #
         # }
 
+        tot <- to_move$size()
+
         disc_ages <- variables$discrete_age$get_values(to_move)
         prob_hosp <- parameters$prob_hosp[disc_ages]
         hosp <- to_move$copy()
