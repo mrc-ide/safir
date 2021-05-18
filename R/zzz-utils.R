@@ -32,7 +32,7 @@ make_rerlang <- function(mu, dt, shape = 2, shift = 0) {
 #' @param mu Mean duration
 #' @param dt Size of time step
 #' @importFrom stats rgeom pexp
-make_rexp <- function(mu, dt, shift = 1L) {
+make_rexp <- function(mu, dt, shift = 0L) {
   assert_pos(mu, zero_allowed = FALSE)
   assert_pos(dt, zero_allowed = FALSE)
   R <- 1 / mu

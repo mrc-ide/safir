@@ -16,38 +16,69 @@ create_exposure_scheduler <- function(events, variables, parameters, dt, vaccine
     return(
       function(timestep, to_move) {
 
+        # disc_ages <- variables$discrete_age$get_values(to_move)
+        # prob_hosp <- parameters$prob_hosp[disc_ages]
+        # hosp <- bernoulli_multi_p(prob_hosp)
+        #
+        # # Severe infections
+        # if(sum(hosp) > 0) {
+        #   to_hosp <- individual::filter_bitset(to_move, which(hosp))
+        #   events$severe_infection$schedule(target = to_hosp, delay = ICase_delay(n = to_hosp$size()))
+        # }
+        #
+        # # Non severe infections
+        # if(sum(!hosp) > 0){
+        #   # Get individuals not going to hospital
+        #   no_hosp <- which(!hosp)
+        #   not_to_hosp <- individual::filter_bitset(to_move, no_hosp)
+        #   prob_asymp <- parameters$prob_asymp[disc_ages[no_hosp]]
+        #   asymp <- bernoulli_multi_p(prob_asymp)
+        #
+        #   # Get those who are asymptomatic
+        #   if (sum(asymp) > 0){
+        #     to_asymp <- individual::filter_bitset(not_to_hosp, which(asymp))
+        #     events$asymp_infection$schedule(target = to_asymp, delay = IAsymp_delay(n = to_asymp$size()))
+        #
+        #   }
+        #   # Get those who have mild infections
+        #   if (sum(!asymp) > 0){
+        #     not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
+        #     events$mild_infection$schedule(target = not_to_asymp, delay = IMild_delay(n = not_to_asymp$size()))
+        #
+        #   }
+        #
+        # }
+
         disc_ages <- variables$discrete_age$get_values(to_move)
         prob_hosp <- parameters$prob_hosp[disc_ages]
-        hosp <- bernoulli_multi_p(prob_hosp)
+        hosp <- to_move$copy()
 
-        # Severe infections
-        if(sum(hosp) > 0) {
-          to_hosp <- individual::filter_bitset(to_move, which(hosp))
-          events$severe_infection$schedule(target = to_hosp, delay = ICase_delay(n = to_hosp$size()))
+        hosp$sample(prob_hosp)
+        not_hosp <- to_move$set_difference(hosp)
+
+        if (hosp$size() > 0) {
+          events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))
         }
 
-        # Non severe infections
-        if(sum(!hosp) > 0){
-          # Get individuals not going to hospital
-          no_hosp <- which(!hosp)
-          not_to_hosp <- individual::filter_bitset(to_move, no_hosp)
-          prob_asymp <- parameters$prob_asymp[disc_ages[no_hosp]]
-          asymp <- bernoulli_multi_p(prob_asymp)
+        if (not_hosp$size() > 0) {
+          disc_ages <- variables$discrete_age$get_values(not_hosp)
+          prob_asymp <- parameters$prob_asymp[disc_ages]
 
-          # Get those who are asymptomatic
-          if (sum(asymp) > 0){
-            to_asymp <- individual::filter_bitset(not_to_hosp, which(asymp))
+          to_asymp <- not_hosp$copy()
+          to_asymp$sample(prob_asymp)
+
+          not_to_asymp <- not_hosp$set_difference(to_asymp)
+
+          if (to_asymp$size() > 0) {
             events$asymp_infection$schedule(target = to_asymp, delay = IAsymp_delay(n = to_asymp$size()))
-
           }
-          # Get those who have mild infections
-          if (sum(!asymp) > 0){
-            not_to_asymp <- individual::filter_bitset(not_to_hosp, which(!asymp))
-            events$mild_infection$schedule(target = not_to_asymp, delay = IMild_delay(n = not_to_asymp$size()))
 
+          if (not_to_asymp$size() > 0) {
+            events$mild_infection$schedule(target = not_to_asymp, delay = IMild_delay(n = not_to_asymp$size()))
           }
 
         }
+
       }
     )
 

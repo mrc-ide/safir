@@ -4,7 +4,7 @@
 \alias{make_rexp}
 \title{Make discretized exponential waiting time distribution}
 \usage{
-make_rexp(mu, dt, shift = 1L)
+make_rexp(mu, dt, shift = 0L)
 }
 \arguments{
 \item{mu}{Mean duration}
