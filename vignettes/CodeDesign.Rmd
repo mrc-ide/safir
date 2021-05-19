@@ -29,7 +29,7 @@ end
 
 Most of the simulation updates state by TargetedEvents. When a targeted event fires, there are 2 types of listeners that would normally be called.
 
-  1. schedulers - these are functions like `create_update_scheduler` which schedule future events.
-  2. state updates - these are functions like `create_infection_update_listener` which update state when the event fires.
+  1. schedulers - these are functions like `create_event_scheduler_listener` which schedule future events (`create_progression_listener` in original code).
+  2. state updates - these are functions like `create_state_update_listener` which update state when the event fires (`create_infection_update_listener` in original code).
 
 There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.

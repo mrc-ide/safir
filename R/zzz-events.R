@@ -7,8 +7,6 @@ create_events_zzz <- function(parameters, vaccines = FALSE) {
     # pop size
     N <- sum(parameters$population)
 
-    stopifnot(!vaccines)
-
     list(
         # Human infection events
         exposure = individual::TargetedEvent$new(N), # S->E, scheduled by infection_process_zzz
@@ -33,21 +31,31 @@ create_events_zzz <- function(parameters, vaccines = FALSE) {
 
 #' @title A listener to schedule future events
 #' @description a listener to be attached to a \code{\link[individual]{TargetedEvent}}
-#' to schedule a future event when it is called.
+#' to schedule a future event when that event fires.
 #' @param event the future event to be schedule
 #' @param duration mean duration of waiting time to be scheduled
 #' @param func either \code{\link{make_rerlang}} or \code{\link{make_rexp}}
 #' @param shift add integer number of time steps to sampled value
 #' @param dt size of time step
-#' @noRd
-create_update_scheduler <- function(event, duration, func, shift, dt) {
+#' @export
+create_event_scheduler_listener <- function(event, duration, func, shift, dt) {
   dwell <- func(mu = duration, dt = dt, shift = shift)
   function(timestep, target) {
     event$schedule(target = target, delay = dwell(n = target$size()))
   }
 }
 
-
+#' @title A listener to update state
+#' @description a listener to be attached to a \code{\link[individual]{TargetedEvent}}
+#' to update state when that event fires.
+#' @param states a \code{\link[individual]{CategoricalVariable}} object
+#' @param destination the destination state
+#' @export
+create_state_update_listener <- function(states, destination) {
+    function(timestep, target) {
+        states$queue_update(value = destination, index = target)
+    }
+}
 
 
 #' @title Attach listeners to events
@@ -56,50 +64,293 @@ create_update_scheduler <- function(event, duration, func, shift, dt) {
 #' @param variables list of variables in the model
 #' @param events a list of events in the model
 #' @param parameters the model parameters
+#' @param dt size of time step
 #' @noRd
 attach_event_listeners_zzz <- function(
   variables,
   events,
-  parameters
+  parameters,
+  dt
 ) {
 
     # Exposure ----------
 
-    # state update
     events$exposure$add_listener(
-        create_infection_update_listener(
-        variables,
-        "E"
+        create_state_update_listener(
+            variables$states,
+            "E"
         )
     )
 
-    # event scheduling
     events$exposure$add_listener(
-        create_exposure_update_listener(
+        create_exposure_scheduler(
             events,
             variables,
-            parameters
+            parameters,
+            dt = dt,
+            shift = 1L
         )
     )
 
-    # Mild Infection ----------
+    # IMild ----------
 
-    # state update
     events$mild_infection$add_listener(
-        create_infection_update_listener(
-            variables,
+        create_state_update_listener(
+            variables$states,
             "IMild"
         )
     )
 
-    # Mild Infection events
-
-    # event scheduling
     events$mild_infection$add_listener(
-        create_progression_listener(
+        create_event_scheduler_listener(
             event = events$recovery,
             duration = parameters$dur_IMild,
-            func = r_exp
+            func = make_rexp_simple,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    # IAsymp ----------
+
+    events$asymp_infection$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IAsymp"
+        )
+    )
+
+    events$asymp_infection$add_listener(
+        create_event_scheduler_listener(
+            event = events$recovery,
+            duration = parameters$dur_IAsymp,
+            func = make_rexp_simple,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    # ICase ----------
+
+    events$severe_infection$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "ICase"
+        )
+    )
+
+    events$severe_infection$add_listener(
+        create_event_scheduler_listener(
+            event = events$hospitilisation,
+            duration = parameters$dur_ICase,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    # Hospitalisation (no state update, queues other events) ----------
+
+    events$hospitilisation$add_listener(
+        create_hospital_scheduler_listener(
+            parameters = parameters,
+            variables = variables,
+            events = events
+        )
+    )
+
+    # IMV (hospitalised, mechanical ventilation) ----------
+
+    events$imv_get_live$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IMVGetLive"
+        )
+    )
+
+    events$imv_get_live$add_listener(
+        create_event_scheduler_listener(
+            event = events$stepdown,
+            duration = parameters$dur_get_mv_survive,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$imv_get_die$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IMVGetDie"
+        )
+    )
+
+    events$imv_get_die$add_listener(
+        create_event_scheduler_listener(
+            event = events$death,
+            duration = parameters$dur_get_mv_die,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$imv_not_get_live$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IMVNotGetLive"
+        )
+    )
+
+    events$imv_not_get_live$add_listener(
+        create_event_scheduler_listener(
+            event = events$recovery,
+            duration = parameters$dur_not_get_mv_survive,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$imv_not_get_die$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IMVNotGetDie"
+        )
+    )
+
+    events$imv_not_get_die$add_listener(
+        create_event_scheduler_listener(
+            event = events$death,
+            duration = parameters$dur_not_get_mv_die,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    # IOx (hospitalised, oxygen) ----------
+
+    events$iox_get_live$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IOxGetLive"
+        )
+    )
+
+    events$iox_get_live$add_listener(
+        create_event_scheduler_listener(
+            event = events$recovery,
+            duration = parameters$dur_get_ox_survive,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$iox_get_die$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IOxGetDie"
+        )
+    )
+
+    events$iox_get_die$add_listener(
+        create_event_scheduler_listener(
+            event = events$death,
+            duration = parameters$dur_get_ox_die,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$iox_not_get_live$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IOxNotGetLive"
+        )
+    )
+
+    events$iox_not_get_live$add_listener(
+        create_event_scheduler_listener(
+            event = events$recovery,
+            duration = parameters$dur_not_get_ox_survive,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    events$iox_not_get_die$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IOxNotGetDie"
+        )
+    )
+
+    events$iox_not_get_die$add_listener(
+        create_event_scheduler_listener(
+            event = events$death,
+            duration = parameters$dur_not_get_ox_die,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+
+    # Recovery events
+    events$recovery$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "R"
+        )
+    )
+
+    if (is.finite(paramaters$dur_R)) {
+        events$recovery$add_listener(
+            create_event_scheduler_listener(
+                event = events$immunity_loss,
+                duration = parameters$dur_R,
+                func = make_rerlang,
+                shift = 1L,
+                dt = dt
+            )
+        )
+    }
+
+    # Stepdown events
+    events$stepdown$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "IRec"
+        )
+    )
+
+    events$stepdown$add_listener(
+        create_event_scheduler_listener(
+            event = events$recovery,
+            duration = parameters$dur_rec,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    )
+
+    # Death events
+    events$death$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "D"
+        )
+    )
+
+    # Loss of immunity
+    events$immunity_loss$add_listener(
+        create_state_update_listener(
+            variables$states,
+            "S"
         )
     )
 
