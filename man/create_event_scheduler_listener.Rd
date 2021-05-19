@@ -19,5 +19,5 @@ create_event_scheduler_listener(event, duration, func, shift, dt)
 }
 \description{
 a listener to be attached to a \code{\link[individual]{TargetedEvent}}
-to schedule a future event when it is called.
+to schedule a future event when that event fires.
 }
