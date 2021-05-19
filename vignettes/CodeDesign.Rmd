@@ -16,8 +16,20 @@ knitr::opts_chunk$set(
 
 It's nice to know how the code works. Let's keep a diary of sorts as we work on this.
 
-Within the simulation loop, we'll want to have process functions for each stage where individuals can become vaccinated.
+Within the simulation loop, we'll want to have process functions for each stage where individuals can become vaccinated. It might look like this:
 
-# ```{r}
-# library(DiagrammeR)
-# ```
+```
+while (run sim)
+    vaccination_process()
+    infection_process()
+    events()
+    updates()
+end
+```
+
+Most of the simulation updates state by TargetedEvents. When a targeted event fires, there are 2 types of listeners that would normally be called.
+
+  1. schedulers - these are functions like `create_update_scheduler` which schedule future events.
+  2. state updates - these are functions like `create_infection_update_listener` which update state when the event fires.
+
+There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.
