@@ -28,7 +28,8 @@ library(parallel)
 iso3c <- "ATG"
 pop <- safir:::get_population(iso3c)
 
-options("mc.cores" = parallel::detectCores() - 6)
+# use as many as you want normally.
+options("mc.cores" = 2)
 
 nrep <- 20
 # Scale it for speed
