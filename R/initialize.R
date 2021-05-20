@@ -1,6 +1,9 @@
-# --------------------------------------------------------------------------------
-#   
-# --------------------------------------------------------------------------------
+# --------------------------------------------------
+#   initialize event scheduling
+#   May 2021
+#   1. setup_events
+# --------------------------------------------------
+
 
 #' @title Schedule events for individuals at initialisation
 #' @export
@@ -15,7 +18,7 @@ setup_events <- function(
     # E individuals
     bset_E <- variables$states$get_index_of("E")
     if (bset_E$size() > 0) {
-        init_fn <- create_exposure_scheduler(
+        init_fn <- create_exposure_scheduler_listener(
             events = events,
             variables = variables,
             parameters = parameters,

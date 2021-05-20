@@ -1,3 +1,10 @@
+# --------------------------------------------------
+#   model categorical states
+#   May 2021
+#   1. create_state_variables
+# --------------------------------------------------
+
+
 #' @title Define model states
 #' @description
 #' Create_states creates and initialises the human states for the model
@@ -6,8 +13,8 @@
 #'
 #' @param psq the model parameters
 #'
-#' @noRd
 #' @return list of states
+#' @export
 create_state_variables <- function(psq) {
 
   # Sum up the states from squire

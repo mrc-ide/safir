@@ -1,11 +1,21 @@
+# --------------------------------------------------
+#   exposure event
+#   May 2021
+#   1. create_exposure_scheduler_listener
+# --------------------------------------------------
+
+
 #' @title Modelling the progression to either IMild or ICase
 #' @description Age dependent outcome of exposure
 #'
 #' @param events a list of events in the model
 #' @param variables the available human variables
 #' @param parameters model parameters
+#' @param dt the time step
+#' @param vaccines vaccine parameters
+#' @param shift passed to \code{\link{make_rerlang}}
 #' @noRd
-create_exposure_scheduler <- function(events, variables, parameters, dt, vaccines = NULL, shift = 0) {
+create_exposure_scheduler_listener <- function(events, variables, parameters, dt, vaccines = NULL, shift = 0) {
 
   ICase_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)

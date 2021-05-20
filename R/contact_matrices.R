@@ -1,3 +1,10 @@
+# --------------------------------------------------
+#   contact matrix
+#   May 2021
+#   1. get_contact_matrix
+# --------------------------------------------------
+
+
 #' @title Contact matrix at current timestep
 #' @description Currently only supports one contact matrix
 #' @param parameters object returned from [get_parameters]

@@ -17,17 +17,22 @@ knitr::opts_chunk$set(
 options("dplyr.summarise.inform" = FALSE)
 ```
 
-Set up our parameters for running
+Set up our parameters for running. We use a time step of 0.1 days.
 
 ```{r}
 library(safir)
+library(data.table)
+library(ggplot2)
+library(parallel)
 
-# Create our population
 iso3c <- "ATG"
 pop <- safir:::get_population(iso3c)
 
+ncores <- detectCores()-6
+
+nrep <- 20
 # Scale it for speed
-pop$n <- as.integer(pop$n / 10)
+# pop$n <- as.integer(pop$n / 10)
 
 # Create our simulation parameters
 R0 <- 2
@@ -41,175 +46,84 @@ parameters <- safir::get_parameters(
   time_period = time_period
 )
 
-
+dt <- 0.1
 ```
 
-Run our simulation
+We're going to compare it to squire. Let's run that first.
 
 ```{r}
+out <- squire::run_explicit_SEEIR_model(
+  population = pop$n,
+  country = "Antigua and Barbuda",
+  contact_matrix_set = squire::get_mixing_matrix(iso3c = "ATG"),
+  time_period = 200,
+  replicates = nrep,
+  day_return = TRUE,
+  R0 = 2,
+  dt = dt
+)
+```
 
-df <- safir::run_simulation(pop, parameters)
+Now we can run safir in parallel. Note that the timesteps is the maximum day divided by the size of the step, `dt`.
+
+```{r}
+system.time(
+  saf_reps <- mclapply(X = 1:nrep,FUN = function(x){
+    
+    timesteps <- parameters$time_period/dt
+    variables <- safir::create_variables(pop = pop, parameters = parameters)
+    events <- safir::create_events(parameters = parameters,vaccines = NULL)
+    safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
+    renderer <- individual::Render$new(timesteps)
+    processes <- list(
+      safir::infection_process(parameters = parameters,variables = variables,events = events,dt = dt,vaccines = NULL),
+      individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
+    )
+    safir::setup_events(parameters = parameters,events = events,variables = variables,dt = dt,vaccines = NULL)
+
+    individual::simulation_loop(
+      variables = variables,
+      events = events,
+      processes = processes,
+      timesteps = timesteps
+    )
+    df <- renderer$to_dataframe()
+    df$repetition <- x
+    return(df)
+  },mc.cores = ncores)
+)
+```
+
+Let's organize our data for plotting. We'll compare the 2.5th and 97.5th quantiles and median.
+
+```{r}
+saf_reps <- do.call(rbind,saf_reps)
+
+saf_dt <- as.data.table(saf_reps)
+saf_dt[, IMild_count := IMild_count + IAsymp_count]
+saf_dt[, IAsymp_count := NULL]
+saf_dt <- melt(saf_dt,id.vars = c("timestep","repetition"),variable.name = "name")
+saf_dt[, model := "safir"]
+saf_dt[, name := gsub("(^)(\\w*)(_count)", "\\2", name)]
+setnames(x = saf_dt,old = c("timestep","name","value"),new = c("t","compartment","y"))
+saf_dt[, t := t * dt]
+saf_dt <- saf_dt[, .(ymin = quantile(y,0.025), ymax = quantile(y,0.975), y = median(y)), by = .(t,compartment,model)]
+
+
+sq_dt <- as.data.table(squire::format_output(out, unique(saf_dt$compartment)))
+sq_dt[, model := "squire"]
+sq_dt <- sq_dt[, .(ymin = quantile(y,0.025), ymax = quantile(y,0.975), y = median(y)), by = .(t,compartment,model)]
 
 ```
 
 ## Plot Results
 
-```{r include=FALSE}
-# Convert to long format
-tidyr::pivot_longer(tibble::as_tibble(df), -timestep) %>% 
-ggplot2::ggplot(
-ggplot2::aes(x = timestep, y = value, group = name, colour = name)) +
-  ggplot2::geom_line(size = 0.5) +
-  ggplot2::theme_bw()
-```
-
-Does it look similar to the squire output:
+It should look nearly identical.
 
 ```{r}
-
-out <- squire::run_explicit_SEEIR_model(
-  population = pop$n, 
-  country = "Antigua and Barbuda", 
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = "ATG"),
-  time_period = 200, 
-  replicates = 10,
-  day_return = TRUE, 
-  R0 = 2, 
-  dt = 0.1
-)
-
-plot(out)
-
-```
-
-Get the actual comparative outputs. Add IAsymp to IMild for squire.
-
-```{r}
-
-saf <- df %>% 
-  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
-  dplyr::select(-IAsymp_count) %>% 
-  tidyr::pivot_longer(-timestep) %>% 
-  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
-                model = "safir") %>% 
-  dplyr::rename(t = timestep, compartment = name, y = value) %>% 
-  dplyr::select(t, compartment, y, model)
-
-sq <- squire::format_output(out, unique(saf$compartment))
-sq <- dplyr::mutate(sq, model = "squire")
-sq <- dplyr::select(sq, c("t", "compartment", "y", "model"))
-
-ggplot2::ggplot(rbind(sq, saf), ggplot2::aes(t, y, color = model)) +
-  ggplot2::geom_line() +
-  ggplot2::facet_wrap(~compartment, scales = "free")
-
-```
-
-And check this is working properly with multiple reps
-
-```{r}
-
-reps <- 10
-saf_reps <- safir::run_simulation_replicate(
-  repetitions = reps, 
-  overrides = safir:::rep_list(list("pop" = pop, "parameters" = parameters), reps)
-  )
-
-saf <- saf_reps %>% 
-  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
-  dplyr::select(-IAsymp_count) %>% 
-  tidyr::pivot_longer(-c(timestep, repetition)) %>% 
-  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
-                model = "safir") %>% 
-  dplyr::rename(t = timestep, compartment = name, y = value) %>% 
-  dplyr::select(t, compartment, y, model, repetition) %>% 
-  dplyr::group_by(t, compartment, model) %>% 
-  dplyr::summarise(ymin = min(y),
-                   ymax = max(y),
-                   y = median(y))
-
-sq <- squire::format_output(out, unique(saf$compartment))
-sq <- dplyr::mutate(sq, model = "squire") %>% 
-  dplyr::group_by(t, compartment, model) %>% 
-  dplyr::summarise(ymin = min(y),
-                   ymax = max(y),
-                   y = median(y))
-
-ggplot2::ggplot(dplyr::bind_rows(sq, saf), ggplot2::aes(t, y, color = model)) +
-  ggplot2::geom_line() +
-  ggplot2::geom_ribbon(ggplot2::aes(ymin = ymin, ymax = ymax, fill = model), alpha = 0.2) +
-  ggplot2::geom_line() +
-  ggplot2::facet_wrap(~compartment, scales = "free")
-
-```
-
-And can it recreate national fits as needed (note how much more variation there is
-when taking a smaller pop size and trying to scale it...):
-
-
-```{r}
-
-# grab the json from the data exports
-iso3c <- "GBR"
-file_path <- "https://raw.githubusercontent.com/mrc-ide/global-lmic-reports/master/"
-country <- squire::population$country[squire::population$iso3c==iso3c][1]
-json_path <- file.path(file_path,iso3c,"input_params.json")
-json <- jsonlite::read_json(json_path)
-betas <- vapply(json, "[[", FUN.VALUE = numeric(1), "beta_set")
-
-# build a 100th of UK pop for simplicity
-uk_pop <- safir:::get_population(iso3c)
-div <- 100
-uk_pop$n <- as.integer(uk_pop$n / div)
-
-# get first 365 days of fit
-uk_parameters <- safir::get_parameters(
-  population = uk_pop$n,
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = iso3c),
-  iso3c = iso3c,
-  beta_set = head(betas, 365),
-  R0 = head(betas, 365), 
-  dur_R = 365,
-  seeding_cases = 5, 
-  tt_R0 = seq_along(head(betas, 365)),
-  time_period = length(head(betas, 365))
-)
-
-# run on 4 cores
-reps <- 4
-options("mc.cores" = 2)
-saf_reps_uk <- safir::run_simulation_replicate(
-  repetitions = reps, 
-  overrides = safir:::rep_list(list("pop" = uk_pop, "parameters" = uk_parameters), reps),
-  parallel = TRUE
-  )
-
-# sort results and just filter to cumulative 
-saf <- saf_reps_uk %>% 
-  dplyr::mutate(IMild_count = IMild_count + IAsymp_count) %>% 
-  dplyr::select(-IAsymp_count) %>% 
-  tidyr::pivot_longer(-c(timestep, repetition)) %>% 
-  dplyr::mutate(name = gsub("(^)(\\w*)(_count)", "\\2", name), 
-                model = "safir") %>% 
-  dplyr::rename(t = timestep, compartment = name, y = value) %>% 
-  dplyr::select(t, compartment, y, model, repetition) %>% 
-  dplyr::filter(compartment == "D")
-
-# real deaths in the UK
-real <- data.frame(
-  "date" = as.Date(vapply(json, "[[", FUN.VALUE = character(1), "date"))[1:365], 
-  "deaths" = cumsum(vapply(json, function(x){ if(!is.null(x$deaths)) x$deaths else  0}, numeric(1))[1:365]),
-  "t" = 1:365
-)
-
-# join and plot
-dplyr::left_join(saf, real, "t") %>% 
-ggplot2::ggplot(ggplot2::aes(date, y*div, group = repetition)) +
-  ggplot2::geom_bar(ggplot2::aes(date, deaths, group = "real"), fill = "red", 
-                    stat = "identity", position=ggplot2::position_dodge(width = 0)) +
-  ggplot2::geom_line(color = "black") +
-  ggplot2::ylab("Cumulative Deaths") +
-  ggplot2::xlab("Date") +
-  ggplot2::theme_bw()
-
+ggplot(data = rbind(saf_dt,sq_dt), aes(t,y,color = model)) +
+  geom_line() +
+  geom_ribbon(ggplot2::aes(ymin = ymin, ymax = ymax, fill = model), alpha = 0.2) +
+  geom_line() +
+  facet_wrap(~compartment, scales = "free")
 ```

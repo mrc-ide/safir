@@ -1,3 +1,16 @@
+# --------------------------------------------------
+#   model variables
+#   May 2021
+#   1. create_variables
+#   2. create_age_variables
+#   3. create_continuous_age_variable
+#   4. create_discrete_age_variable
+#   5. identify_ages_to_adjust
+#   6. vcapply
+#   7. swap_ages
+# --------------------------------------------------
+
+
 #' @title Create variables
 #' @description Create all individual variables for humans
 #'
@@ -5,7 +18,7 @@
 #' @param parameters model parameters
 #'
 #' @return named list of individual::Variable
-#' @noRd
+#' @export
 create_variables <- function(pop, parameters) {
 
   c(
@@ -21,7 +34,7 @@ create_variables <- function(pop, parameters) {
 #' @param pop population list
 #' @param parameters model parameters
 #' @param continuous return both age by year and bin?
-#' @noRd
+#' 
 #' @return named list of individual::Variable
 create_age_variables <- function(pop, parameters, continuous = FALSE) {
 
@@ -49,6 +62,7 @@ create_age_variables <- function(pop, parameters, continuous = FALSE) {
   }
 }
 
+
 #' @title Continuous age variable
 #' @description Create a continuous age variable for the population
 #'
@@ -57,7 +71,7 @@ create_age_variables <- function(pop, parameters, continuous = FALSE) {
 #'
 #' @importFrom stats dexp
 #' @return continuous age variable
-#' @noRd
+#' @export
 create_continuous_age_variable <- function(pop, max_age = 100) {
 
   # get out country median ages
@@ -92,6 +106,7 @@ create_continuous_age_variable <- function(pop, max_age = 100) {
 
 }
 
+
 #' @title Discrete age variable
 #' @description Create a discrete age variable for each of the
 #' length(pop$age_group) distinct age groups
@@ -99,8 +114,8 @@ create_continuous_age_variable <- function(pop, max_age = 100) {
 #' @param ages Vector of ages from [create_continuous_age_variable]
 #' @param pop Vector of integer ages
 #'
-#' @noRd
 #' @return discrete age variable
+#' @export
 create_discrete_age_variable <- function(ages, pop) {
   # get the top end of the 5 year age bins
   age_bins <- c(get_age_bins(pop$age_group), max(ages))
@@ -124,7 +139,6 @@ get_age_bins <- function(groups) {
 }
 
 
-
 #' @title Identify ages to adjust
 #'
 #' @details Identifies age variables to be switched based on parameters object
@@ -134,8 +148,6 @@ get_age_bins <- function(groups) {
 #' @param parameters Parameters object created by \code{\link{get_parameters}}
 #' @return Returns values to swap
 #' @importFrom utils head tail
-#'
-#' @noRd
 identify_ages_to_adjust <- function(discrete_ages, parameters) {
 
   # what are the ages that have been initialised
@@ -161,6 +173,7 @@ identify_ages_to_adjust <- function(discrete_ages, parameters) {
   list(to_distribute = to_distribute, to_swap = to_swap)
 
 }
+
 
 #' @title Swap values that have been identified
 #'

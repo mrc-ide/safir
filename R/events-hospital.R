@@ -1,10 +1,20 @@
-#' @title Simulate hospitilisation flow
+# --------------------------------------------------
+#   hospitilisation scheduler listener
+#   May 2021
+#   1. create_hospital_scheduler_listener
+#   2. schedule_outcome
+#   3. allocate_treatment
+# --------------------------------------------------
+
+
+#' @title Create listener function to schedule events upon hospitilisation
 #' @description
-#' Allocated individuals to hospital resources upon arrival
+#' When the \code{hospitilisation} event fires, this listener should be called
+#' to schedule future events and state changes for those persons.
 #' @param parameters Model parameters
-#' @param states a list of all of the model states
+#' @param variables a list of all of the model variables
 #' @param events a list of all of the model events
-#' @noRd
+#' @export
 create_hospital_scheduler_listener <- function(
    parameters,
    variables,
@@ -34,7 +44,7 @@ create_hospital_scheduler_listener <- function(
         # schedule for those getting mv
         if (mv_get$size() > 0) {
             prob_death <- parameters$prob_severe_death_treatment[variables$discrete_age$get_values(mv_get)]
-            schedule_outcome_zzz(
+            schedule_outcome(
                 target = mv_get,
                 prob_successful = prob_death,
                 success_event = events$imv_get_die,
@@ -46,7 +56,7 @@ create_hospital_scheduler_listener <- function(
         mv_not_get <- need_mv$set_difference(mv_get) # need_mv should not be used after this point
         if (mv_not_get$size() > 0) {
             prob_death <- parameters$prob_severe_death_no_treatment[variables$discrete_age$get_values(mv_not_get)]
-            schedule_outcome_zzz(
+            schedule_outcome(
                 target = mv_not_get,
                 prob_successful = prob_death,
                 success_event = events$imv_not_get_die,
@@ -70,7 +80,7 @@ create_hospital_scheduler_listener <- function(
         # schedule for those getting ox
         if (ox_get$size() > 0) {
             prob_death <- parameters$prob_non_severe_death_treatment[variables$discrete_age$get_values(ox_get)]
-            schedule_outcome_zzz(
+            schedule_outcome(
                 target = ox_get,
                 prob_successful = prob_death,
                 success_event = events$iox_get_die,
@@ -82,7 +92,7 @@ create_hospital_scheduler_listener <- function(
         ox_not_get <- need_ox$set_difference(ox_get) # need_ox should not be used after this point
         if (ox_not_get$size() > 0) {
             prob_death <- parameters$prob_non_severe_death_no_treatment[variables$discrete_age$get_values(ox_not_get)]
-            schedule_outcome_zzz(
+            schedule_outcome(
                 target = ox_not_get,
                 prob_successful = prob_death,
                 success_event = events$iox_not_get_die,
@@ -97,7 +107,6 @@ create_hospital_scheduler_listener <- function(
 }
 
 
-
 #' @title Schedule outcome
 #' @description
 #' schedule individuals into follow up events based based on bernoulli draws of
@@ -106,8 +115,7 @@ create_hospital_scheduler_listener <- function(
 #' @param prob_successful the probability each target individual is successful
 #' @param success_event will be scheduled on success
 #' @param failure_event will be scheduled on failure
-#' @noRd
-schedule_outcome_zzz <- function(
+schedule_outcome <- function(
   target,
   prob_successful,
   success_event,
@@ -127,4 +135,33 @@ schedule_outcome_zzz <- function(
         failure_event$schedule(target = failure, delay = 0L)
     }
 
+}
+
+
+#' @title Allocate treatment
+#' @description
+#' sample a subset of individuals who will receive treatment. The subset is
+#' allways smaller than the limit of treatments available minus those already
+#' receiving treatment
+#' @param variables Model variables
+#' @param need_treatment a vector of individuals who need treatment
+#' @param treated_state a list states for individuals receiving treatment
+#' @param limit the number of individuals who can receive treatment
+allocate_treatment <- function(
+  variables,
+  need_treatment,
+  treated_state,
+  limit
+) {
+  # mv bed allocation
+  occupied <- variables$states$get_index_of(treated_state)
+  available <- limit - occupied$size()
+
+  # who is getting an mv from available
+  if (need_treatment$size() <= available) {
+    return(need_treatment)
+  }
+
+  get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
+  return(get_treatment)
 }

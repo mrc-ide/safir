@@ -1,4 +1,8 @@
-# vaccination needs special handling, so all states from which individuals may be vaccinated get their own processes.
+# --------------------------------------------------
+#   infection process
+#   May 2021
+#   1. infection_process
+# --------------------------------------------------
 
 
 #' @title Transitions from S
@@ -8,8 +12,10 @@
 #' @param paramaters Model parameters
 #' @param variables Model variable
 #' @param events Model events
+#' @param dt the time step
+#' @param vaccines vaccine parameters
 #' @export
-infection_process_zzz <- function(parameters, variables, events, dt, vaccines = NULL) {
+infection_process <- function(parameters, variables, events, dt, vaccines = NULL) {
 
   if (is.null(vaccines)) {
 
