@@ -4,9 +4,9 @@ test_that("create_variables returns the correct output", {
 
   pop$n <- as.integer(pop$n/10000)
   theages <- create_variables(pop, get_parameters("AFG"))
-  expect_length(length(theages$age), 1)
+  expect_length(length(theages$discrete_age), 1)
 
-  expect_length(theages$age$get_values(), sum(pop$n))
+  expect_length(theages$discrete_age$get_values(), sum(pop$n))
 
 })
 
