@@ -6,8 +6,10 @@
 \usage{
 create_events(parameters, vaccines = NULL)
 }
-\value{
-a named list of individual::Event
+\arguments{
+\item{parameters}{a named list of individual::Event}
+
+\item{vaccines}{not currently used}
 }
 \description{
 Create events

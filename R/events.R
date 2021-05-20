@@ -10,7 +10,8 @@
 
 #' @title Create events
 #'
-#' @return a named list of individual::Event
+#' @param parameters a named list of individual::Event
+#' @param vaccines not currently used
 #' @export
 create_events <- function(parameters, vaccines = NULL) {
 
