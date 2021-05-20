@@ -6,6 +6,11 @@
 
 
 #' @title Schedule events for individuals at initialisation
+#' @param parameters write me!
+#' @param events write me!
+#' @param variables write me!
+#' @param dt write me!
+#' @param vaccines write me!
 #' @export
 setup_events <- function(
     parameters,

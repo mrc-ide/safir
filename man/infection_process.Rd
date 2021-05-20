@@ -7,6 +7,8 @@
 infection_process(parameters, variables, events, dt, vaccines = NULL)
 }
 \arguments{
+\item{parameters}{Model parameters}
+
 \item{variables}{Model variable}
 
 \item{events}{Model events}
@@ -14,8 +16,6 @@ infection_process(parameters, variables, events, dt, vaccines = NULL)
 \item{dt}{the time step}
 
 \item{vaccines}{vaccine parameters}
-
-\item{paramaters}{Model parameters}
 }
 \description{
 S -> E if infected; can also become vaccinated.

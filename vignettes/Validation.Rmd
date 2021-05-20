@@ -31,7 +31,7 @@ pop <- safir:::get_population(iso3c)
 # use as many as you want normally.
 options("mc.cores" = 2)
 
-nrep <- 20
+nrep <- 10
 # Scale it for speed
 # pop$n <- as.integer(pop$n / 10)
 

@@ -10,9 +10,6 @@ identify_ages_to_adjust(discrete_ages, parameters)
 \item{discrete_ages}{discrete ages}
 
 \item{parameters}{Parameters object created by \code{\link{get_parameters}}}
-
-\item{initial_values}{Vector of inital values from with variables object
-created by \code{\link{create_variables}}}
 }
 \value{
 Returns values to swap

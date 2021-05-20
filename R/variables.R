@@ -143,8 +143,6 @@ get_age_bins <- function(groups) {
 #'
 #' @details Identifies age variables to be switched based on parameters object
 #' @param discrete_ages discrete ages
-#' @param initial_values Vector of inital values from with variables object
-#'   created by \code{\link{create_variables}}
 #' @param parameters Parameters object created by \code{\link{get_parameters}}
 #' @return Returns values to swap
 #' @importFrom utils head tail

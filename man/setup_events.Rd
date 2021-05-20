@@ -6,6 +6,17 @@
 \usage{
 setup_events(parameters, events, variables, dt, vaccines = NULL)
 }
+\arguments{
+\item{parameters}{write me!}
+
+\item{events}{write me!}
+
+\item{variables}{write me!}
+
+\item{dt}{write me!}
+
+\item{vaccines}{write me!}
+}
 \description{
 Schedule events for individuals at initialisation
 }

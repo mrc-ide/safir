@@ -9,7 +9,7 @@
 #'
 #' @description S -> E if infected; can also become vaccinated.
 #'
-#' @param paramaters Model parameters
+#' @param parameters Model parameters
 #' @param variables Model variable
 #' @param events Model events
 #' @param dt the time step
