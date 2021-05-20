@@ -28,7 +28,7 @@ library(parallel)
 iso3c <- "ATG"
 pop <- safir:::get_population(iso3c)
 
-ncores <- detectCores()-6
+options("mc.cores" = parallel::detectCores() - 6)
 
 nrep <- 20
 # Scale it for speed
@@ -90,7 +90,7 @@ system.time(
     df <- renderer$to_dataframe()
     df$repetition <- x
     return(df)
-  },mc.cores = ncores)
+  })
 )
 ```
 
