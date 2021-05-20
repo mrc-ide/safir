@@ -8,7 +8,7 @@
 #' @param paramaters Model parameters
 #' @param variables Model variable
 #' @param events Model events
-#' @noRd
+#' @export
 infection_process_zzz <- function(parameters, variables, events, dt, vaccines = NULL) {
 
   if (is.null(vaccines)) {
@@ -28,7 +28,7 @@ infection_process_zzz <- function(parameters, variables, events, dt, vaccines = 
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)
-          lambda <- parameters$beta[1L + as.integer(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          lambda <- parameters$beta[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
 
           # Transition from S to E
           susceptible <- variables$states$get_index_of("S")

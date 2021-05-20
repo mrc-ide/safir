@@ -3,6 +3,7 @@
 # --------------------------------------------------------------------------------
 
 #' @title Schedule events for individuals at initialisation
+#' @export
 setup_events <- function(
     parameters,
     events,
@@ -168,7 +169,7 @@ setup_events <- function(
     }
 
     # R
-    if (is.finite(paramaters$dur_R)) {
+    if (is.finite(parameters$dur_R)) {
         bset_R <- variables$states$get_index_of("R")
         if (bset_R$size() > 0){
             init_fn <- create_event_scheduler_listener(

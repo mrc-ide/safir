@@ -1,8 +1,8 @@
 #' @title Create events
 #'
 #' @return a named list of individual::Event
-#' @noRd
-create_events_zzz <- function(parameters, vaccines = FALSE) {
+#' @export
+create_events_zzz <- function(parameters, vaccines = NULL) {
 
     # pop size
     N <- sum(parameters$population)
@@ -65,7 +65,7 @@ create_state_update_listener <- function(states, destination) {
 #' @param events a list of events in the model
 #' @param parameters the model parameters
 #' @param dt size of time step
-#' @noRd
+#' @export
 attach_event_listeners_zzz <- function(
   variables,
   events,
@@ -308,7 +308,7 @@ attach_event_listeners_zzz <- function(
         )
     )
 
-    if (is.finite(paramaters$dur_R)) {
+    if (is.finite(parameters$dur_R)) {
         events$recovery$add_listener(
             create_event_scheduler_listener(
                 event = events$immunity_loss,
