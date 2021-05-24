@@ -3,7 +3,7 @@
 #' @description calculating the FOI and infection process
 #'
 #' @param paramaters Model parameters
-#' @param varaibles Model variable
+#' @param variables Model variable
 #' @param events Model events
 #' @noRd
 infection_process <- function(parameters, variables, events) {
@@ -19,7 +19,7 @@ infection_process <- function(parameters, variables, events) {
       inf_ages <- tabulate(ages, nbins = parameters$N_age)
 
       # Calculate FoI and use to create probability for each age group
-      m <- get_contact_matrix(parameters$mix_mat_set)
+      m <- get_contact_matrix(parameters)
 
       lambda <- parameters$beta[timestep] * rowSums(m %*% diag(inf_ages))
 
@@ -33,12 +33,11 @@ infection_process <- function(parameters, variables, events) {
       prob_infection  <- 1 - exp(-lambda)
 
       # infected
-      infected <- bernoulli_multi_p(prob_infection)
+      susceptible$sample(rate = prob_infection)
 
-      # if infections then
-      if(sum(infected) > 0) {
-        to_infect <- individual::filter_bitset(susceptible, which(infected))
-        events$exposure$schedule(to_infect, delay = 0)
+      # newly infecteds queue the exposure event
+      if (susceptible$size() > 0) {
+        events$exposure$schedule(susceptible, delay = 0)
       }
     }
   }

@@ -1,8 +1,15 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
 Version: 0.1.0
-Authors@R: c(person("OJ", "Watson", role = c("aut", "cre"),
+Authors@R: c(person(given = "OJ", family = "Watson", role = c("aut", "cre"),
                     email = "o.watson15@imperial.ac.uk"),
+            person(
+                given = "Sean L.",
+                family = "Wu",
+                role = c('aut'),
+                comment = c(ORCID = "0000-0002-5781-9493"),
+                email = 'slwood89@gmail.com'
+            ),
              person("Imperial College of Science, Technology and Medicine",
                     role = "cph"))
 Description: Implements an individual-based model of COVID-19 transmission.
@@ -23,7 +30,8 @@ Suggests:
     rvest,
     knitr,
     rmarkdown,
-    jsonlite
+    jsonlite,
+    data.table
 Imports:
     individual (>= 0.1.0),
     Rcpp,

@@ -1,3 +1,16 @@
+# --------------------------------------------------
+#   model parameters
+#   May 2021
+#   1. get_parameters
+#   2. get_population
+#   3. get_country
+#   4. get_asymptomatic
+#   5. interp_vector_constant
+#   6. interp_matrix_list_constant
+#   7. interp_input_par
+# --------------------------------------------------
+
+
 #' @title Get parameters from squire model
 #'
 #' @inheritParams squire::parameters_explicit_SEEIR
@@ -51,6 +64,7 @@ get_parameters <- function(iso3c = NULL,
 
 }
 
+
 #' @title Get population from SQUIRE model
 #' @description rounds population sizes to discrete numbers
 #'
@@ -60,10 +74,12 @@ get_population <- function(iso3c) {
   squire::get_population(iso3c = iso3c, simple_SEIR = FALSE)
 }
 
+
 #' @noRd
 get_country <- function(iso3c) {
   squire::population[squire::population$iso3c == iso3c, "country"][[1]]
 }
+
 
 #' Function to add asymptomatic information
 #'
@@ -84,6 +100,7 @@ get_asymptomatic <- function() {
 
 }
 
+
 #' @noRd
 interp_vector_constant <- function(x, y, by = 1, end = max(x)) {
 
@@ -101,6 +118,7 @@ interp_vector_constant <- function(x, y, by = 1, end = max(x)) {
   return(yout$y)
 
 }
+
 
 #' @noRd
 interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
