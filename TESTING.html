@@ -94,6 +94,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="articles/CodeDesign.html">Code Design</a>
+    </li>
+    <li>
       <a href="articles/Validation.html">Comparison</a>
     </li>
   </ul>
@@ -251,9 +254,9 @@
   <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_population.html">get_population</a></span><span class="op">(</span><span class="st">"ATG"</span><span class="op">)</span>
   <span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span> <span class="co"># reduce population size for speed</span>
   <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_parameters.html">get_parameters</a></span><span class="op">(</span><span class="st">"ATG"</span><span class="op">)</span>
-  <span class="va">events</span> <span class="op">&lt;-</span> <span class="fu">create_events</span><span class="op">(</span><span class="op">)</span>
+  <span class="va">events</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/create_events.html">create_events</a></span><span class="op">(</span><span class="op">)</span>
   <span class="va">states</span> <span class="op">&lt;-</span> <span class="fu">create_states</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span>
-  <span class="va">variables</span> <span class="op">&lt;-</span> <span class="fu">create_variables</span><span class="op">(</span><span class="va">pop</span>, <span class="va">parameters</span><span class="op">)</span>
+  <span class="va">variables</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/create_variables.html">create_variables</a></span><span class="op">(</span><span class="va">pop</span>, <span class="va">parameters</span><span class="op">)</span>
   <span class="va">human</span> <span class="op">&lt;-</span> <span class="fu">create_human</span><span class="op">(</span><span class="va">states</span>, <span class="va">variables</span>, <span class="va">events</span><span class="op">)</span>
 
   <span class="co"># Integrate the events and the listeners</span>
@@ -289,7 +292,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by OJ Watson.</p>
+  <p>Developed by OJ Watson, Sean L. Wu.</p>
 </div>
 
 <div class="pkgdown">
