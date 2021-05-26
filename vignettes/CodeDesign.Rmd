@@ -33,3 +33,33 @@ Most of the simulation updates state by TargetedEvents. When a targeted event fi
   2. state updates - these are functions like `create_state_update_listener` which update state when the event fires (`create_infection_update_listener` in original code).
 
 There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.
+
+## Vaccination
+
+### State representation
+
+A straightforward way to track vaccines is this. Let `max_vaxx` be the maximum number of doses people will receive (assumed to be 2). For each dose two pieces of information must be stored, the time it was given and the type (for mixed dosing regimens).
+
+  1. `IntegerVariable[max_vaxx]`: stores the time each dose is given.
+  2. `CategoricalVariable[max_vaxx]`: store the type of vaccine for each dose.
+  
+### Transitions & scheduling
+
+The `vaccination_process()` function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is "at risk" of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only "at risk" of vaccination?) we do the normal binomial draw.
+
+In [nimue](https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L404) the code that handles how vaccines are allocated works like below:
+
+```{r,eval=FALSE}
+vr_temp[] <- S[i,1] * vaccination_target[i] + E1[i,1] * vaccination_target[i] + E2[i,1] * vaccination_target[i] + R1[i,1] * vaccination_target[i] + R2[i,1] * vaccination_target[i]
+dim(vr_temp) <- N_age
+# Catch so vaccination rate does not exceed 1 if the number of people available for vaccination < number of vaccines
+vr_den <- if(sum(vr_temp) <= mv) mv else sum(vr_temp)
+vr <- if(mv == 0) 0 else mv / vr_den  # Vaccination rate to achieve capacity given number in vaccine-eligible population
+```
+
+How it works:
+  
+  1. `mv` is interpolated from input, it's the maximum number of vaccines which can be given out in a day, so if there are more people to vaccinate than `mv`, it's the rate at which vaccines are distributed. If there are fewer people to vaccinate than `mv`, then the rate at which vaccines would be given out would be lower than `mv`.
+  2. `vr_temp` is the total number of individuals in each age group (its dimension is `N_age`) who are eligible to get vaccines at that instant.
+  3. `vr` will be `mv / vr_den` if there are more people to vaccinate than the maximum number of vaccines that can be given out that day then it's (`vr`) the proportion of those eligible who will get them. If there's fewer people to vaccinate than the maximum number of vaccines that can be given out that day then `vr` will be capped at 1.
+

@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{create_variables}
 \alias{create_variables}
-\title{Create variables}
+\title{Create age & state variables}
 \usage{
 create_variables(pop, parameters)
 }
@@ -15,5 +15,5 @@ create_variables(pop, parameters)
 named list of individual::Variable
 }
 \description{
-Create all individual variables for humans
+Create all age & state variables for simulated population
 }

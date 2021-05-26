@@ -1,5 +1,5 @@
 # --------------------------------------------------
-#   model variables
+#   state and age variables
 #   May 2021
 #   1. create_variables
 #   2. create_age_variables
@@ -11,8 +11,8 @@
 # --------------------------------------------------
 
 
-#' @title Create variables
-#' @description Create all individual variables for humans
+#' @title Create age & state variables
+#' @description Create all age & state variables for simulated population
 #'
 #' @param pop population list
 #' @param parameters model parameters
@@ -34,7 +34,7 @@ create_variables <- function(pop, parameters) {
 #' @param pop population list
 #' @param parameters model parameters
 #' @param continuous return both age by year and bin?
-#' 
+#'
 #' @return named list of individual::Variable
 create_age_variables <- function(pop, parameters, continuous = FALSE) {
 

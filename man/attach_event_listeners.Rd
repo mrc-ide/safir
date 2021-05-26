@@ -4,7 +4,14 @@
 \alias{attach_event_listeners}
 \title{Attach listeners to events}
 \usage{
-attach_event_listeners(variables, events, parameters, dt)
+attach_event_listeners(
+  variables,
+  events,
+  parameters,
+  dt,
+  shift = 1L,
+  shift_exposure = 1L
+)
 }
 \arguments{
 \item{variables}{list of variables in the model}
@@ -14,6 +21,10 @@ attach_event_listeners(variables, events, parameters, dt)
 \item{parameters}{the model parameters}
 
 \item{dt}{size of time step}
+
+\item{shift}{schedule future events after minimum number of time step delay}
+
+\item{shift_exposure}{schedule exposure event after minimum number of time step delay}
 }
 \description{
 defines processes for events that can be scheduled in the future

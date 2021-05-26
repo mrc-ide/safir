@@ -13,6 +13,7 @@ safir is an individual-based simulation model of COVD-19 based on squire.
 
 Authors:
 \itemize{
+  \item Peter Winskill \email{p.winskill@imperial.ac.uk}
   \item Sean L. Wu \email{slwood89@gmail.com} (\href{https://orcid.org/0000-0002-5781-9493}{ORCID})
 }
 
