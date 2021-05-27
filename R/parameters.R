@@ -139,7 +139,7 @@ interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
 #' Interpolate input parameters
 #'
 #' @details Constant interpolation of time changing parameters
-#' @param x Time points for [y] changing
+#' @param x Time points for \code{y} changing
 #' @param y Object to be interpolated
 #' @param by Time steps to interpolate at. Default = 1
 #' @param end End time point for interpoation. Default = \code{max(x)}

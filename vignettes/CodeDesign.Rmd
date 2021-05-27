@@ -63,3 +63,46 @@ How it works:
   2. `vr_temp` is the total number of individuals in each age group (its dimension is `N_age`) who are eligible to get vaccines at that instant.
   3. `vr` will be `mv / vr_den` if there are more people to vaccinate than the maximum number of vaccines that can be given out that day then it's (`vr`) the proportion of those eligible who will get them. If there's fewer people to vaccinate than the maximum number of vaccines that can be given out that day then `vr` will be capped at 1.
 
+It would make sense to calculate things in **safir** as closely as possible to this setup. How would this work in practice? `vaccine_process()` would have to do something like this:
+
+  1. which age groups should be targeted for vaccination by using the targeting matrix; could be more or less the same as [nimue](https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L393): 
+      ```{r,eval=FALSE} 
+      # Isolate age groups below current target coverage which must be targeted
+      vaccination_target_mat[,] <- if(pr[j] < vaccine_coverage_mat[i,j]) 1 else 0
+      ```
+  2. for each age group that should be targeted get the number that haven't been vaccinated yet, in nimue it's simple
+      ```{r,eval=FALSE}
+      vr_temp[] <- S[i,1] * vaccination_target[i] + E1[i,1] * vaccination_target[i] + E2[i,1] * vaccination_target[i] + R1[i,1] * vaccination_target[i] + R2[i,1] * vaccination_target[i]
+      dim(vr_temp) <- N_age
+      ```
+      In our case we'd want to do something likewise but with the state variables in eligible age groups. Lots of bitset and operations, return the sum.
+  3. In the simple vaccination model now we can just get the bitset that is the union of *everyone* who is eligible from step 2, that's every single individual       who is eligible this time step.
+  4. calculate the per-capita rate `vr` similarly, use this for those people given by the bitset in step 3 to do the draws for state transition.
+
+This gives us a vaccination distribution module that looks like the one from **nimue**.
+
+### Prioritization
+
+One thing is that **nimue** doesn't think about how many doses a person was given. When they're vaccinated, they transition to the vaccinated compartment and that's it. We need to worry about that in **safir**.
+
+Let's try to figure out what we're up against.
+
+  * we have a mixed array of vaccines at our disposal, J&J and others only need 1 dose, Pfizer, Moderna, etc. need 2 doses.
+  * the prioritization matrix doesn't know about doses.
+
+How can we make sense of this? We have a few options. Here's one reasonable starting point.
+
+  * For each vaccine type that has >1 dose, we have a priotiziation matrix for each dose (store as array for efficiency).
+  * the prioritization step is shared between the 2 matrices, that is before we move to the next prioritization step, the targets in both (all) matrices need to be fulfilled.
+  * we also need some sort of rule to figure out how many of the available daily doses each day should be apportioned to first vs. second dose individuals. One thing to do is to prioritize second dose individuals (which by definition would have already recieved a first dose previously) and allocate the leftover to newly arriving first dosers. this is probably closer to how it works in reality, as 2nd doses are more or less guaranteed whereas 1st doses can sometimes be acquired via "walk ups". The 2nd dose matrix should probably be interpreted as "of those who are eligible for 2nd dose, how many need to actually recieve them?"
+  * for vaccines like J&J, just use the current single matrix setup.
+  * each vaccine will have its own vector of availability each day.
+  
+That sounds good but there's some problems. The biggest one is this one, how do we figure out who will get vaccinated? What I mean is this, in **nimue**, because its an ODE model, the stochastic version would assume that S people (for example) are "at risk" of becoming infected *or* vaccinated with hazards equal to `lambda` and `vr`, respectively. To duplicate such behavior in **safir** is a bit of work, especially with respect to figuring out how to apportion the vaccination rate to different groups, and doses, etc. But the easier path, which would be to assign vaccine doses seperately, mean it would be posssible for someone to be both vaccinated and become infected on a time step, which is explicitly *not allowed* in **nimue** because the paths out of S(V0) are mutually exclusive. If we let both happen, we have a stochastic model that no longer will look like **nimue**.
+
+If we put in the hard work, what are we left with?
+
+  * on a time step, we can calculate `vr` normally, by summing everyone who is eligible (both for 1st and 2nd dose).
+  * distribute the rate to 1st dosers vs. 2nd dosers based on some rule.
+
+So the question is, do we work with rates and have models that are self-consistent but harder to reason about, or do we work with integer number of vaccinations but end up with inconsistent models?
