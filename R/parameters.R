@@ -32,10 +32,12 @@ get_parameters <- function(iso3c = NULL,
     contact_matrix_set <- squire::get_mixing_matrix(iso3c = iso3c)
   }
 
+  country <- get_country(iso3c)
+
   # Get squire parameters
   pars <- squire::parameters_explicit_SEEIR(
         population = population,
-        country = get_country(iso3c),
+        country = country,
         contact_matrix_set = contact_matrix_set,
         dt = 1, # dt should always be 1 as individual is always a discrete time
         time_period = time_period,
@@ -60,10 +62,130 @@ get_parameters <- function(iso3c = NULL,
     c(pars$beta_set, tail(pars$beta_set, 1))
   )
 
+  pars$country <- country
+
   return(pars)
 
 }
 
+
+#' @title Append vaccine parameters from nimue model
+#' @description This calls \code{\link[nimue]{parameters}} from \href{https://mrc-ide.github.io/nimue/index.html}{nimue}
+#' and appends the following parameters to the list:
+#'
+#'     * \code{gamma_vaccine_delay}: mean duration of period from vaccination to vaccine protection.
+#'     * \code{gamma_V}: mean duration of vaccine-derived immunity (days)
+#'     * \code{rel_infectiousness_vaccinated}: Relative infectiousness per age category of vaccinated individuals relative to unvaccinated individuals. Default = rep(1, 17), which is no impact of vaccination on onwards transmissions
+#'     * \code{rel_infectiousness}: Relative infectiousness per age category relative to maximum infectiousness category. Default = rep(1, 17)
+#'     * \code{vaccine_efficacy_infection}: Efficacy of vaccine against infection. This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.
+#'     * \code{prob_hosp}: Efficacy of vaccine against severe (requiring hospitilisation) disease (by age). This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce the probability of hospitalisation by 100 percent, an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.
+#'     * \code{vaccine_coverage_mat}: Vaccine coverage targets by age (columns) and priority (row)
+#'     * \code{N_prioritisation_steps}: number of vaccine prioritization levels
+#'     * \code{current_prioritisation_step}: current prioritization step we are on
+#'     * \code{vaccine_set}: vaccines available each day of simulation
+#' @param parameters list from [get_parameters]
+#' @param ... Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}, if specifying these parameters, be aware that \code{tt_vaccine_efficacy_infection,tt_vaccine_efficacy_disease} should not be set because safir does not currently model time varying versions of these parameters
+#' @export
+append_vaccine_nimue <- function(parameters, ...) {
+
+  nimue_pars <- call_nimue_pars(country = parameters$country, ...)
+
+  stopifnot(all(dim(nimue_pars$vaccine_efficacy_infection) == c(1,17,6)))
+  stopifnot(all(dim(nimue_pars$prob_hosp) == c(1,17,6)))
+
+  parameters$gamma_vaccine_delay <- 1 / (nimue_pars$gamma_vaccine[2] / 2)
+  parameters$gamma_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
+  parameters$rel_infectiousness_vaccinated <- nimue_pars$rel_infectiousness_vaccinated
+  parameters$rel_infectiousness <- nimue_pars$rel_infectiousness
+  parameters$vaccine_efficacy_infection <- nimue_pars$vaccine_efficacy_infection
+  parameters$prob_hosp <- nimue_pars$prob_hosp
+  parameters$vaccine_coverage_mat <- nimue_pars$vaccine_coverage_mat
+  parameters$N_prioritisation_steps <- nimue_pars$N_prioritisation_steps
+  parameters$current_prioritisation_step <- 1L
+
+  parameters$vaccine_set <- interp_input_par(
+    c(nimue_pars$tt_vaccine, parameters$time_period),
+    c(nimue_pars$max_vaccine, tail(nimue_pars$max_vaccine, 1))
+  )
+
+  return(parameters)
+}
+
+
+#' @noRd
+call_nimue_pars <- function(
+    country,
+    # durations
+    dur_E  = nimue:::durs$dur_E,
+    dur_IMild = nimue:::durs$dur_IMild,
+    dur_ICase = nimue:::durs$dur_ICase,
+    # hospital durations
+    dur_get_ox_survive = nimue:::durs$dur_get_ox_survive,
+    dur_get_ox_die = nimue:::durs$dur_get_ox_die,
+    dur_not_get_ox_survive = nimue:::durs$dur_not_get_ox_survive,
+    dur_not_get_ox_die = nimue:::durs$dur_not_get_ox_die,
+    dur_get_mv_survive = nimue:::durs$dur_get_mv_survive,
+    dur_get_mv_die = nimue:::durs$dur_get_mv_die,
+    dur_not_get_mv_survive = nimue:::durs$dur_not_get_mv_survive,
+    dur_not_get_mv_die = nimue:::durs$dur_not_get_mv_die,
+    dur_rec = nimue:::durs$dur_rec,
+    # vaccine
+    dur_R = nimue:::vaccine_pars$dur_R,
+    dur_V = nimue:::vaccine_pars$dur_V,
+    vaccine_efficacy_infection = nimue:::vaccine_pars$vaccine_efficacy_infection,
+    tt_vaccine_efficacy_infection = nimue:::vaccine_pars$tt_vaccine_efficacy_infection,
+    vaccine_efficacy_disease = nimue:::vaccine_pars$vaccine_efficacy_disease,
+    tt_vaccine_efficacy_disease = nimue:::vaccine_pars$tt_vaccine_efficacy_disease,
+    max_vaccine = nimue:::vaccine_pars$max_vaccine,
+    tt_vaccine = nimue:::vaccine_pars$tt_vaccine,
+    dur_vaccine_delay = nimue:::vaccine_pars$dur_vaccine_delay,
+    vaccine_coverage_mat = nimue:::vaccine_pars$vaccine_coverage_mat,
+    # health system capacity
+    hosp_bed_capacity = NULL,
+    ICU_bed_capacity = NULL,
+    tt_hosp_beds = 0,
+    tt_ICU_beds = 0,
+    # misc
+    seeding_cases = 20,
+    seeding_age_order = NULL
+) {
+  nimue:::parameters(
+    country = country,
+    # durations
+    dur_E  = dur_E,
+    dur_IMild = dur_IMild,
+    dur_ICase = dur_ICase,
+    # hospital durations
+    dur_get_ox_survive = dur_get_ox_survive,
+    dur_get_ox_die = dur_get_ox_die,
+    dur_not_get_ox_survive = dur_not_get_ox_survive,
+    dur_not_get_ox_die = dur_not_get_ox_die,
+    dur_get_mv_survive = dur_get_mv_survive,
+    dur_get_mv_die = dur_get_mv_die,
+    dur_not_get_mv_survive = dur_not_get_mv_survive,
+    dur_not_get_mv_die = dur_not_get_mv_die,
+    dur_rec = dur_rec,
+    # vaccine
+    dur_R = dur_R,
+    dur_V = dur_V,
+    vaccine_efficacy_infection = vaccine_efficacy_infection,
+    tt_vaccine_efficacy_infection = tt_vaccine_efficacy_infection,
+    vaccine_efficacy_disease = vaccine_efficacy_disease,
+    tt_vaccine_efficacy_disease = tt_vaccine_efficacy_disease,
+    max_vaccine = max_vaccine,
+    tt_vaccine = tt_vaccine,
+    dur_vaccine_delay = dur_vaccine_delay,
+    vaccine_coverage_mat = vaccine_coverage_mat,
+    # health system capacity
+    hosp_bed_capacity = hosp_bed_capacity,
+    ICU_bed_capacity = ICU_bed_capacity,
+    tt_hosp_beds = tt_hosp_beds,
+    tt_ICU_beds = tt_ICU_beds,
+    # misc
+    seeding_cases = seeding_cases,
+    seeding_age_order = seeding_age_order
+  )
+}
 
 #' @title Get population from SQUIRE model
 #' @description rounds population sizes to discrete numbers

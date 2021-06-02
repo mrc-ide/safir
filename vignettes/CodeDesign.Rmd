@@ -104,5 +104,6 @@ If we put in the hard work, what are we left with?
 
   * on a time step, we can calculate `vr` normally, by summing everyone who is eligible (both for 1st and 2nd dose).
   * distribute the rate to 1st dosers vs. 2nd dosers based on some rule.
+  * this is actually nicer for modeling hesistancy, because we could in theory do something like sample numbers with mean of 1 to model relative hesitancy/willingness.
 
 So the question is, do we work with rates and have models that are self-consistent but harder to reason about, or do we work with integer number of vaccinations but end up with inconsistent models?

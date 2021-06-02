@@ -44,6 +44,4 @@ Imports:
     magrittr
 Depends: 
     R (>= 2.10)
-RcppModules: 
-    individual_cpp
 VignetteBuilder: knitr
