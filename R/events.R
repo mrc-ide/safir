@@ -10,10 +10,10 @@
 
 #' @title Create events
 #'
-#' @param parameters a named list of individual::Event
+#' @param parameters write me!
 #' @param vaccines not currently used
 #' @export
-create_events <- function(parameters, vaccines = NULL) {
+create_events <- function(parameters) {
 
     # pop size
     N <- sum(parameters$population)

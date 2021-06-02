@@ -27,6 +27,7 @@ create_vaccine_variables_nimue <- function(variables, pop) {
   variables$vaccinated <- individual::Bitset$new(size = n)
   variables$eligible <- individual::Bitset$new(size = n)
   variables$empty <- individual::Bitset$new(size = n)
+  variables$vr <- 0
 
   return(variables)
 }
