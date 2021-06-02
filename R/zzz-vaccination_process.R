@@ -46,9 +46,11 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
     # set who is eligible
     variables$eligible$or(SER)
 
-    # needs to compute
-    # 1. number of vaccines that can be given out today (vaccine rate * dt), because vaccine rate is in
-    #    numbers of doses/day
-    # 2.
+    mv <- parameters$vaccine_set[ceiling(timestep * dt)]
+
+    vr_den <- variables$eligible$size()
+    vr <- ifelse(mv <= 0, 0, min(mv/vr_den, 1))
+
+
   }
 }

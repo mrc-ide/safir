@@ -97,16 +97,22 @@ append_vaccine_nimue <- function(parameters, ...) {
   parameters$gamma_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
   parameters$rel_infectiousness_vaccinated <- nimue_pars$rel_infectiousness_vaccinated
   parameters$rel_infectiousness <- nimue_pars$rel_infectiousness
-  parameters$vaccine_efficacy_infection <- nimue_pars$vaccine_efficacy_infection
-  parameters$prob_hosp <- nimue_pars$prob_hosp
   parameters$vaccine_coverage_mat <- nimue_pars$vaccine_coverage_mat
   parameters$N_prioritisation_steps <- nimue_pars$N_prioritisation_steps
   parameters$current_prioritisation_step <- 1L
 
   parameters$vaccine_set <- interp_input_par(
-    c(nimue_pars$tt_vaccine, parameters$time_period),
-    c(nimue_pars$max_vaccine, tail(nimue_pars$max_vaccine, 1))
+    x = c(nimue_pars$tt_vaccine, parameters$time_period),
+    y = c(nimue_pars$max_vaccine, tail(nimue_pars$max_vaccine, 1))
   )
+
+  parameters$prob_hosp <- interp_input_par(
+    x = c(nimue_pars$tt_vaccine_efficacy_disease, parameters$time_period),
+    y = c(nimue_pars$prob_hosp, tail(nimue_pars$prob_hosp, 1))
+  )
+
+  # parameters$vaccine_efficacy_infection <- nimue_pars$vaccine_efficacy_infection
+  # parameters$prob_hosp <- nimue_pars$prob_hosp
 
   return(parameters)
 }
@@ -254,6 +260,39 @@ interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
   yout <- array(unlist(rep_mats), dim = c(dim(y[[1]]), length(xout)))
 
   return(yout)
+
+}
+
+# Browse[2]> tt_vaccine_efficacy_disease <<- nimue_pars$tt_vaccine_efficacy_disease
+# Browse[2]> prob_hosp <<- nimue_pars$prob_hosp
+# Browse[2]> tt_vaccine_efficacy_infection <<- nimue_pars$tt_vaccine_efficacy_infection
+# Browse[2]> vaccine_efficacy_infection <<- nimue_pars$vaccine_efficacy_infection
+
+
+#' @noRd
+interp_nimue_array <- function(x, y, by = 1, end = max(x) + 1) {
+  stopifnot(inherits(y, "array"))
+  stopifnot(length(dim(y)) == 3)
+  stopifnot(dim(y)[2] == 17)
+  stopifnot(dim(y)[3] == 6)
+  stopifnot(dim(y)[1] >= 1)
+
+  # create the time series
+  if (length(x) > 1) {
+    x_all <- c(x[-length(x)], end)
+  } else {
+    x_all <- c(x, end)
+  }
+
+  xout <- seq(1, end, 1)
+  yout <- array(data = NA,dim = c(length(xout),dim(y)[-1]))
+
+  xdiffs <- diff(x_all)
+  for (i in 1:6) {
+    for (j in seq_along(xdiffs)) {
+      yout[(x_all+1)[j]:x_all[j+1], , i] <- do.call(rbind,replicate(n = xdiffs[j],expr = y[j,,i],simplify = FALSE))
+    }
+  }
 
 }
 
