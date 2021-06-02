@@ -20,7 +20,6 @@ create_exposure_scheduler_listener <- function(events, variables, parameters, dt
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
-
   return(
     function(timestep, to_move) {
 

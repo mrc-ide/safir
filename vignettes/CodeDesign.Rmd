@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(DiagrammeR)
 ```
 
 It's nice to know how the code works. Let's keep a diary of sorts as we work on this.
@@ -107,3 +108,76 @@ If we put in the hard work, what are we left with?
   * this is actually nicer for modeling hesistancy, because we could in theory do something like sample numbers with mean of 1 to model relative hesitancy/willingness.
 
 So the question is, do we work with rates and have models that are self-consistent but harder to reason about, or do we work with integer number of vaccinations but end up with inconsistent models?
+
+## **nimue** style vaccination
+
+### Infection process `infection_process_nimue`
+
+We'll go with a function that uses a calculated `vr` akin to the original **nimue** model but allows vaccination and infection to occur in a single time step. Normally, this would make a model that's pretty inconsistent with the stochastic interpretation of the deterministic model but I think in this case we got lucky. Here's why.
+
+```{r,echo=F}
+graph <-
+  create_graph() %>%
+  add_node(label = "S_{0}") %>%
+  add_node(label = "S_{1}") %>%
+  add_node(label = "E1_{0}") %>%
+  add_node(label = "E1_{1}")
+
+graph <-
+  graph %>%
+  set_node_position(
+    node = 1,
+    x = 0.5, y = 1) %>%
+  set_node_position(
+    node = 2,
+    x = 2, y = 1) %>%
+  set_node_position(
+    node = 3,
+    x = 0.5, y = 0) %>%
+  set_node_position(
+    node = 4,
+    x = 2, y = 0)
+
+graph <- 
+  graph %>%
+  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="vaccination")) %>%
+  add_edge(from = 3, to = 4, edge_aes = edge_aes(label="vaccination")) %>%
+  add_edge(from = 1, to = 3, edge_aes = edge_aes(label="infection (v0)")) %>%
+  add_edge(from = 2, to = 4, edge_aes = edge_aes(label="infection (v1)")) %>%
+  add_edge(from = 1, to = 4, edge_aes = edge_aes(label="infection + vaccinated",style="dashed"))
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```
+
+Here's why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let's consider **safir** to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination's protective effect doesn't kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn't matter. It's still not going to make sense as $\Delta t \to 0$ but it will be a pretty good approximation.
+
+### What needs to be done
+
+Needs to schedule events:
+  1. `infection_process_nimue`
+  2. new listener for exposure, like `create_exposure_scheduler_listener`. It would need to only schedule new vaccinations for those who have not already been vaccinated, and are eligible.
+  3. new listener for recovery `create_recovery_vaccination_listener` or the like
+  
+Need to set up event progression for vaccines.
+
+It looks like this right now
+
+```{r,eval=F}
+  events$v0_to_v1v2 = individual::TargetedEvent$new(N) # scheduled when vaccination occurs
+  events$v1v2_to_v3v4 = individual::TargetedEvent$new(N) # scheduled when entering v1v2
+  events$v3v4_to_v5 = individual::TargetedEvent$new(N) # scheduled when entering v3v4
+```
+
+```{r,echo=F}
+graph <-
+  create_graph() %>%
+  add_node(label = "V0") %>% set_node_position(node=1,x=1,y=4) %>%
+  add_node(label = "V1,V2") %>% set_node_position(node=2,x=1,y=3) %>%
+  add_node(label = "V3,V4") %>% set_node_position(node=3,x=1,y=2) %>%
+  add_node(label = "V5") %>% set_node_position(node=4,x=1,y=1) %>%
+  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="occurs at (S,E,R) vaccination")) %>%
+  add_edge(from=2,to=3, edge_aes = edge_aes(label="event scheduled")) %>%
+  add_edge(from=3,to=4, edge_aes = edge_aes(label="event scheduled"))
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```

@@ -2,6 +2,8 @@
 #'
 #' @description S -> E if infected; can also become vaccinated. This incorporates
 #' the slightly more complex force of infection calculation from the nimue model.
+#' This function assumes an individual can become infected and vaccinated in a
+#' time step.
 #'
 #' @param parameters Model parameters
 #' @param variables Model variable
@@ -12,11 +14,10 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
   return(
 
-    # process without vaccination
     function(timestep) {
 
+      # infection
       infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
-
       if (infectious$size() > 0) {
 
         # Group infection by age
@@ -33,8 +34,6 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
         # FoI for each susceptible person
         lambda <- lambda[ages]
-
-        # infected
         susceptible$sample(rate = pexp(q = lambda * dt))
 
         # newly infecteds queue the exposure event
@@ -43,7 +42,21 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
         }
 
       }
-    }
 
-  )
+      # vaccination
+      if (variables$eligible$size() > 0) {
+
+        vaccinated <- variables$eligible$copy()
+        vaccinated$sample(rate = pexp(q = variables$vr * dt))
+
+        if (vaccinated$size() > 0) {
+          events$v0_to_v1v2$schedule(vaccinated, delay = 0)
+        }
+
+      }
+
+
+    } # end function
+
+  ) # return
 }
