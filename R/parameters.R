@@ -73,25 +73,23 @@ get_parameters <- function(iso3c = NULL,
 #' @description This calls \code{\link[nimue]{parameters}} from \href{https://mrc-ide.github.io/nimue/index.html}{nimue}
 #' and appends the following parameters to the list:
 #'
-#'     * \code{gamma_vaccine_delay}: mean duration of period from vaccination to vaccine protection.
-#'     * \code{gamma_V}: mean duration of vaccine-derived immunity (days)
-#'     * \code{rel_infectiousness_vaccinated}: Relative infectiousness per age category of vaccinated individuals relative to unvaccinated individuals. Default = rep(1, 17), which is no impact of vaccination on onwards transmissions
-#'     * \code{rel_infectiousness}: Relative infectiousness per age category relative to maximum infectiousness category. Default = rep(1, 17)
-#'     * \code{vaccine_efficacy_infection}: Efficacy of vaccine against infection. This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.
-#'     * \code{prob_hosp}: Efficacy of vaccine against severe (requiring hospitilisation) disease (by age). This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce the probability of hospitalisation by 100 percent, an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.
-#'     * \code{vaccine_coverage_mat}: Vaccine coverage targets by age (columns) and priority (row)
-#'     * \code{N_prioritisation_steps}: number of vaccine prioritization levels
-#'     * \code{current_prioritisation_step}: current prioritization step we are on
-#'     * \code{vaccine_set}: vaccines available each day of simulation
+#'  * gamma_vaccine_delay: mean duration of period from vaccination to vaccine protection.
+#'  * gamma_V: mean duration of vaccine-derived immunity (days)
+#'  * rel_infectiousness_vaccinated: Relative infectiousness per age category of vaccinated individuals relative to unvaccinated individuals. Default = rep(1, 17), which is no impact of vaccination on onwards transmissions
+#'  * rel_infectiousness: Relative infectiousness per age category relative to maximum infectiousness category. Default = rep(1, 17)
+#'  * vaccine_efficacy_infection: Efficacy of vaccine against infection. This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.
+#'  * prob_hosp: Efficacy of vaccine against severe (requiring hospitilisation) disease (by age). This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce the probability of hospitalisation by 100 percent, an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.
+#'  * vaccine_coverage_mat: Vaccine coverage targets by age (columns) and priority (row)
+#'  * N_prioritisation_steps: number of vaccine prioritization levels
+#'  * current_prioritisation_step: current prioritization step we are on
+#'  * vaccine_set: vaccines available each day of simulation
+#'
 #' @param parameters list from [get_parameters]
-#' @param ... Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}, if specifying these parameters, be aware that \code{tt_vaccine_efficacy_infection,tt_vaccine_efficacy_disease} should not be set because safir does not currently model time varying versions of these parameters
+#' @param ... Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}
 #' @export
 append_vaccine_nimue <- function(parameters, ...) {
 
   nimue_pars <- call_nimue_pars(country = parameters$country, ...)
-
-  stopifnot(all(dim(nimue_pars$vaccine_efficacy_infection) == c(1,17,6)))
-  stopifnot(all(dim(nimue_pars$prob_hosp) == c(1,17,6)))
 
   parameters$gamma_vaccine_delay <- 1 / (nimue_pars$gamma_vaccine[2] / 2)
   parameters$gamma_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
@@ -106,13 +104,15 @@ append_vaccine_nimue <- function(parameters, ...) {
     y = c(nimue_pars$max_vaccine, tail(nimue_pars$max_vaccine, 1))
   )
 
-  parameters$prob_hosp <- interp_input_par(
+  parameters$prob_hosp <- interp_nimue_array(
     x = c(nimue_pars$tt_vaccine_efficacy_disease, parameters$time_period),
-    y = c(nimue_pars$prob_hosp, tail(nimue_pars$prob_hosp, 1))
+    y = nimue_pars$prob_hosp
   )
 
-  # parameters$vaccine_efficacy_infection <- nimue_pars$vaccine_efficacy_infection
-  # parameters$prob_hosp <- nimue_pars$prob_hosp
+  parameters$vaccine_efficacy_infection <- interp_nimue_array(
+    x = c(nimue_pars$tt_vaccine_efficacy_infection, parameters$time_period),
+    y = nimue_pars$vaccine_efficacy_infection
+  )
 
   return(parameters)
 }
@@ -294,6 +294,7 @@ interp_nimue_array <- function(x, y, by = 1, end = max(x) + 1) {
     }
   }
 
+  return(yout)
 }
 
 
