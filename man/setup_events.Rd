@@ -4,7 +4,7 @@
 \alias{setup_events}
 \title{Schedule events for individuals at initialisation}
 \usage{
-setup_events(parameters, events, variables, dt, vaccines = NULL)
+setup_events(parameters, events, variables, dt)
 }
 \arguments{
 \item{parameters}{write me!}
@@ -14,8 +14,6 @@ setup_events(parameters, events, variables, dt, vaccines = NULL)
 \item{variables}{write me!}
 
 \item{dt}{write me!}
-
-\item{vaccines}{write me!}
 }
 \description{
 Schedule events for individuals at initialisation

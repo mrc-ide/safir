@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Schedule events for individuals at initialisation — setup_events • safir</title>
+<title>Get proportion of an age group that is vaccinated — get_proportion_vaccinated • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Schedule events for individuals at initialisation — setup_events" />
-<meta property="og:description" content="Schedule events for individuals at initialisation" />
+<meta property="og:title" content="Get proportion of an age group that is vaccinated — get_proportion_vaccinated" />
+<meta property="og:description" content="Get proportion of an age group that has received a particular vaccine dose
+by this timestep." />
 
 
 
@@ -118,35 +119,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Schedule events for individuals at initialisation</h1>
+    <h1>Get proportion of an age group that is vaccinated</h1>
     
-    <div class="hidden name"><code>setup_events.Rd</code></div>
+    <div class="hidden name"><code>get_proportion_vaccinated.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Schedule events for individuals at initialisation</p>
+    <p>Get proportion of an age group that has received a particular vaccine dose
+by this timestep.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setup_events</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>events</span>, <span class='va'>variables</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_proportion_vaccinated</span><span class='op'>(</span><span class='va'>variables</span>, <span class='va'>timestep</span>, <span class='va'>age</span>, <span class='va'>dose</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>write me!</p></td>
-    </tr>
-    <tr>
-      <th>events</th>
-      <td><p>write me!</p></td>
-    </tr>
-    <tr>
       <th>variables</th>
-      <td><p>write me!</p></td>
+      <td><p>a list</p></td>
     </tr>
     <tr>
-      <th>dt</th>
-      <td><p>write me!</p></td>
+      <th>timestep</th>
+      <td><p>the current time step</p></td>
+    </tr>
+    <tr>
+      <th>age</th>
+      <td><p>an age group (can be a vector of Multiple age groups)</p></td>
+    </tr>
+    <tr>
+      <th>dose</th>
+      <td><p>which dose to get proportion of age group who has received it</p></td>
     </tr>
     </table>
 

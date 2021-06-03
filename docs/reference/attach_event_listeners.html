@@ -127,7 +127,14 @@
     <p>defines processes for events that can be scheduled in the future</p>
     </div>
 
-    <pre class="usage"><span class='fu'>attach_event_listeners</span><span class='op'>(</span><span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>parameters</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>attach_event_listeners</span><span class='op'>(</span>
+  <span class='va'>variables</span>,
+  <span class='va'>events</span>,
+  <span class='va'>parameters</span>,
+  <span class='va'>dt</span>,
+  shift <span class='op'>=</span> <span class='fl'>1L</span>,
+  shift_exposure <span class='op'>=</span> <span class='fl'>1L</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,6 +154,14 @@
     <tr>
       <th>dt</th>
       <td><p>size of time step</p></td>
+    </tr>
+    <tr>
+      <th>shift</th>
+      <td><p>schedule future events after minimum number of time step delay</p></td>
+    </tr>
+    <tr>
+      <th>shift_exposure</th>
+      <td><p>schedule exposure event after minimum number of time step delay</p></td>
     </tr>
     </table>
 

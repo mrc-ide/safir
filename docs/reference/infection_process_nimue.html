@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Schedule events for individuals at initialisation — setup_events • safir</title>
+<title>Infection process (nimue vaccine model) — infection_process_nimue • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Schedule events for individuals at initialisation — setup_events" />
-<meta property="og:description" content="Schedule events for individuals at initialisation" />
+<meta property="og:title" content="Infection process (nimue vaccine model) — infection_process_nimue" />
+<meta property="og:description" content="This samples infection events in the susceptible population. This incorporates
+the slightly more complex force of infection calculation from the nimue model." />
 
 
 
@@ -118,35 +119,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Schedule events for individuals at initialisation</h1>
+    <h1>Infection process (nimue vaccine model)</h1>
     
-    <div class="hidden name"><code>setup_events.Rd</code></div>
+    <div class="hidden name"><code>infection_process_nimue.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Schedule events for individuals at initialisation</p>
+    <p>This samples infection events in the susceptible population. This incorporates
+the slightly more complex force of infection calculation from the nimue model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setup_events</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>events</span>, <span class='va'>variables</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>infection_process_nimue</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>parameters</th>
-      <td><p>write me!</p></td>
-    </tr>
-    <tr>
-      <th>events</th>
-      <td><p>write me!</p></td>
+      <td><p>Model parameters</p></td>
     </tr>
     <tr>
       <th>variables</th>
-      <td><p>write me!</p></td>
+      <td><p>Model variable</p></td>
+    </tr>
+    <tr>
+      <th>events</th>
+      <td><p>Model events</p></td>
     </tr>
     <tr>
       <th>dt</th>
-      <td><p>write me!</p></td>
+      <td><p>the time step</p></td>
     </tr>
     </table>
 

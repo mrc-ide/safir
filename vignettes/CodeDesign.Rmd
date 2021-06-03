@@ -118,10 +118,10 @@ We'll go with a function that uses a calculated `vr` akin to the original **nimu
 ```{r,echo=F}
 graph <-
   create_graph() %>%
-  add_node(label = "S_{0}") %>%
-  add_node(label = "S_{1}") %>%
-  add_node(label = "E1_{0}") %>%
-  add_node(label = "E1_{1}")
+  add_node(label = "S@_{0}") %>%
+  add_node(label = "S@_{1}") %>%
+  add_node(label = "E1@_{0}") %>%
+  add_node(label = "E1@_{1}")
 
 graph <-
   graph %>%
@@ -138,13 +138,15 @@ graph <-
     node = 4,
     x = 2, y = 0)
 
+edgefontsize <- 5
+
 graph <- 
   graph %>%
-  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="vaccination")) %>%
-  add_edge(from = 3, to = 4, edge_aes = edge_aes(label="vaccination")) %>%
-  add_edge(from = 1, to = 3, edge_aes = edge_aes(label="infection (v0)")) %>%
-  add_edge(from = 2, to = 4, edge_aes = edge_aes(label="infection (v1)")) %>%
-  add_edge(from = 1, to = 4, edge_aes = edge_aes(label="infection + vaccinated",style="dashed"))
+  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="vaccination",fontsize = edgefontsize)) %>%
+  add_edge(from = 3, to = 4, edge_aes = edge_aes(label="vaccination",fontsize = edgefontsize)) %>%
+  add_edge(from = 1, to = 3, edge_aes = edge_aes(label="infection (v0)",fontsize = edgefontsize)) %>%
+  add_edge(from = 2, to = 4, edge_aes = edge_aes(label="infection (v1)",fontsize = edgefontsize)) %>%
+  add_edge(from = 1, to = 4, edge_aes = edge_aes(label="infection+vaccinated",style="dashed",fontsize = edgefontsize))
 
 render_graph(graph, layout = "neato",width = 600,height = 500)
 ```
@@ -181,3 +183,12 @@ graph <-
 
 render_graph(graph, layout = "neato",width = 600,height = 500)
 ```
+
+### Data structures
+
+There are some new data structures stored in the list `variables`.
+
+  * `vaccine_states`: a IntegerVariable where 1 = v0, 2 = v1,v2, 3 = v3,v4, 4 = v5. It's an integer variable and not categorical because we need to store integers for fast subsetting of probability vectors and matrices that depend on vaccine status (see `infection_process_nimue` for example).
+  * `eligible`: a bitset of individuals who are eligible for vaccination, used in `vaccination_process_nimue`
+  * `vaccinated`: gets set when someone goes from state 1 = v0 to 2 = v1,v2
+  * `empty`: used to quickly empty the `eligible` bitset, see `vaccination_process_nimue`.

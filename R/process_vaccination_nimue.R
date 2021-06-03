@@ -45,9 +45,6 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
         vaccination_target <- vaccination_target_mat[current_index, ]
 
-        # calculate the current per-capita rate of vaccination
-        unvaccinated <- variables$vaccinated$not()
-
         # clear out eligible
         variables$eligible$and(variables$empty)
 
@@ -56,8 +53,9 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
           SER$and(variables$discrete_age$get_index_of(a))
         }
 
-        # set who is eligible: SER people in an age group in this priority step
+        # set who is eligible: SER people in an age group in this priority step AND unvaccinated
         variables$eligible$or(SER)
+        variables$eligible$and(variables$vaccinated$not())
 
         # calc rate of vaccination now
         vr_den <- variables$eligible$size()

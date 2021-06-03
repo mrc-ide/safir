@@ -53,8 +53,8 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
         submat[, 2] <- ages
         submat[, 3] <- sus_vaxx
 
-        lambda <- lambda[ages] * parameters$vaccine_efficacy_infection[submat]
-        susceptible$sample(rate = pexp(q = lambda * dt))
+        foi <- lambda[ages] * parameters$vaccine_efficacy_infection[submat]
+        susceptible$sample(rate = pexp(q = foi * dt))
 
         # newly infected persons queue the exposure event
         if (susceptible$size() > 0) {

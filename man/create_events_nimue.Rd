@@ -2,17 +2,15 @@
 % Please edit documentation in R/events_vaccination_nimue.R
 \name{create_events_nimue}
 \alias{create_events_nimue}
-\title{Create events}
+\title{Append vaccination events (nimue vaccine model)}
 \usage{
-create_events_nimue(events, parameters, vaccines = NULL)
+create_events_nimue(events, parameters)
 }
 \arguments{
 \item{events}{a named list of individual::Event}
 
 \item{parameters}{write me!}
-
-\item{vaccines}{not currently used}
 }
 \description{
-Create events
+Append vaccination events (nimue vaccine model)
 }

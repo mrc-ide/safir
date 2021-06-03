@@ -10,14 +10,12 @@
 #' @param events write me!
 #' @param variables write me!
 #' @param dt write me!
-#' @param vaccines write me!
 #' @export
 setup_events <- function(
     parameters,
     events,
     variables,
-    dt,
-    vaccines = NULL
+    dt
 ) {
 
     # E individuals
@@ -27,8 +25,7 @@ setup_events <- function(
             events = events,
             variables = variables,
             parameters = parameters,
-            dt = dt,
-            vaccines = vaccines
+            dt = dt
         )
         init_fn(timestep = 1, to_move = bset_E)
     }
