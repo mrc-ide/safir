@@ -83,10 +83,7 @@ create_v1v2_to_v3v4_listener_nimue <- function(variables, events, parameters, fu
 #' @param variables a named list of variables
 #' @param events a named list of individual::Event
 #' @param parameters the parameters
-#' @param func function to draw waiting times from
-#' @param shift number of time steps to shift scheduled event by
-#' @param dt size of time step
-create_v3v4_to_v5_listener_nimue <- function(variables, events, parameters, func, shift, dt) {
+create_v3v4_to_v5_listener_nimue <- function(variables, events, parameters) {
 
   stopifnot(all(nimue_events_names %in% names(events)))
   stopifnot(all(nimue_states_names %in% names(variables)))
@@ -98,6 +95,56 @@ create_v3v4_to_v5_listener_nimue <- function(variables, events, parameters, func
 }
 
 
+#' @title Attach listeners to events (nimue vaccine model)
+#' @description defines processes for events that can be scheduled in the future
+#'
+#' @param variables list of variables in the model
+#' @param events a list of events in the model
+#' @param parameters the model parameters
+#' @param dt size of time step
+#' @param shift schedule future events after minimum number of time step delay
+#' @param shift_exposure schedule exposure event after minimum number of time step delay
+#' @export
+attach_listeners_nimue <- function(
+  variables,
+  events,
+  parameters,
+  dt,
+  shift = 1L
+) {
 
-attach_listeners_nimue <- function() {}
+  # vaccination (v0 -> v1,v2) ------------------------------
+  events$v0_to_v1v2$add_listener(
+    create_v0_to_v1v2_listener_nimue(
+      variables = variables,
+      events = events,
+      parameters = parameters,
+      func = make_rerlang,
+      shift = shift,
+      dt = dt
+    )
+  )
+
+  # start of vaccine protection (v1,v2 -> v3,v4) ------------------------------
+  events$v1v2_to_v3v4$add_listener(
+    create_v1v2_to_v3v4_listener_nimue(
+      variables = variables,
+      events = events,
+      parameters = parameters,
+      func = make_rerlang,
+      shift = shift,
+      dt = dt
+    )
+  )
+
+  # decay of vaccine protection (v3,v4 -> v5) ------------------------------
+  events$v3v4_to_v5$add_listener(
+    create_v3v4_to_v5_listener_nimue(
+      variables = variables,
+      events = events,
+      parameters = parameters
+    )
+  )
+
+}
 
