@@ -22,7 +22,8 @@ create_vaccine_variables_nimue <- function(variables, pop) {
 
   n <- sum(pop$n)
 
-  variables$vaccine_state <- individual::CategoricalVariable$new(categories = c("v0","v1v2","v3v4","v5"),initial_values = rep("v0",n))
+  # variables$vaccine_state <- individual::CategoricalVariable$new(categories = c("v0","v1v2","v3v4","v5"),initial_values = rep("v0",n))
+  variables$vaccine_states <- individual::IntegerVariable$new(initial_values = rep(1,n))
   variables$time <- individual::IntegerVariable$new(initial_values = rep(-1,n))
   variables$vaccinated <- individual::Bitset$new(size = n)
   variables$eligible <- individual::Bitset$new(size = n)

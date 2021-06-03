@@ -42,9 +42,6 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
       variables$vr <- vr
 
-    } else {
-      variables$eligible$and(variables$empty)
-      variables$vr <- 0
     }
 
   }

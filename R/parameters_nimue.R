@@ -22,7 +22,7 @@ append_vaccine_nimue <- function(parameters, ...) {
 
   parameters$gamma_vaccine_delay <- 1 / (nimue_pars$gamma_vaccine[2] / 2)
   parameters$gamma_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
-  parameters$rel_infectiousness_vaccinated <- nimue_pars$rel_infectiousness_vaccinated
+  parameters$rel_infectiousness_vaccinated <- nimue_pars$rel_infectiousness_vaccinated[,-c(3,5)]
   parameters$rel_infectiousness <- nimue_pars$rel_infectiousness
   parameters$vaccine_coverage_mat <- nimue_pars$vaccine_coverage_mat
   parameters$N_prioritisation_steps <- nimue_pars$N_prioritisation_steps

@@ -176,8 +176,8 @@ graph <-
   add_node(label = "V3,V4") %>% set_node_position(node=3,x=1,y=2) %>%
   add_node(label = "V5") %>% set_node_position(node=4,x=1,y=1) %>%
   add_edge(from = 1, to = 2, edge_aes = edge_aes(label="occurs at (S,E,R) vaccination")) %>%
-  add_edge(from=2,to=3, edge_aes = edge_aes(label="event scheduled")) %>%
-  add_edge(from=3,to=4, edge_aes = edge_aes(label="event scheduled"))
+  add_edge(from=2,to=3, edge_aes = edge_aes(label="event scheduled (gamma_vaccine_delay)")) %>%
+  add_edge(from=3,to=4, edge_aes = edge_aes(label="event scheduled (gamma_V)"))
 
 render_graph(graph, layout = "neato",width = 600,height = 500)
 ```
