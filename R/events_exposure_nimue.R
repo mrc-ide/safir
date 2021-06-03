@@ -49,11 +49,11 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
       if (not_hosp$size() > 0) {
 
         ages <- variables$discrete_age$get_values(not_hosp)
-        vaxx <- variables$vaccine_states$get_values(not_hosp)
-        submat[, 2] <- ages
-        submat[, 3] <- vaxx
+        # vaxx <- variables$vaccine_states$get_values(not_hosp)
+        # submat[, 2] <- ages
+        # submat[, 3] <- vaxx
 
-        prob_asymp <- parameters$prob_asymp[submat]
+        prob_asymp <- parameters$prob_asymp[ages]
 
         to_asymp <- not_hosp$copy()
         to_asymp$sample(prob_asymp)
