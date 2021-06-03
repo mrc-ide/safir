@@ -105,7 +105,7 @@ create_v3v4_to_v5_listener_nimue <- function(variables, events, parameters) {
 #' @param shift schedule future events after minimum number of time step delay
 #' @param shift_exposure schedule exposure event after minimum number of time step delay
 #' @export
-attach_listeners_nimue <- function(
+attach_event_listeners_nimue <- function(
   variables,
   events,
   parameters,

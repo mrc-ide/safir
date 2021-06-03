@@ -3,7 +3,7 @@
 export("%>%")
 export(append_vaccine_nimue)
 export(attach_event_listeners)
-export(attach_listeners_nimue)
+export(attach_event_listeners_nimue)
 export(create_continuous_age_variable)
 export(create_discrete_age_variable)
 export(create_event_scheduler_listener)
