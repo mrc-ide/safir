@@ -4,14 +4,7 @@
 \alias{create_v3v4_to_v5_listener_nimue}
 \title{Create listener for decay of vaccine protection (nimue vaccine model)}
 \usage{
-create_v3v4_to_v5_listener_nimue(
-  variables,
-  events,
-  parameters,
-  func,
-  shift,
-  dt
-)
+create_v3v4_to_v5_listener_nimue(variables, events, parameters)
 }
 \arguments{
 \item{variables}{a named list of variables}
@@ -19,12 +12,6 @@ create_v3v4_to_v5_listener_nimue(
 \item{events}{a named list of individual::Event}
 
 \item{parameters}{the parameters}
-
-\item{func}{function to draw waiting times from}
-
-\item{shift}{number of time steps to shift scheduled event by}
-
-\item{dt}{size of time step}
 }
 \description{
 Create listener for decay of vaccine protection (nimue vaccine model)
