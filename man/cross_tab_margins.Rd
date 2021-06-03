@@ -11,12 +11,18 @@ cross_tab_margins(a, b, a_margin, b_margin)
 
 \item{b}{another set of observations}
 
-\item{a_margin}{margins for a (rows)}
+\item{a_margin}{number of distinct values of a (rows)}
 
-\item{b_margin}{margins for b (cols)}
+\item{b_margin}{number of distinct values of b (cols)}
 }
 \description{
 this is a replacement for \code{\link[base]{table}} that allows empty
 cells because the margins have been specified. The input vectors \code{a} and \code{b}
 must be the same length, this function does no argument checking.
+}
+\examples{
+a <- 1:5
+b <- c(1,2,3,1,2)
+cross_tab_margins(a,b,5,3)
+table(a,b)
 }

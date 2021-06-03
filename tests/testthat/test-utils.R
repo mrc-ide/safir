@@ -25,8 +25,8 @@ test_that("remove_non_numerics removes characters and characters of arrays", {
 
 test_that("cross tab works", {
 
-  a_mar <- 1:4
-  b_mar <- 1:3
+  a_mar <- 4
+  b_mar <- 3
 
   a <- c(1,2,3,4,1,2,3,4)
   b <- c(1,1,1,2,2,2,3,3)

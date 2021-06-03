@@ -6,15 +6,15 @@
 using namespace Rcpp;
 
 // cross_tab_margins
-Rcpp::IntegerMatrix cross_tab_margins(const Rcpp::IntegerVector& a, const Rcpp::IntegerVector& b, const Rcpp::IntegerVector& a_margin, const Rcpp::IntegerVector& b_margin);
+Rcpp::IntegerMatrix cross_tab_margins(const Rcpp::IntegerVector& a, const Rcpp::IntegerVector& b, const int a_margin, const int b_margin);
 RcppExport SEXP _safir_cross_tab_margins(SEXP aSEXP, SEXP bSEXP, SEXP a_marginSEXP, SEXP b_marginSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type a(aSEXP);
     Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type b(bSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type a_margin(a_marginSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type b_margin(b_marginSEXP);
+    Rcpp::traits::input_parameter< const int >::type a_margin(a_marginSEXP);
+    Rcpp::traits::input_parameter< const int >::type b_margin(b_marginSEXP);
     rcpp_result_gen = Rcpp::wrap(cross_tab_margins(a, b, a_margin, b_margin));
     return rcpp_result_gen;
 END_RCPP

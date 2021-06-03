@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_vaccination_nimue.R
 \name{vaccination_process_nimue}
 \alias{vaccination_process_nimue}
-\title{Vaccination process  (nimue vaccine model)}
+\title{Vaccination process (nimue vaccine model)}
 \usage{
 vaccination_process_nimue(parameters, variables, events, dt)
 }

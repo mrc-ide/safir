@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------------
 
 
-#' @title Vaccination process  (nimue vaccine model)
+#' @title Vaccination process (nimue vaccine model)
 #'
 #' @description This samples vaccination events (if there are vaccines available that day)
 #' for individuals in S, E, R states.

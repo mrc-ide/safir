@@ -7,8 +7,13 @@
 #' must be the same length, this function does no argument checking.
 #' @param a one set of observations
 #' @param b another set of observations
-#' @param a_margin margins for a (rows)
-#' @param b_margin margins for b (cols)
+#' @param a_margin number of distinct values of a (rows)
+#' @param b_margin number of distinct values of b (cols)
+#' @examples
+#' a <- 1:5
+#' b <- c(1,2,3,1,2)
+#' cross_tab_margins(a,b,5,3)
+#' table(a,b)
 #' @export
 cross_tab_margins <- function(a, b, a_margin, b_margin) {
     .Call('_safir_cross_tab_margins', PACKAGE = 'safir', a, b, a_margin, b_margin)

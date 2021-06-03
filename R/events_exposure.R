@@ -5,7 +5,7 @@
 # --------------------------------------------------
 
 
-#' @title Modelling the progression to either IMild or ICase
+#' @title Modelling the progression to either IMild, ICase, IAsymp
 #' @description Age dependent outcome of exposure
 #'
 #' @param events a list of events in the model

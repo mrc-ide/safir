@@ -12,8 +12,8 @@
 Rcpp::IntegerMatrix cross_tab_margins(
     const Rcpp::IntegerVector& a,
     const Rcpp::IntegerVector& b,
-    const Rcpp::IntegerVector& a_margin,
-    const Rcpp::IntegerVector& b_margin
+    const int a_margin,
+    const int b_margin
 );
 
 #endif

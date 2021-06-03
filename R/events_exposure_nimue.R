@@ -5,7 +5,7 @@
 # --------------------------------------------------
 
 
-#' @title Modelling the progression to either IMild or ICase
+#' @title Modelling the progression to either IMild, ICase, IAsymp (nimue vaccine model)
 #' @description Age dependent outcome of exposure
 #'
 #' @param events a list of events in the model
@@ -16,6 +16,11 @@
 #' @noRd
 create_exposure_scheduler_listener_nimue <- function(events, variables, parameters, dt, shift = 0) {
 
+  stopifnot(length(dim(parameters$prob_hosp)) == 3)
+  stopifnot(dim(parameters$prob_hosp)[2] == 17)
+  stopifnot(dim(parameters$prob_hosp)[3] == 4)
+  stopifnot(all(c("discrete_age", "vaccine_states") %in% names(variables)))
+
   ICase_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
@@ -23,8 +28,15 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   return(
     function(timestep, to_move) {
 
-      disc_ages <- variables$discrete_age$get_values(to_move)
-      prob_hosp <- parameters$prob_hosp[disc_ages]
+      ages <- variables$discrete_age$get_values(to_move)
+      vaxx <- variables$vaccine_states$get_values(to_move)
+
+      submat <- matrix(data = NA,nrow = to_move$size(),ncol = 3)
+      submat[, 1] <- ceiling(timestep * dt)
+      submat[, 2] <- ages
+      submat[, 3] <- vaxx
+
+      prob_hosp <- parameters$prob_hosp[submat]
       hosp <- to_move$copy()
 
       hosp$sample(prob_hosp)
@@ -35,8 +47,13 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
       }
 
       if (not_hosp$size() > 0) {
-        disc_ages <- variables$discrete_age$get_values(not_hosp)
-        prob_asymp <- parameters$prob_asymp[disc_ages]
+
+        ages <- variables$discrete_age$get_values(not_hosp)
+        vaxx <- variables$vaccine_states$get_values(not_hosp)
+        submat[, 2] <- ages
+        submat[, 3] <- vaxx
+
+        prob_asymp <- parameters$prob_asymp[submat]
 
         to_asymp <- not_hosp$copy()
         to_asymp$sample(prob_asymp)

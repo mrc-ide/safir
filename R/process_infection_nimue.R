@@ -26,6 +26,8 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
       if (infectious$size() > 0) {
 
+        day <- ceiling(timestep * dt)
+
         susceptible <- variables$states$get_index_of("S")
 
         # infection by vaccine status
@@ -35,19 +37,26 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
         ages <- variables$discrete_age$get_values(infectious)
 
         # compute cross tab for relative infectiousness, multiply by that matrix, and sum it out
-        inf_age_vax <- cross_tab_margins(a = ages,b = inf_vaxx,a_margin = 1:17,b_margin = 1:4)
+        inf_age_vax <- cross_tab_margins(a = ages,b = inf_vaxx,a_margin = 17,b_margin = 4)
         inf_ages <- rowSums(inf_age_vax * parameters$rel_infectiousness_vaccinated)
 
         # calculate FoI for each age group
         m <- get_contact_matrix(parameters)
-        lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages) %*% diag(parameters$rel_infectiousness))
+        lambda <- parameters$beta_set[day] * rowSums(m %*% diag(inf_ages) %*% diag(parameters$rel_infectiousness))
 
         # FoI for each susceptible person
+        sus_vaxx <- variables$vaccine_states$get_values(index = susceptible)
         ages <- variables$discrete_age$get_values(susceptible)
-        lambda <- lambda[ages]
+
+        submat <- matrix(data = NA,nrow = susceptible$size(),ncol = 3)
+        submat[, 1] <- day
+        submat[, 2] <- ages
+        submat[, 3] <- sus_vaxx
+
+        lambda <- lambda[ages] * parameters$vaccine_efficacy_infection[submat]
         susceptible$sample(rate = pexp(q = lambda * dt))
 
-        # newly infecteds queue the exposure event
+        # newly infected persons queue the exposure event
         if (susceptible$size() > 0) {
           events$exposure$schedule(susceptible, delay = 0)
         }
