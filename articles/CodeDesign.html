@@ -72,7 +72,8 @@
 
       
 
-      </header><script src="CodeDesign_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="CodeDesign_files/header-attrs-2.6/header-attrs.js"></script><script src="CodeDesign_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="CodeDesign_files/viz-1.8.2/viz.js"></script><link href="CodeDesign_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="CodeDesign_files/grViz-binding-1.0.6.9000/grViz.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Code Design</h1>
@@ -99,11 +100,119 @@ end</code></pre>
 <li>state updates - these are functions like <code>create_state_update_listener</code> which update state when the event fires (<code>create_infection_update_listener</code> in original code).</li>
 </ol>
 <p>There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.</p>
+<div id="vaccination" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vaccination" class="anchor"></a>Vaccination</h2>
+<div id="state-representation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#state-representation" class="anchor"></a>State representation</h3>
+<p>A straightforward way to track vaccines is this. Let <code>max_vaxx</code> be the maximum number of doses people will receive (assumed to be 2). For each dose two pieces of information must be stored, the time it was given and the type (for mixed dosing regimens).</p>
+<ol style="list-style-type: decimal">
+<li>
+<code>IntegerVariable[max_vaxx]</code>: stores the time each dose is given.</li>
+<li>
+<code>CategoricalVariable[max_vaxx]</code>: store the type of vaccine for each dose.</li>
+</ol>
+</div>
+<div id="transitions-scheduling" class="section level3">
+<h3 class="hasAnchor">
+<a href="#transitions-scheduling" class="anchor"></a>Transitions &amp; scheduling</h3>
+<p>The <code>vaccination_process()</code> function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is “at risk” of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only “at risk” of vaccination?) we do the normal binomial draw.</p>
+<p>In <a href="https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L404">nimue</a> the code that handles how vaccines are allocated works like below:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">vr_temp</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">S</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
+<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">N_age</span>
+<span class="co"># Catch so vaccination rate does not exceed 1 if the number of people available for vaccination &lt; number of vaccines</span>
+<span class="va">vr_den</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">mv</span><span class="op">)</span> <span class="va">mv</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span>
+<span class="va">vr</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">mv</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="fl">0</span> <span class="kw">else</span> <span class="va">mv</span> <span class="op">/</span> <span class="va">vr_den</span>  <span class="co"># Vaccination rate to achieve capacity given number in vaccine-eligible population</span></code></pre></div>
+<p>How it works:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code>mv</code> is interpolated from input, it’s the maximum number of vaccines which can be given out in a day, so if there are more people to vaccinate than <code>mv</code>, it’s the rate at which vaccines are distributed. If there are fewer people to vaccinate than <code>mv</code>, then the rate at which vaccines would be given out would be lower than <code>mv</code>.</li>
+<li>
+<code>vr_temp</code> is the total number of individuals in each age group (its dimension is <code>N_age</code>) who are eligible to get vaccines at that instant.</li>
+<li>
+<code>vr</code> will be <code>mv / vr_den</code> if there are more people to vaccinate than the maximum number of vaccines that can be given out that day then it’s (<code>vr</code>) the proportion of those eligible who will get them. If there’s fewer people to vaccinate than the maximum number of vaccines that can be given out that day then <code>vr</code> will be capped at 1.</li>
+</ol>
+<p>It would make sense to calculate things in <strong>safir</strong> as closely as possible to this setup. How would this work in practice? <code>vaccine_process()</code> would have to do something like this:</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>which age groups should be targeted for vaccination by using the targeting matrix; could be more or less the same as <a href="https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L393">nimue</a>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Isolate age groups below current target coverage which must be targeted</span>
+<span class="va">vaccination_target_mat</span><span class="op">[</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">pr</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">vaccine_coverage_mat</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></code></pre></div>
+</li>
+<li>
+<p>for each age group that should be targeted get the number that haven’t been vaccinated yet, in nimue it’s simple</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">vr_temp</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">S</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
+<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">N_age</span></code></pre></div>
+<p>In our case we’d want to do something likewise but with the state variables in eligible age groups. Lots of bitset and operations, return the sum.</p>
+</li>
+<li><p>In the simple vaccination model now we can just get the bitset that is the union of <em>everyone</em> who is eligible from step 2, that’s every single individual who is eligible this time step.</p></li>
+<li><p>calculate the per-capita rate <code>vr</code> similarly, use this for those people given by the bitset in step 3 to do the draws for state transition.</p></li>
+</ol>
+<p>This gives us a vaccination distribution module that looks like the one from <strong>nimue</strong>.</p>
+</div>
+<div id="prioritization" class="section level3">
+<h3 class="hasAnchor">
+<a href="#prioritization" class="anchor"></a>Prioritization</h3>
+<p>One thing is that <strong>nimue</strong> doesn’t think about how many doses a person was given. When they’re vaccinated, they transition to the vaccinated compartment and that’s it. We need to worry about that in <strong>safir</strong>.</p>
+<p>Let’s try to figure out what we’re up against.</p>
+<ul>
+<li>we have a mixed array of vaccines at our disposal, J&amp;J and others only need 1 dose, Pfizer, Moderna, etc. need 2 doses.</li>
+<li>the prioritization matrix doesn’t know about doses.</li>
+</ul>
+<p>How can we make sense of this? We have a few options. Here’s one reasonable starting point.</p>
+<ul>
+<li>For each vaccine type that has &gt;1 dose, we have a priotiziation matrix for each dose (store as array for efficiency).</li>
+<li>the prioritization step is shared between the 2 matrices, that is before we move to the next prioritization step, the targets in both (all) matrices need to be fulfilled.</li>
+<li>we also need some sort of rule to figure out how many of the available daily doses each day should be apportioned to first vs. second dose individuals. One thing to do is to prioritize second dose individuals (which by definition would have already recieved a first dose previously) and allocate the leftover to newly arriving first dosers. this is probably closer to how it works in reality, as 2nd doses are more or less guaranteed whereas 1st doses can sometimes be acquired via “walk ups”. The 2nd dose matrix should probably be interpreted as “of those who are eligible for 2nd dose, how many need to actually recieve them?”</li>
+<li>for vaccines like J&amp;J, just use the current single matrix setup.</li>
+<li>each vaccine will have its own vector of availability each day.</li>
+</ul>
+<p>That sounds good but there’s some problems. The biggest one is this one, how do we figure out who will get vaccinated? What I mean is this, in <strong>nimue</strong>, because its an ODE model, the stochastic version would assume that S people (for example) are “at risk” of becoming infected <em>or</em> vaccinated with hazards equal to <code>lambda</code> and <code>vr</code>, respectively. To duplicate such behavior in <strong>safir</strong> is a bit of work, especially with respect to figuring out how to apportion the vaccination rate to different groups, and doses, etc. But the easier path, which would be to assign vaccine doses seperately, mean it would be posssible for someone to be both vaccinated and become infected on a time step, which is explicitly <em>not allowed</em> in <strong>nimue</strong> because the paths out of S(V0) are mutually exclusive. If we let both happen, we have a stochastic model that no longer will look like <strong>nimue</strong>.</p>
+<p>If we put in the hard work, what are we left with?</p>
+<ul>
+<li>on a time step, we can calculate <code>vr</code> normally, by summing everyone who is eligible (both for 1st and 2nd dose).</li>
+<li>distribute the rate to 1st dosers vs. 2nd dosers based on some rule.</li>
+<li>this is actually nicer for modeling hesistancy, because we could in theory do something like sample numbers with mean of 1 to model relative hesitancy/willingness.</li>
+</ul>
+<p>So the question is, do we work with rates and have models that are self-consistent but harder to reason about, or do we work with integer number of vaccinations but end up with inconsistent models?</p>
+</div>
+</div>
+<div id="nimue-style-vaccination" class="section level2">
+<h2 class="hasAnchor">
+<a href="#nimue-style-vaccination" class="anchor"></a><strong>nimue</strong> style vaccination</h2>
+<div id="infection-process-infection_process_nimue" class="section level3">
+<h3 class="hasAnchor">
+<a href="#infection-process-infection_process_nimue" class="anchor"></a>Infection process <code>infection_process_nimue</code>
+</h3>
+<p>We’ll go with a function that uses a calculated <code>vr</code> akin to the original <strong>nimue</strong> model but allows vaccination and infection to occur in a single time step. Normally, this would make a model that’s pretty inconsistent with the stochastic interpretation of the deterministic model but I think in this case we got lucky. Here’s why.</p>
+<div id="htmlwidget-ac6279b7234d359170b0" style="width:600px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ac6279b7234d359170b0">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"S_{0}\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,1!\"] \n  \"2\" [label = \"S_{1}\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"3\" [label = \"E1_{0}\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,0!\"] \n  \"4\" [label = \"E1_{1}\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,0!\"] \n\"1\"->\"2\" [label = \"vaccination\", label = \"vaccination\"] \n\"3\"->\"4\" [label = \"vaccination\", label = \"vaccination\"] \n\"1\"->\"3\" [label = \"infection (v0)\", label = \"infection (v0)\"] \n\"2\"->\"4\" [label = \"infection (v1)\", label = \"infection (v1)\"] \n\"1\"->\"4\" [label = \"infection + vaccinated\", style = \"dashed\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>Here’s why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let’s consider <strong>safir</strong> to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination’s protective effect doesn’t kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn’t matter. It’s still not going to make sense as <span class="math inline">\(\Delta t \to 0\)</span> but it will be a pretty good approximation.</p>
+</div>
+<div id="what-needs-to-be-done" class="section level3">
+<h3 class="hasAnchor">
+<a href="#what-needs-to-be-done" class="anchor"></a>What needs to be done</h3>
+<p>Needs to schedule events: 1. <code>infection_process_nimue</code> 2. new listener for exposure, like <code>create_exposure_scheduler_listener</code>. It would need to only schedule new vaccinations for those who have not already been vaccinated, and are eligible. 3. new listener for recovery <code>create_recovery_vaccination_listener</code> or the like</p>
+<p>Need to set up event progression for vaccines.</p>
+<p>It looks like this right now</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="va">events</span><span class="op">$</span><span class="va">v0_to_v1v2</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when vaccination occurs</span>
+  <span class="va">events</span><span class="op">$</span><span class="va">v1v2_to_v3v4</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when entering v1v2</span>
+  <span class="va">events</span><span class="op">$</span><span class="va">v3v4_to_v5</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when entering v3v4</span></code></pre></div>
+<div id="htmlwidget-e4b5cec2111fa64b2203" style="width:600px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e4b5cec2111fa64b2203">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"V0\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,4!\"] \n  \"2\" [label = \"V1,V2\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,3!\"] \n  \"3\" [label = \"V3,V4\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,2!\"] \n  \"4\" [label = \"V5\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,1!\"] \n\"1\"->\"2\" [label = \"occurs at (S,E,R) vaccination\"] \n\"2\"->\"3\" [label = \"event scheduled (gamma_vaccine_delay)\"] \n\"3\"->\"4\" [label = \"event scheduled (gamma_V)\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

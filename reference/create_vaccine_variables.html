@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Schedule events for individuals at initialisation — setup_events • safir</title>
+<title>Create vaccination variables — create_vaccine_variables • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Schedule events for individuals at initialisation — setup_events" />
-<meta property="og:description" content="Schedule events for individuals at initialisation" />
+<meta property="og:title" content="Create vaccination variables — create_vaccine_variables" />
+<meta property="og:description" content="Create all individual variables for humans" />
 
 
 
@@ -118,38 +118,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Schedule events for individuals at initialisation</h1>
+    <h1>Create vaccination variables</h1>
     
-    <div class="hidden name"><code>setup_events.Rd</code></div>
+    <div class="hidden name"><code>create_vaccine_variables.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Schedule events for individuals at initialisation</p>
+    <p>Create all individual variables for humans</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setup_events</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>events</span>, <span class='va'>variables</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>create_vaccine_variables</span><span class='op'>(</span>
+  <span class='va'>pop</span>,
+  vaxx_types <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"AZ"</span>, <span class='st'>"MD"</span>, <span class='st'>"PF"</span>, <span class='st'>"JJ"</span>, <span class='st'>"null"</span><span class='op'>)</span>,
+  max_dose <span class='op'>=</span> <span class='fl'>2</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>write me!</p></td>
+      <th>pop</th>
+      <td><p>population list</p></td>
     </tr>
     <tr>
-      <th>events</th>
-      <td><p>write me!</p></td>
+      <th>vaxx_types</th>
+      <td><p>a character vector of possible vaccine types</p></td>
     </tr>
     <tr>
-      <th>variables</th>
-      <td><p>write me!</p></td>
-    </tr>
-    <tr>
-      <th>dt</th>
-      <td><p>write me!</p></td>
+      <th>max_dose</th>
+      <td><p>maximum number of possible doses (2 for now)</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>named list of individual::Variable</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
