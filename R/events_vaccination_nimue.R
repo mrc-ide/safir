@@ -49,7 +49,7 @@ create_v0_to_v1v2_listener_nimue <- function(variables, events, parameters, func
     variables$vaccinated$or(target)
     variables$vaccine_states$queue_update(values = 2, index = target)
     # schedule future events
-    event$v1v2_to_v3v4$schedule(target = target, delay = dwell(n = target$size()))
+    events$v1v2_to_v3v4$schedule(target = target, delay = dwell(n = target$size()))
   }
 }
 
@@ -73,7 +73,7 @@ create_v1v2_to_v3v4_listener_nimue <- function(variables, events, parameters, fu
     # newly protected persons: update state
     variables$vaccine_states$queue_update(values = 3, index = target)
     # schedule future events
-    event$v3v4_to_v5$schedule(target = target, delay = dwell(n = target$size()))
+    events$v3v4_to_v5$schedule(target = target, delay = dwell(n = target$size()))
   }
 }
 

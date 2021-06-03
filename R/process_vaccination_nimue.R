@@ -31,6 +31,9 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
         # calculate prioritisation step and which age groups are eligible right now
         pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated_nimue(variables = variables,age = a)})
 
+        # cat("time: ",timestep*dt,"pr: ",pr," --- \n")
+        # if (timestep*dt > 20){browser()}
+
         vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
         for (p in 1:parameters$N_prioritisation_steps) {
           vaccination_target_mat[p, ] <- as.integer(pr < parameters$vaccine_coverage_mat[p, ])
@@ -45,26 +48,30 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
         vaccination_target <- vaccination_target_mat[current_index, ]
 
-        # clear out eligible
-        variables$eligible$and(variables$empty)
+        # if no vaccination targets remain don't run the code to distribute vaccines
+        if (!all(vaccination_target == 0)) {
 
-        SER <- variables$states$get_index_of(c("S","E","R"))
-        for (a in which(vaccination_target > 0)) {
-          SER$and(variables$discrete_age$get_index_of(a))
-        }
+          # clear out eligible
+          variables$eligible$and(variables$empty)
 
-        # set who is eligible: SER people in an age group in this priority step AND unvaccinated
-        variables$eligible$or(SER)
-        variables$eligible$and(variables$vaccinated$not())
+          SER <- variables$states$get_index_of(c("S","E","R"))
+          target_ages <- which(vaccination_target > 0)
+          SER$and(variables$discrete_age$get_index_of(target_ages))
 
-        # calc rate of vaccination now
-        vr_den <- variables$eligible$size()
-        vr <- ifelse(mv <= 0, 0, min(mv/vr_den, 1))
+          # set who is eligible: SER people in an age group in this priority step AND unvaccinated
+          variables$eligible$or(SER)
+          variables$eligible$and(variables$vaccinated$not())
 
-        # sample who gets vaccinated
-        variables$eligible$sample(rate = pexp(q = vr * dt))
-        if (variables$eligible$size() > 0) {
-          events$v0_to_v1v2$schedule(variables$eligible, delay = 0)
+          # calc rate of vaccination now
+          vr_den <- variables$eligible$size()
+          vr <- ifelse(mv <= 0, 0, min(mv/vr_den, 1))
+
+          # sample who gets vaccinated
+          variables$eligible$sample(rate = pexp(q = vr * dt))
+          if (variables$eligible$size() > 0) {
+            events$v0_to_v1v2$schedule(variables$eligible, delay = 0)
+          }
+
         }
 
       } # end if
