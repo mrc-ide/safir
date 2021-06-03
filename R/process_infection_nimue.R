@@ -1,9 +1,13 @@
-#' @title Transitions from S (nimue vaccine model)
+# --------------------------------------------------------------------------------
+#   infection process for nimue style vaccination model
+#   Sean L. Wu (slwood89@gmail.com)
+#   June 2021
+# --------------------------------------------------------------------------------
+
+#' @title Infection process (nimue vaccine model)
 #'
-#' @description S -> E if infected; can also become vaccinated. This incorporates
+#' @description This samples infection events in the susceptible population. This incorporates
 #' the slightly more complex force of infection calculation from the nimue model.
-#' This function assumes an individual can become infected and vaccinated in a
-#' time step.
 #'
 #' @param parameters Model parameters
 #' @param variables Model variable
@@ -11,6 +15,8 @@
 #' @param dt the time step
 #' @export
 infection_process_nimue <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("states","vaccine_states","discrete_age") %in% names(variables)))
 
   return(
 

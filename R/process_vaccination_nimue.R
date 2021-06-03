@@ -1,48 +1,77 @@
+# --------------------------------------------------------------------------------
+#   vaccination process for nimue style vaccination model
+#   Sean L. Wu (slwood89@gmail.com)
+#   June 2021
+# --------------------------------------------------------------------------------
+
+
+#' @title Vaccination process  (nimue vaccine model)
+#'
+#' @description This samples vaccination events (if there are vaccines available that day)
+#' for individuals in S, E, R states.
+#'
+#' @param parameters Model parameters
+#' @param variables Model variable
+#' @param events Model events
+#' @param dt the time step
+#' @export
 vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
-  function(timestep) {
+  stopifnot(all(c("eligible","vaccinated","empty","discrete_age") %in% names(variables)))
+  stopifnot("v0_to_v1v2" %in% names(events))
 
-    mv <- parameters$vaccine_set[ceiling(timestep * dt)]
+  return(
 
-    if (mv > 0) {
+    function(timestep) {
 
-      # calculate prioritisation step and which age groups are eligible right now
-      pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated_nimue(variables = variables,age = a)})
+      mv <- parameters$vaccine_set[ceiling(timestep * dt)]
 
-      vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
-      for (p in 1:parameters$N_prioritisation_steps) {
-        vaccination_target_mat[p, ] <- as.integer(pr < parameters$vaccine_coverage_mat[p, ])
-      }
+      if (mv > 0) {
 
-      vaccine_target_vec <- rep(0, parameters$N_prioritisation_steps)
-      for (p in 1:parameters$N_prioritisation_steps) {
-        # an entire row summing to zero means that step has been completed
-        vaccine_target_vec[p] <- as.integer(sum(vaccination_target_mat[p, ]) == 0)
-      }
-      current_index <- min(sum(vaccine_target_vec) + 1, parameters$N_prioritisation_steps)
+        # calculate prioritisation step and which age groups are eligible right now
+        pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated_nimue(variables = variables,age = a)})
 
-      vaccination_target <- vaccination_target_mat[current_index, ]
+        vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
+        for (p in 1:parameters$N_prioritisation_steps) {
+          vaccination_target_mat[p, ] <- as.integer(pr < parameters$vaccine_coverage_mat[p, ])
+        }
 
-      # calculate the current per-capita rate of vaccination
-      unvaccinated <- variables$vaccinated$not()
+        vaccine_target_vec <- rep(0, parameters$N_prioritisation_steps)
+        for (p in 1:parameters$N_prioritisation_steps) {
+          # an entire row summing to zero means that step has been completed
+          vaccine_target_vec[p] <- as.integer(sum(vaccination_target_mat[p, ]) == 0)
+        }
+        current_index <- min(sum(vaccine_target_vec) + 1, parameters$N_prioritisation_steps)
 
-      # clear out eligible
-      variables$eligible$and(variables$empty)
+        vaccination_target <- vaccination_target_mat[current_index, ]
 
-      SER <- variables$states$get_index_of(c("S","E","R"))
-      for (a in which(vaccination_target > 0)) {
-        SER$and(variables$discrete_age$get_index_of(a))
-      }
+        # calculate the current per-capita rate of vaccination
+        unvaccinated <- variables$vaccinated$not()
 
-      # set who is eligible
-      variables$eligible$or(SER)
+        # clear out eligible
+        variables$eligible$and(variables$empty)
 
-      vr_den <- variables$eligible$size()
-      vr <- ifelse(mv <= 0, 0, min(mv/vr_den, 1))
+        SER <- variables$states$get_index_of(c("S","E","R"))
+        for (a in which(vaccination_target > 0)) {
+          SER$and(variables$discrete_age$get_index_of(a))
+        }
 
-      variables$vr <- vr
+        # set who is eligible: SER people in an age group in this priority step
+        variables$eligible$or(SER)
 
-    }
+        # calc rate of vaccination now
+        vr_den <- variables$eligible$size()
+        vr <- ifelse(mv <= 0, 0, min(mv/vr_den, 1))
 
-  }
+        # sample who gets vaccinated
+        variables$eligible$sample(rate = pexp(q = vr * dt))
+        if (variables$eligible$size() > 0) {
+          events$v0_to_v1v2$schedule(variables$eligible, delay = 0)
+        }
+
+      } # end if
+
+    } # end function
+
+  ) # end return
 }

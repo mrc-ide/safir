@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_infection_nimue.R
 \name{infection_process_nimue}
 \alias{infection_process_nimue}
-\title{Transitions from S (nimue vaccine model)}
+\title{Infection process (nimue vaccine model)}
 \usage{
 infection_process_nimue(parameters, variables, events, dt)
 }
@@ -16,8 +16,6 @@ infection_process_nimue(parameters, variables, events, dt)
 \item{dt}{the time step}
 }
 \description{
-S -> E if infected; can also become vaccinated. This incorporates
+This samples infection events in the susceptible population. This incorporates
 the slightly more complex force of infection calculation from the nimue model.
-This function assumes an individual can become infected and vaccinated in a
-time step.
 }
