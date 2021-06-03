@@ -3,6 +3,8 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   CodeDesign: CodeDesign.html
-  Validation: Validation.html
-last_built: 2021-06-03T04:23Z
+  compare_nimue: compare_nimue.html
+  compare_squire: compare_squire.html
+  params: params.html
+last_built: 2021-06-03T22:55Z
 

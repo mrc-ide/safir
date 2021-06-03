@@ -22,7 +22,9 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 **safir**: **s**quire **a**nd **f**riends **i**ndividual **r**ewrite (and maintains
-the squire naming [theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir))
+the squire naming [theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir)).
+
+It uses the [`{individual}`](https://github.com/mrc-ide/individual) package to specify and run the simulation.
 
 ## Installation
 
@@ -38,7 +40,10 @@ Documentation
 
 This includes the following vignettes:
 
-- **`Validation`**: general introduction and comparison to [`{squire}`](https://github.com/mrc-ide/squire)
+- **`Squire Validation Run`**: comparison of `{safir}` to [`{squire}`](https://github.com/mrc-ide/squire)
+- **`Nimue Validation Run`**: comparison of `{safir}` to [`{nimue}`](https://github.com/mrc-ide/nimue)
+- **`Code Design`**: a diary of ideas, notes, etc. as `{safir}` is developed.
+- **`Parameters`**: how parameters from the compartmental models are translated to the individual based model. Not written yet.
 
 ## License
 

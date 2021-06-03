@@ -13,7 +13,10 @@ status](https://github.com/mrc-ide/safir/workflows/R-CMD-check/badge.svg)](https
 
 **safir**: **s**quire **a**nd **f**riends **i**ndividual **r**ewrite
 (and maintains the squire naming
-[theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir))
+[theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir)).
+
+It uses the [`{individual}`](https://github.com/mrc-ide/individual)
+package to specify and run the simulation.
 
 ## Installation
 
@@ -29,8 +32,14 @@ library(safir)
 
 This includes the following vignettes:
 
-  - **`Validation`**: general introduction and comparison to
+-   **`Squire Validation Run`**: comparison of \[`{safir}`\] to
     [`{squire}`](https://github.com/mrc-ide/squire)
+-   **`Nimue Validation Run`**: comparison of \[`{safir}`\] to
+    [`{nimue}`](https://github.com/mrc-ide/nimue)
+-   **`Code Design`**: a diary of ideas, notes, etc. as \[`{safir}`\] is
+    developed.
+-   **`Parameters`**: how parameters from the compartmental models are
+    translated to the individual based model. Not written yet.
 
 ## License
 

@@ -1,8 +1,8 @@
 ---
-title: "Comparison"
+title: "Squire Validation Run"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Comparison}
+  %\VignetteIndexEntry{Squire Validation Run}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 options("dplyr.summarise.inform" = FALSE)
 ```
 
-Set up our parameters for running. We use a time step of 0.1 days.
+Let's compare **safir** to **squire**. Set up our parameters for running. We use a time step of 0.1 days.
 
 ```{r}
 library(safir)
@@ -33,7 +33,7 @@ options("mc.cores" = 2)
 
 nrep <- 10
 # Scale it for speed
-# pop$n <- as.integer(pop$n / 10)
+pop$n <- as.integer(pop$n / 5)
 
 # Create our simulation parameters
 R0 <- 2
