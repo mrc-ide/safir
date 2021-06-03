@@ -28,9 +28,9 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   return(
     function(timestep, to_move) {
 
-      if (timestep * dt > 20) {
-        browser()
-      }
+      # if (timestep * dt > 20) {
+      #   browser()
+      # }
 
       ages <- variables$discrete_age$get_values(to_move)
       vaxx <- variables$vaccine_states$get_values(to_move)

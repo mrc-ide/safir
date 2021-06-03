@@ -27,5 +27,5 @@ create_v1v2_to_v3v4_listener_nimue(
 \item{dt}{size of time step}
 }
 \description{
-Create listener for start of vaccine protection (nimue vaccine model)
+This is called when entering v3v4 state
 }

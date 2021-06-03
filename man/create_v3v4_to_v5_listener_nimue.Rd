@@ -14,5 +14,5 @@ create_v3v4_to_v5_listener_nimue(variables, events, parameters)
 \item{parameters}{the parameters}
 }
 \description{
-Create listener for decay of vaccine protection (nimue vaccine model)
+This is called when entering v5 state
 }

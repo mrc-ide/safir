@@ -27,5 +27,5 @@ create_v0_to_v1v2_listener_nimue(
 \item{dt}{size of time step}
 }
 \description{
-Create listener for initial vaccination (nimue vaccine model)
+This is called when entering v1v2 state
 }

@@ -5,7 +5,7 @@
 # --------------------------------------------------
 
 
-#' @title Schedule events for individuals at initialisation
+#' @title Schedule events for individuals at initialisation (nimue vaccine model)
 #' @param parameters write me!
 #' @param events write me!
 #' @param variables write me!
@@ -202,5 +202,31 @@ setup_events_nimue <- function(
     }
 
     # vaccination
+
+    # vaxx no protect
+    bset_v1v2 <- variables$vaccine_states$get_index_of(set = 2)
+    if (bset_v1v2$size() > 0) {
+        init_fn <- create_v0_to_v1v2_listener_nimue(
+            variables = variables,
+            events = events,
+            parameters = parameters,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    }
+
+    # vaxx w/protection
+    bset_v3v4 <- variables$vaccine_states$get_index_of(set = 3)
+    if (bset_v3v4$size() > 0) {
+        init_fn <- create_v1v2_to_v3v4_listener_nimue(
+            variables = variables,
+            events = events,
+            parameters = parameters,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    }
 
 }

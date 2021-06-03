@@ -30,7 +30,7 @@ create_events_nimue <- function(events, parameters) {
 
 
 #' @title Create listener for initial vaccination (nimue vaccine model)
-#'
+#' @description This is called when entering v1v2 state
 #' @param variables a named list of variables
 #' @param events a named list of individual::Event
 #' @param parameters the parameters
@@ -55,7 +55,7 @@ create_v0_to_v1v2_listener_nimue <- function(variables, events, parameters, func
 
 
 #' @title Create listener for start of vaccine protection (nimue vaccine model)
-#'
+#' @description This is called when entering v3v4 state
 #' @param variables a named list of variables
 #' @param events a named list of individual::Event
 #' @param parameters the parameters
@@ -79,7 +79,7 @@ create_v1v2_to_v3v4_listener_nimue <- function(variables, events, parameters, fu
 
 
 #' @title Create listener for decay of vaccine protection (nimue vaccine model)
-#'
+#' @description This is called when entering v5 state
 #' @param variables a named list of variables
 #' @param events a named list of individual::Event
 #' @param parameters the parameters
