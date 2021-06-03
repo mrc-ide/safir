@@ -18,4 +18,6 @@ infection_process_nimue(parameters, variables, events, dt)
 \description{
 S -> E if infected; can also become vaccinated. This incorporates
 the slightly more complex force of infection calculation from the nimue model.
+This function assumes an individual can become infected and vaccinated in a
+time step.
 }

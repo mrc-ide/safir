@@ -22,46 +22,19 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
         susceptible <- variables$states$get_index_of("S")
 
-        # Group infection by age
+        # infection by vaccine status
+        inf_vaxx <- variables$vaccine_states$get_values(index = infectious)
+
+        # infection by age
         ages <- variables$discrete_age$get_values(infectious)
-        inf_ages <- tabulate(ages, nbins = parameters$N_age)
+
+        # compute cross tab for relative infectiousness, multiply by that matrix, and sum it out
+        inf_age_vax <- cross_tab_margins(a = ages,b = inf_vaxx,a_margin = 1:17,b_margin = 1:4)
+        inf_ages <- rowSums(inf_age_vax * parameters$rel_infectiousness_vaccinated)
 
         # calculate FoI for each age group
         m <- get_contact_matrix(parameters)
-        lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
-
-        # FoI for each susceptible person
-        ages <- variables$discrete_age$get_values(susceptible)
-        lambda <- lambda[ages]
-        susceptible$sample(rate = pexp(q = lambda * dt))
-
-        # newly infecteds queue the exposure event
-        if (susceptible$size() > 0) {
-          events$exposure$schedule(susceptible, delay = 0)
-        }
-
-      }
-
-    } # end function
-
-    function(timestep) {
-
-      infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
-
-      if (infectious$size() > 0) {
-
-        v0 <- variables$vaccine_state$get_index_of("v0")
-        v1v2 <- variables$vaccine_state$get_index_of("v1v2")
-        v3v4 <- variables$vaccine_state$get_index_of("v3v4")
-        v5 <- variables$vaccine_state$get_index_of("v5")
-
-        # Group infection by age
-        ages <- variables$discrete_age$get_values(infectious)
-        inf_ages <- tabulate(ages, nbins = parameters$N_age)
-
-        # calculate FoI for each age group
-        m <- get_contact_matrix(parameters)
-        lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+        lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages) %*% diag(parameters$rel_infectiousness))
 
         # FoI for each susceptible person
         ages <- variables$discrete_age$get_values(susceptible)

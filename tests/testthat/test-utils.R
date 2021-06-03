@@ -14,14 +14,6 @@ test_that("vcapply works", {
 
 })
 
-# test_that("r_exp works", {
-#
-#   ret <- r_exp(1, 0.1)
-#   expect_true(ret >= 0.0)
-#   expect_true(ret <= 1.0)
-#
-# })
-
 test_that("remove_non_numerics removes characters and characters of arrays", {
   actual <- remove_non_numerics(list(
     a = array(c('1', '2'), dim=c(1, 2)),
@@ -31,17 +23,16 @@ test_that("remove_non_numerics removes characters and characters of arrays", {
   expect_equal(actual, list(c = c(1, 2)))
 })
 
-# test_that("bernoulli_multi_p works with empty p", {
-#   expect_equal(bernoulli_multi_p(NULL), logical(0))
-# })
-#
-# test_that("bernoulli_multi_p works with two p", {
-#   mockery::stub(bernoulli_multi_p, 'runif', mockery::mock(c(.1, .7)))
-#   expect_equal(bernoulli_multi_p(c(.2, .6)), c(TRUE, FALSE))
-# })
-#
-# test_that("bernoulli_multi_p works on the boundary", {
-#   mockery::stub(bernoulli_multi_p, 'runif', mockery::mock(c(.1, .7)))
-#   expect_equal(bernoulli_multi_p(c(.2, .7)), c(TRUE, FALSE))
-# })
-#
+test_that("cross tab works", {
+
+  a_mar <- 1:4
+  b_mar <- 1:3
+
+  a <- c(1,2,3,4,1,2,3,4)
+  b <- c(1,1,1,2,2,2,3,3)
+
+  expect_true(all(cross_tab_margins(a,b,a_mar,b_mar) == table(a,b)))
+
+})
+
+
