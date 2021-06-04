@@ -132,3 +132,11 @@ ggplot(data = rbind(saf_dt,sq_dt), aes(t,y,color = model)) +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
 ```
+
+## Ensemble plot
+
+Here's a run of **safir** vs. **squire** on GBR with 20 repetitions.
+
+```{r echo=FALSE, out.width='100%'}
+knitr::include_graphics('./squire_comparison.png')
+```
