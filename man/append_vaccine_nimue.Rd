@@ -4,10 +4,14 @@
 \alias{append_vaccine_nimue}
 \title{Append vaccine parameters from nimue model}
 \usage{
-append_vaccine_nimue(parameters, ...)
+append_vaccine_nimue(parameters, population, contact_mat, ...)
 }
 \arguments{
 \item{parameters}{list from \link{get_parameters}}
+
+\item{population}{a population data frame}
+
+\item{contact_mat}{a contact matrix}
 
 \item{...}{Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}}
 }

@@ -14,11 +14,17 @@
 #'  * vaccine_set: vaccines available each day of simulation
 #'
 #' @param parameters list from [get_parameters]
+#' @param population a population data frame
+#' @param contact_mat a contact matrix
 #' @param ... Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}
 #' @export
-append_vaccine_nimue <- function(parameters, ...) {
+append_vaccine_nimue <- function(parameters, population, contact_mat, ...) {
 
-  nimue_pars <- call_nimue_pars(country = parameters$country, ...)
+  nimue_pars <- call_nimue_pars(
+    population = population,
+    contact_matrix_set = contact_mat,
+    ...
+  )
 
   parameters$gamma_vaccine_delay <- 1 / (nimue_pars$gamma_vaccine[2] / 2)
   parameters$gamma_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
@@ -57,7 +63,8 @@ append_vaccine_nimue <- function(parameters, ...) {
 
 #' @noRd
 call_nimue_pars <- function(
-  country,
+  population,
+  contact_matrix_set,
   # durations
   dur_E  = nimue:::durs$dur_E,
   dur_IMild = nimue:::durs$dur_IMild,
@@ -93,7 +100,9 @@ call_nimue_pars <- function(
   seeding_age_order = NULL
 ) {
   nimue:::parameters(
-    country = country,
+    country = NULL,
+    population = population,
+    contact_matrix_set = contact_matrix_set,
     # durations
     dur_E  = dur_E,
     dur_IMild = dur_IMild,

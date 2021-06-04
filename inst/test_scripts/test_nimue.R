@@ -46,11 +46,31 @@ parameters <- safir::get_parameters(
 
 parameters <- append_vaccine_nimue(
   parameters = parameters,
+  population = pop$n,
+  contact_mat = contact_mat,
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),
   vaccine_efficacy_infection = rep(0.9, 17)
 )
+
+# # figure out parameters
+# nim_names <- names(nim_pars)
+# saf_names <- names(parameters)
+#
+# shared <- saf_names[which(saf_names %in% nim_names)]
+# shared <- shared[29:length(shared)]
+#
+# both <- lapply(X = shared,FUN = function(x){
+#   list(safir = parameters[x],nimue=nim_pars[x])
+# })
+#
+# pars2get <- which(sapply(X = both,FUN = function(x){
+#   !identical(x$safir,x$nimue)
+# }))
+#
+# both[pars2get]
+# # end
 
 timesteps <- parameters$time_period/dt
 

@@ -41,6 +41,8 @@ parameters <- safir::get_parameters(
 
 parameters <- append_vaccine_nimue(
   parameters = parameters,
+  population = pop$n,
+  contact_mat = contact_mat,
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),
