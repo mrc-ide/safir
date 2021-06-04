@@ -4,7 +4,7 @@
  *  June 2021
  -------------------------------------------------------------------------------- */
 
-#include "utils.hpp"
+#include "../inst/include/utils.hpp"
 
 //' @title Cross tabulate two vectors with given margins
 //' @description this is a replacement for \code{\link[base]{table}} that allows empty
