@@ -78,7 +78,7 @@
 
       
 
-      </header><script src="compare_squire_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="compare_squire_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Squire Validation Run</h1>
@@ -169,7 +169,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  11.772   0.063  12.191</span></code></pre></div>
+<span class="co">#&gt;  27.097   1.782  28.920</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
@@ -200,6 +200,12 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">compartment</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
 <p><img src="compare_squire_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
+</div>
+<div id="ensemble-plot" class="section level2">
+<h2 class="hasAnchor">
+<a href="#ensemble-plot" class="anchor"></a>Ensemble plot</h2>
+<p>Here’s a run of <strong>safir</strong> vs. <strong>squire</strong> on GBR with 20 repetitions.</p>
+<p><img src="squire_comparison.png" width="100%"></p>
 </div>
   </div>
 
