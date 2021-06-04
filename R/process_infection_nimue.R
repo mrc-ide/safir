@@ -22,6 +22,10 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
     function(timestep) {
 
+      # if (timestep * dt > 15) {
+      #   browser()
+      # }
+
       infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
 
       if (infectious$size() > 0) {

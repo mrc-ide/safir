@@ -1,36 +1,13 @@
----
-title: "Nimue Validation Run"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Nimue Validation Run}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>", 
-  fig.width = 9, 
-  fig.height = 9
-)
-```
-
-## Setup
-
-Let's compare **safir** to **nimue**. Set up our parameters for running. We use a time step of 0.1 days.
-
-Do a run of **nimue** with increasing vaccination.
-```{r}
+rm(list=ls());gc();dev.off()
 library(safir)
 library(nimue)
-library(data.table)
 library(individual)
+library(data.table)
 library(ggplot2)
 
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
-pop$n <- as.integer(pop$n / 1e2)
+pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
 tmax <- 365
@@ -48,13 +25,15 @@ increasing <- run(
   vaccine_efficacy_infection = rep(0.9, 17)
 )
 
-```
+# o2 <- format(increasing, compartments = NULL, summaries = c("deaths", "unvaccinated"))
+#
+# ggplot(o2, aes(x = t, y = value)) +
+#   geom_line(size = 1) +
+#   facet_wrap(~ compartment, scales = "free_y") +
+#   ylab("Time") +
+#   theme_bw()
 
-
-## Run **safir**
-
-Do a **safir** run. This takes around 3-4 minutes. That's too long and I'll figure out how to speed it up after it's verified against **nimue**.
-```{r}
+# safir run
 dt <- 0.1
 
 parameters <- safir::get_parameters(
@@ -99,7 +78,7 @@ renderer <- Render$new(timesteps)
 vaxx_renderer <- Render$new(timesteps)
 processes <- list(
   vaccination_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
-  infection_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  infection_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
   individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories()),
   integer_count_render_process(renderer = vaxx_renderer,variable = variables$vaccine_states,margin = 1:4)
 )
@@ -112,46 +91,10 @@ system.time(
     events = events,
     processes = processes,
     timesteps = timesteps,
-    progress = FALSE
+    progress = TRUE
   )
 )
-```
 
-## Plot vaccinations
-
-Compare vaccinations. These are spot-on.
-```{r}
-# extract data - vaxx
-safir_vax_dt <- as.data.table(vaxx_renderer$to_dataframe())
-safir_vax_dt[ , "vaccinated" := X2_count + X3_count ]
-safir_vax_dt[ , c("X2_count","X3_count") := NULL]
-setnames(x = safir_vax_dt,old = c("X1_count","X4_count"),new = c("unvaccinated","priorvaccinated"))
-safir_vax_dt <- melt(safir_vax_dt,id.vars = "timestep",variable.name = "compartment")
-safir_vax_dt[, t := timestep * dt]
-safir_vax_dt[, timestep := NULL]
-safir_vax_dt[, "model" := "safir"]
-
-nimue_vax_dt <- as.data.table(format(increasing, compartments = NULL,summaries = c("unvaccinated","vaccinated","priorvaccinated")))
-nimue_vax_dt[, replicate := NULL]
-nimue_vax_dt[, "model" := "nimue"]
-
-combined_vax_dt <- rbind(safir_vax_dt,nimue_vax_dt)
-```
-
-plot it.
-```{r}
-ggplot(data = combined_vax_dt) +
-  geom_line(aes(x=t,y=value,color=compartment,linetype=model,group=model)) +
-  facet_wrap(.~compartment,scales="free_y") +
-  guides(color = FALSE)+
-  theme_bw()+
-  theme(strip.text.x = element_text(size=10,face = "bold"))
-```
-
-## Plot compartments
-
-Compare state (compartments) output. It's slightly off in deaths, for some reason.
-```{r}
 # extract data - state
 safir_compartments<- c("S","E","D","R","IMild","ICase","IRec","IOxGetDie","IOxNotGetDie","IOxNotGetLive","IOxGetLive","IMVNotGetDie","IMVNotGetLive","IMVGetLive","IMVGetDie")
 nimue_compartments<- c("S","E","D","R","IMild","ICase","IRec","IICU","IHospital")
@@ -177,20 +120,33 @@ nimue_dt <- nimue_dt[compartment %in% nimue_compartments, ]
 nimue_dt[ ,"model" := "nimue"]
 
 combined_dt <- rbind(nimue_dt,safir_dt)
-```
 
-plot it.
-```{r}
 ggplot(data = combined_dt) +
   geom_line(aes(x=t,y=value,color=compartment,group=model,linetype=model)) +
   facet_wrap(.~compartment,scales="free_y")+
   guides(color = FALSE)+
   theme_bw()+
   theme(strip.text.x = element_text(size=10,face = "bold"))
-```
 
-## Ensemble plot
+# extract data - vaxx
+safir_vax_dt <- as.data.table(vaxx_renderer$to_dataframe())
+safir_vax_dt[ , "vaccinated" := X2_count + X3_count ]
+safir_vax_dt[ , c("X2_count","X3_count") := NULL]
+setnames(x = safir_vax_dt,old = c("X1_count","X4_count"),new = c("unvaccinated","priorvaccinated"))
+safir_vax_dt <- melt(safir_vax_dt,id.vars = "timestep",variable.name = "compartment")
+safir_vax_dt[, t := timestep * dt]
+safir_vax_dt[, timestep := NULL]
+safir_vax_dt[, "model" := "safir"]
 
-```{r echo=FALSE, out.width='100%'}
-knitr::include_graphics('./nimue_comparison.png')
-```
+nimue_vax_dt <- as.data.table(format(increasing, compartments = NULL,summaries = c("unvaccinated","vaccinated","priorvaccinated")))
+nimue_vax_dt[, replicate := NULL]
+nimue_vax_dt[, "model" := "nimue"]
+
+combined_vax_dt <- rbind(safir_vax_dt,nimue_vax_dt)
+
+ggplot(data = combined_vax_dt) +
+  geom_line(aes(x=t,y=value,color=compartment,linetype=model,group=model)) +
+  facet_wrap(.~compartment,scales="free_y") +
+  guides(color = FALSE)+
+  theme_bw()+
+  theme(strip.text.x = element_text(size=10,face = "bold"))

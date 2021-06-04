@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# safir
+# **safir**
 
 <!-- badges: start -->
 
@@ -32,12 +32,14 @@ library(safir)
 
 This includes the following vignettes:
 
--   **`Squire Validation Run`**: comparison of \[`{safir}`\] to
+-   **`Squire Validation Run`**: comparison of
+    [`{safir}`](https://github.com/mrc-ide/safir) to
     [`{squire}`](https://github.com/mrc-ide/squire)
--   **`Nimue Validation Run`**: comparison of \[`{safir}`\] to
+-   **`Nimue Validation Run`**: comparison of
+    [`{safir}`](https://github.com/mrc-ide/safir) to
     [`{nimue}`](https://github.com/mrc-ide/nimue)
--   **`Code Design`**: a diary of ideas, notes, etc. as \[`{safir}`\] is
-    developed.
+-   **`Code Design`**: a diary of ideas, notes, etc. as
+    [`{safir}`](https://github.com/mrc-ide/safir) is developed.
 -   **`Parameters`**: how parameters from the compartmental models are
     translated to the individual based model. Not written yet.
 
