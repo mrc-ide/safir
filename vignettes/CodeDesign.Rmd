@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(DiagrammeR)
 ```
 
 It's nice to know how the code works. Let's keep a diary of sorts as we work on this.
@@ -33,3 +34,165 @@ Most of the simulation updates state by TargetedEvents. When a targeted event fi
   2. state updates - these are functions like `create_state_update_listener` which update state when the event fires (`create_infection_update_listener` in original code).
 
 There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.
+
+## Vaccination
+
+### State representation
+
+A straightforward way to track vaccines is this. Let `max_vaxx` be the maximum number of doses people will receive (assumed to be 2). For each dose two pieces of information must be stored, the time it was given and the type (for mixed dosing regimens).
+
+  1. `IntegerVariable[max_vaxx]`: stores the time each dose is given.
+  2. `CategoricalVariable[max_vaxx]`: store the type of vaccine for each dose.
+  
+### Transitions & scheduling
+
+The `vaccination_process()` function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is "at risk" of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only "at risk" of vaccination?) we do the normal binomial draw.
+
+In [nimue](https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L404) the code that handles how vaccines are allocated works like below:
+
+```{r,eval=FALSE}
+vr_temp[] <- S[i,1] * vaccination_target[i] + E1[i,1] * vaccination_target[i] + E2[i,1] * vaccination_target[i] + R1[i,1] * vaccination_target[i] + R2[i,1] * vaccination_target[i]
+dim(vr_temp) <- N_age
+# Catch so vaccination rate does not exceed 1 if the number of people available for vaccination < number of vaccines
+vr_den <- if(sum(vr_temp) <= mv) mv else sum(vr_temp)
+vr <- if(mv == 0) 0 else mv / vr_den  # Vaccination rate to achieve capacity given number in vaccine-eligible population
+```
+
+How it works:
+  
+  1. `mv` is interpolated from input, it's the maximum number of vaccines which can be given out in a day, so if there are more people to vaccinate than `mv`, it's the rate at which vaccines are distributed. If there are fewer people to vaccinate than `mv`, then the rate at which vaccines would be given out would be lower than `mv`.
+  2. `vr_temp` is the total number of individuals in each age group (its dimension is `N_age`) who are eligible to get vaccines at that instant.
+  3. `vr` will be `mv / vr_den` if there are more people to vaccinate than the maximum number of vaccines that can be given out that day then it's (`vr`) the proportion of those eligible who will get them. If there's fewer people to vaccinate than the maximum number of vaccines that can be given out that day then `vr` will be capped at 1.
+
+It would make sense to calculate things in **safir** as closely as possible to this setup. How would this work in practice? `vaccine_process()` would have to do something like this:
+
+  1. which age groups should be targeted for vaccination by using the targeting matrix; could be more or less the same as [nimue](https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L393): 
+      ```{r,eval=FALSE} 
+      # Isolate age groups below current target coverage which must be targeted
+      vaccination_target_mat[,] <- if(pr[j] < vaccine_coverage_mat[i,j]) 1 else 0
+      ```
+  2. for each age group that should be targeted get the number that haven't been vaccinated yet, in nimue it's simple
+      ```{r,eval=FALSE}
+      vr_temp[] <- S[i,1] * vaccination_target[i] + E1[i,1] * vaccination_target[i] + E2[i,1] * vaccination_target[i] + R1[i,1] * vaccination_target[i] + R2[i,1] * vaccination_target[i]
+      dim(vr_temp) <- N_age
+      ```
+      In our case we'd want to do something likewise but with the state variables in eligible age groups. Lots of bitset and operations, return the sum.
+  3. In the simple vaccination model now we can just get the bitset that is the union of *everyone* who is eligible from step 2, that's every single individual       who is eligible this time step.
+  4. calculate the per-capita rate `vr` similarly, use this for those people given by the bitset in step 3 to do the draws for state transition.
+
+This gives us a vaccination distribution module that looks like the one from **nimue**.
+
+### Prioritization
+
+One thing is that **nimue** doesn't think about how many doses a person was given. When they're vaccinated, they transition to the vaccinated compartment and that's it. We need to worry about that in **safir**.
+
+Let's try to figure out what we're up against.
+
+  * we have a mixed array of vaccines at our disposal, J&J and others only need 1 dose, Pfizer, Moderna, etc. need 2 doses.
+  * the prioritization matrix doesn't know about doses.
+
+How can we make sense of this? We have a few options. Here's one reasonable starting point.
+
+  * For each vaccine type that has >1 dose, we have a priotiziation matrix for each dose (store as array for efficiency).
+  * the prioritization step is shared between the 2 matrices, that is before we move to the next prioritization step, the targets in both (all) matrices need to be fulfilled.
+  * we also need some sort of rule to figure out how many of the available daily doses each day should be apportioned to first vs. second dose individuals. One thing to do is to prioritize second dose individuals (which by definition would have already recieved a first dose previously) and allocate the leftover to newly arriving first dosers. this is probably closer to how it works in reality, as 2nd doses are more or less guaranteed whereas 1st doses can sometimes be acquired via "walk ups". The 2nd dose matrix should probably be interpreted as "of those who are eligible for 2nd dose, how many need to actually recieve them?"
+  * for vaccines like J&J, just use the current single matrix setup.
+  * each vaccine will have its own vector of availability each day.
+  
+That sounds good but there's some problems. The biggest one is this one, how do we figure out who will get vaccinated? What I mean is this, in **nimue**, because its an ODE model, the stochastic version would assume that S people (for example) are "at risk" of becoming infected *or* vaccinated with hazards equal to `lambda` and `vr`, respectively. To duplicate such behavior in **safir** is a bit of work, especially with respect to figuring out how to apportion the vaccination rate to different groups, and doses, etc. But the easier path, which would be to assign vaccine doses seperately, mean it would be posssible for someone to be both vaccinated and become infected on a time step, which is explicitly *not allowed* in **nimue** because the paths out of S(V0) are mutually exclusive. If we let both happen, we have a stochastic model that no longer will look like **nimue**.
+
+If we put in the hard work, what are we left with?
+
+  * on a time step, we can calculate `vr` normally, by summing everyone who is eligible (both for 1st and 2nd dose).
+  * distribute the rate to 1st dosers vs. 2nd dosers based on some rule.
+  * this is actually nicer for modeling hesistancy, because we could in theory do something like sample numbers with mean of 1 to model relative hesitancy/willingness.
+
+So the question is, do we work with rates and have models that are self-consistent but harder to reason about, or do we work with integer number of vaccinations but end up with inconsistent models?
+
+## **nimue** style vaccination
+
+### Infection process `infection_process_nimue`
+
+We'll go with a function that uses a calculated `vr` akin to the original **nimue** model but allows vaccination and infection to occur in a single time step. Normally, this would make a model that's pretty inconsistent with the stochastic interpretation of the deterministic model but I think in this case we got lucky. Here's why.
+
+```{r,echo=F}
+graph <-
+  create_graph() %>%
+  add_node(label = "S@_{0}") %>%
+  add_node(label = "S@_{1}") %>%
+  add_node(label = "E1@_{0}") %>%
+  add_node(label = "E1@_{1}")
+
+graph <-
+  graph %>%
+  set_node_position(
+    node = 1,
+    x = 0.5, y = 1) %>%
+  set_node_position(
+    node = 2,
+    x = 2, y = 1) %>%
+  set_node_position(
+    node = 3,
+    x = 0.5, y = 0) %>%
+  set_node_position(
+    node = 4,
+    x = 2, y = 0)
+
+edgefontsize <- 5
+
+graph <- 
+  graph %>%
+  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="vaccination",fontsize = edgefontsize)) %>%
+  add_edge(from = 3, to = 4, edge_aes = edge_aes(label="vaccination",fontsize = edgefontsize)) %>%
+  add_edge(from = 1, to = 3, edge_aes = edge_aes(label="infection (v0)",fontsize = edgefontsize)) %>%
+  add_edge(from = 2, to = 4, edge_aes = edge_aes(label="infection (v1)",fontsize = edgefontsize)) %>%
+  add_edge(from = 1, to = 4, edge_aes = edge_aes(label="infection+vaccinated",style="dashed",fontsize = edgefontsize))
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```
+
+Here's why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let's consider **safir** to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination's protective effect doesn't kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn't matter. It's still not going to make sense as $\Delta t \to 0$ but it will be a pretty good approximation.
+
+### What needs to be done
+
+NOT DONE:
+  1. How to speed up `vaccination_process_nimue`? if nobody will be vaccinated that day, even if `mv > 0`, how to detect and exit early?
+
+ALL DONE:
+Needs to schedule events:
+  1. `infection_process_nimue`
+  2. new listener for exposure, like `create_exposure_scheduler_listener`. It would need to only schedule new vaccinations for those who have not already been vaccinated, and are eligible.
+  3. new listener for recovery `create_recovery_vaccination_listener` or the like
+  
+Need to set up event progression for vaccines.
+
+It looks like this right now
+
+```{r,eval=F}
+  events$v0_to_v1v2 = individual::TargetedEvent$new(N) # scheduled when vaccination occurs
+  events$v1v2_to_v3v4 = individual::TargetedEvent$new(N) # scheduled when entering v1v2
+  events$v3v4_to_v5 = individual::TargetedEvent$new(N) # scheduled when entering v3v4
+```
+
+```{r,echo=F}
+graph <-
+  create_graph() %>%
+  add_node(label = "V0") %>% set_node_position(node=1,x=1,y=4) %>%
+  add_node(label = "V1,V2") %>% set_node_position(node=2,x=1,y=3) %>%
+  add_node(label = "V3,V4") %>% set_node_position(node=3,x=1,y=2) %>%
+  add_node(label = "V5") %>% set_node_position(node=4,x=1,y=1) %>%
+  add_edge(from = 1, to = 2, edge_aes = edge_aes(label="occurs at (S,E,R) vaccination")) %>%
+  add_edge(from=2,to=3, edge_aes = edge_aes(label="event scheduled (gamma_vaccine_delay)")) %>%
+  add_edge(from=3,to=4, edge_aes = edge_aes(label="event scheduled (gamma_V)"))
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```
+
+### Data structures
+
+There are some new data structures stored in the list `variables`.
+
+  * `vaccine_states`: a IntegerVariable where 1 = v0, 2 = v1,v2, 3 = v3,v4, 4 = v5. It's an integer variable and not categorical because we need to store integers for fast subsetting of probability vectors and matrices that depend on vaccine status (see `infection_process_nimue` for example).
+  * `eligible`: a bitset of individuals who are eligible for vaccination, used in `vaccination_process_nimue`
+  * `vaccinated`: gets set when someone goes from state 1 = v0 to 2 = v1,v2
+  * `empty`: used to quickly empty the `eligible` bitset, see `vaccination_process_nimue`.

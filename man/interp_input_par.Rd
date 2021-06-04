@@ -7,7 +7,7 @@
 interp_input_par(x, y, by = 1, end = max(x))
 }
 \arguments{
-\item{x}{Time points for \link{y} changing}
+\item{x}{Time points for \code{y} changing}
 
 \item{y}{Object to be interpolated}
 

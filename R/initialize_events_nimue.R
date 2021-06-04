@@ -5,30 +5,27 @@
 # --------------------------------------------------
 
 
-#' @title Schedule events for individuals at initialisation
+#' @title Schedule events for individuals at initialisation (nimue vaccine model)
 #' @param parameters write me!
 #' @param events write me!
 #' @param variables write me!
 #' @param dt write me!
-#' @param vaccines write me!
 #' @export
-setup_events <- function(
+setup_events_nimue <- function(
     parameters,
     events,
     variables,
-    dt,
-    vaccines = NULL
+    dt
 ) {
 
     # E individuals
     bset_E <- variables$states$get_index_of("E")
     if (bset_E$size() > 0) {
-        init_fn <- create_exposure_scheduler_listener(
+        init_fn <- create_exposure_scheduler_listener_nimue(
             events = events,
             variables = variables,
             parameters = parameters,
-            dt = dt,
-            vaccines = vaccines
+            dt = dt
         )
         init_fn(timestep = 1, to_move = bset_E)
     }
@@ -202,6 +199,34 @@ setup_events <- function(
             dt = dt
         )
         init_fn(timestep = 1, to_move = bset_IRec)
+    }
+
+    # vaccination
+
+    # vaxx no protect
+    bset_v1v2 <- variables$vaccine_states$get_index_of(set = 2)
+    if (bset_v1v2$size() > 0) {
+        init_fn <- create_v0_to_v1v2_listener_nimue(
+            variables = variables,
+            events = events,
+            parameters = parameters,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
+    }
+
+    # vaxx w/protection
+    bset_v3v4 <- variables$vaccine_states$get_index_of(set = 3)
+    if (bset_v3v4$size() > 0) {
+        init_fn <- create_v1v2_to_v3v4_listener_nimue(
+            variables = variables,
+            events = events,
+            parameters = parameters,
+            func = make_rerlang,
+            shift = 1L,
+            dt = dt
+        )
     }
 
 }

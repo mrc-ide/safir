@@ -10,10 +10,10 @@
 
 #' @title Create events
 #'
-#' @param parameters a named list of individual::Event
+#' @param parameters write me!
 #' @param vaccines not currently used
 #' @export
-create_events <- function(parameters, vaccines = NULL) {
+create_events <- function(parameters) {
 
     # pop size
     N <- sum(parameters$population)
@@ -78,12 +78,16 @@ create_state_update_listener <- function(states, destination) {
 #' @param events a list of events in the model
 #' @param parameters the model parameters
 #' @param dt size of time step
+#' @param shift schedule future events after minimum number of time step delay
+#' @param shift_exposure schedule exposure event after minimum number of time step delay
 #' @export
 attach_event_listeners <- function(
   variables,
   events,
   parameters,
-  dt
+  dt,
+  shift = 1L,
+  shift_exposure = 1L
 ) {
 
     # Exposure ----------
@@ -101,7 +105,7 @@ attach_event_listeners <- function(
             variables,
             parameters,
             dt = dt,
-            shift = 1L
+            shift = shift_exposure
         )
     )
 
@@ -119,7 +123,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_IMild,
             func = make_rexp_simple,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -138,7 +142,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_IAsymp,
             func = make_rexp_simple,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -157,7 +161,7 @@ attach_event_listeners <- function(
             event = events$hospitilisation,
             duration = parameters$dur_ICase,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -186,7 +190,7 @@ attach_event_listeners <- function(
             event = events$stepdown,
             duration = parameters$dur_get_mv_survive,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -203,7 +207,7 @@ attach_event_listeners <- function(
             event = events$death,
             duration = parameters$dur_get_mv_die,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -220,7 +224,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_not_get_mv_survive,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -237,7 +241,7 @@ attach_event_listeners <- function(
             event = events$death,
             duration = parameters$dur_not_get_mv_die,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -256,7 +260,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_get_ox_survive,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -273,7 +277,7 @@ attach_event_listeners <- function(
             event = events$death,
             duration = parameters$dur_get_ox_die,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -290,7 +294,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_not_get_ox_survive,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -307,7 +311,7 @@ attach_event_listeners <- function(
             event = events$death,
             duration = parameters$dur_not_get_ox_die,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )
@@ -327,7 +331,7 @@ attach_event_listeners <- function(
                 event = events$immunity_loss,
                 duration = parameters$dur_R,
                 func = make_rerlang,
-                shift = 1L,
+                shift = shift,
                 dt = dt
             )
         )
@@ -346,7 +350,7 @@ attach_event_listeners <- function(
             event = events$recovery,
             duration = parameters$dur_rec,
             func = make_rerlang,
-            shift = 1L,
+            shift = shift,
             dt = dt
         )
     )

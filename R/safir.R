@@ -9,3 +9,9 @@
 #' @importFrom stats setNames
 #'
 "_PACKAGE"
+
+## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+#' @useDynLib safir
+## usethis namespace: end
+NULL

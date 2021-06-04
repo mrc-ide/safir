@@ -4,10 +4,10 @@
 \alias{create_events}
 \title{Create events}
 \usage{
-create_events(parameters, vaccines = NULL)
+create_events(parameters)
 }
 \arguments{
-\item{parameters}{a named list of individual::Event}
+\item{parameters}{write me!}
 
 \item{vaccines}{not currently used}
 }

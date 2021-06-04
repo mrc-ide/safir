@@ -32,10 +32,12 @@ get_parameters <- function(iso3c = NULL,
     contact_matrix_set <- squire::get_mixing_matrix(iso3c = iso3c)
   }
 
+  country <- get_country(iso3c)
+
   # Get squire parameters
   pars <- squire::parameters_explicit_SEEIR(
         population = population,
-        country = get_country(iso3c),
+        country = country,
         contact_matrix_set = contact_matrix_set,
         dt = 1, # dt should always be 1 as individual is always a discrete time
         time_period = time_period,
@@ -59,6 +61,8 @@ get_parameters <- function(iso3c = NULL,
     c(pars$tt_beta, time_period),
     c(pars$beta_set, tail(pars$beta_set, 1))
   )
+
+  pars$country <- country
 
   return(pars)
 
@@ -139,7 +143,7 @@ interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
 #' Interpolate input parameters
 #'
 #' @details Constant interpolation of time changing parameters
-#' @param x Time points for [y] changing
+#' @param x Time points for \code{y} changing
 #' @param y Object to be interpolated
 #' @param by Time steps to interpolate at. Default = 1
 #' @param end End time point for interpoation. Default = \code{max(x)}

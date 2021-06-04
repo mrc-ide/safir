@@ -7,17 +7,14 @@
 
 #' @title Transitions from S
 #'
-#' @description S -> E if infected; can also become vaccinated.
+#' @description S -> E if infected.
 #'
 #' @param parameters Model parameters
 #' @param variables Model variable
 #' @param events Model events
 #' @param dt the time step
-#' @param vaccines vaccine parameters
 #' @export
-infection_process <- function(parameters, variables, events, dt, vaccines = NULL) {
-
-  if (is.null(vaccines)) {
+infection_process <- function(parameters, variables, events, dt) {
 
     return(
 
@@ -34,7 +31,7 @@ infection_process <- function(parameters, variables, events, dt, vaccines = NULL
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)
-          lambda <- parameters$beta[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
 
           # Transition from S to E
           susceptible <- variables$states$get_index_of("S")
@@ -55,9 +52,4 @@ infection_process <- function(parameters, variables, events, dt, vaccines = NULL
       }
 
     )
-
-  } else {
-    stop("not implemented yet!")
-  }
-
 }

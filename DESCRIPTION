@@ -1,8 +1,9 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
 Version: 0.1.0
-Authors@R: c(person(given = "OJ", family = "Watson", role = c("aut", "cre"),
-                    email = "o.watson15@imperial.ac.uk"),
+Authors@R: c(
+          person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
+          person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
             person(
                 given = "Sean L.",
                 family = "Wu",
@@ -43,6 +44,6 @@ Imports:
     magrittr
 Depends: 
     R (>= 2.10)
-RcppModules: 
-    individual_cpp
 VignetteBuilder: knitr
+LinkingTo: 
+    Rcpp

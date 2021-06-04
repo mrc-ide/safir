@@ -1,39 +1,19 @@
----
-title: "Comparison"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Comparison}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>", 
-  fig.width = 9, 
-  fig.height = 9
-)
-options("dplyr.summarise.inform" = FALSE)
-```
-
-Set up our parameters for running. We use a time step of 0.1 days.
-
-```{r}
+rm(list=ls());gc()
 library(safir)
 library(data.table)
 library(ggplot2)
 library(parallel)
 
-iso3c <- "ATG"
+iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
+contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
 # use as many as you want normally.
-options("mc.cores" = 2)
+options("mc.cores" = 20)
 
-nrep <- 10
+nrep <- 20
 # Scale it for speed
-# pop$n <- as.integer(pop$n / 10)
+pop$n <- as.integer(pop$n / 100)
 
 # Create our simulation parameters
 R0 <- 2
@@ -41,46 +21,40 @@ time_period <- 200
 
 parameters <- safir::get_parameters(
   population = pop$n,
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = iso3c),
+  contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
   time_period = time_period
 )
 
 dt <- 0.1
-```
 
-We're going to compare it to squire. Let's run that first.
 
-```{r}
 out <- squire::run_explicit_SEEIR_model(
   population = pop$n,
-  country = "Antigua and Barbuda",
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = "ATG"),
+  country = "United Kingdom",
+  contact_matrix_set = contact_mat,
   time_period = 200,
   replicates = nrep,
   day_return = TRUE,
   R0 = 2,
   dt = dt
 )
-```
 
-Now we can run safir in parallel. Note that the timesteps is the maximum day divided by the size of the step, `dt`.
 
-```{r}
 system.time(
   saf_reps <- mclapply(X = 1:nrep,FUN = function(x){
-    
+
     timesteps <- parameters$time_period/dt
     variables <- safir::create_variables(pop = pop, parameters = parameters)
-    events <- safir::create_events(parameters = parameters,vaccines = NULL)
+    events <- safir::create_events(parameters = parameters)
     safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
     renderer <- individual::Render$new(timesteps)
     processes <- list(
-      safir::infection_process(parameters = parameters,variables = variables,events = events,dt = dt,vaccines = NULL),
+      safir::infection_process(parameters = parameters,variables = variables,events = events,dt = dt),
       individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
     )
-    safir::setup_events(parameters = parameters,events = events,variables = variables,dt = dt,vaccines = NULL)
+    safir::setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
 
     individual::simulation_loop(
       variables = variables,
@@ -93,11 +67,8 @@ system.time(
     return(df)
   })
 )
-```
 
-Let's organize our data for plotting. We'll compare the 2.5th and 97.5th quantiles and median.
 
-```{r}
 saf_reps <- do.call(rbind,saf_reps)
 
 saf_dt <- as.data.table(saf_reps)
@@ -115,16 +86,10 @@ sq_dt <- as.data.table(squire::format_output(out, unique(saf_dt$compartment)))
 sq_dt[, model := "squire"]
 sq_dt <- sq_dt[, .(ymin = quantile(y,0.025), ymax = quantile(y,0.975), y = median(y)), by = .(t,compartment,model)]
 
-```
 
-## Plot Results
-
-It should look nearly identical.
-
-```{r}
 ggplot(data = rbind(saf_dt,sq_dt), aes(t,y,color = model)) +
   geom_line() +
   geom_ribbon(ggplot2::aes(ymin = ymin, ymax = ymax, fill = model), alpha = 0.2) +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
-```
+
