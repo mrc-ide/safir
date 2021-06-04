@@ -32,11 +32,6 @@ make_rerlang <- function(mu, dt, shape = 2, shift = 0L) {
   assert_pos(shape, zero_allowed = FALSE)
   r <- shape / mu
   function(n) {
-    # x <- floor(rgamma(n = n, shape = shape, rate = r) / dt) + shift # possibility of 0 delay
-    # if (any(is.na(x))) {
-    #   browser()
-    # }
-    # return(x)
     floor(rgamma(n = n, shape = shape, rate = r) / dt) + shift # possibility of 0 delay
   }
 }
