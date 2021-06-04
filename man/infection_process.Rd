@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_infection.R
 \name{infection_process}
 \alias{infection_process}
-\title{Transitions from S}
+\title{Infection process (squire model)}
 \usage{
 infection_process(parameters, variables, events, dt)
 }

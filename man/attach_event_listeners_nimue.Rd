@@ -16,8 +16,6 @@ attach_event_listeners_nimue(variables, events, parameters, dt, shift = 1L)
 \item{dt}{size of time step}
 
 \item{shift}{schedule future events after minimum number of time step delay}
-
-\item{shift_exposure}{schedule exposure event after minimum number of time step delay}
 }
 \description{
 defines processes for events that can be scheduled in the future

@@ -1,6 +1,7 @@
 rm(list=ls());gc();dev.off()
 library(safir)
 library(nimue)
+library(parallel)
 library(individual)
 library(data.table)
 library(ggplot2)
@@ -10,7 +11,7 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 365
+tmax <- 200
 R0 <- 4
 
 # nimue run
@@ -31,16 +32,11 @@ dt <- 0.1
 nrep <- 40
 options("mc.cores" = 20)
 
-parameters <- safir::get_parameters(
+parameters <- get_parameters_nimue(
   population = pop$n,
-  contact_matrix_set = contact_mat,
-  iso3c = iso3c,
+  contact_mat = contact_mat,
+  time_period = tmax,
   R0 = R0,
-  time_period = tmax
-)
-
-parameters <- append_vaccine_nimue(
-  parameters = parameters,
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),

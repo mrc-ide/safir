@@ -10,7 +10,7 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 365
+tmax <- 250
 R0 <- 4
 
 # nimue run
@@ -25,27 +25,15 @@ increasing <- run(
   vaccine_efficacy_infection = rep(0.9, 17)
 )
 
-# o2 <- format(increasing, compartments = NULL, summaries = c("deaths", "unvaccinated"))
-#
-# ggplot(o2, aes(x = t, y = value)) +
-#   geom_line(size = 1) +
-#   facet_wrap(~ compartment, scales = "free_y") +
-#   ylab("Time") +
-#   theme_bw()
 
 # safir run
 dt <- 0.1
 
-parameters <- safir::get_parameters(
+parameters <- get_parameters_nimue(
   population = pop$n,
-  contact_matrix_set = contact_mat,
-  iso3c = iso3c,
+  contact_mat = contact_mat,
+  time_period = tmax,
   R0 = R0,
-  time_period = tmax
-)
-
-parameters <- append_vaccine_nimue(
-  parameters = parameters,
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),
@@ -96,7 +84,6 @@ system.time(
 )
 
 # extract data - state
-safir_compartments<- c("S","E","D","R","IMild","ICase","IRec","IOxGetDie","IOxNotGetDie","IOxNotGetLive","IOxGetLive","IMVNotGetDie","IMVNotGetLive","IMVGetLive","IMVGetDie")
 nimue_compartments<- c("S","E","D","R","IMild","ICase","IRec","IICU","IHospital")
 
 df <- renderer$to_dataframe()

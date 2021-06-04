@@ -11,7 +11,6 @@
 #' @title Create events
 #'
 #' @param parameters write me!
-#' @param vaccines not currently used
 #' @export
 create_events <- function(parameters) {
 

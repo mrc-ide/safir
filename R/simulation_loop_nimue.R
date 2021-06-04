@@ -4,7 +4,7 @@
 #   May 2021
 # --------------------------------------------------
 
-#' @title Simulation loop for safir (nimue style vaccination)
+#' @title Simulation loop for safir (nimue vaccine model)
 #' @description a modification of \code{\link[individual]{simulation_loop}}
 #' to deal with the presence of special values in the \code{variables} list, and
 #' also adds an optional progress bar

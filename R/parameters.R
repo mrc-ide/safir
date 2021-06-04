@@ -1,5 +1,6 @@
 # --------------------------------------------------
-#   model parameters
+#   model parameters for squire transmission model
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
 #   1. get_parameters
 #   2. get_population

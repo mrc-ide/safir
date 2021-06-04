@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables_vaccination.R
 \name{get_proportion_vaccinated_nimue}
 \alias{get_proportion_vaccinated_nimue}
-\title{Get proportion of an age group that is vaccinated for nimue style vaccination}
+\title{Get proportion of an age group that is vaccinated (nimue vaccine model)}
 \usage{
 get_proportion_vaccinated_nimue(variables, age)
 }

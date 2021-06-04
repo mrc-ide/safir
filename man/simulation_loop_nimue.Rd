@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulation_loop_nimue.R
 \name{simulation_loop_nimue}
 \alias{simulation_loop_nimue}
-\title{Simulation loop for safir (nimue style vaccination)}
+\title{Simulation loop for safir (nimue vaccine model)}
 \usage{
 simulation_loop_nimue(
   variables = list(),
