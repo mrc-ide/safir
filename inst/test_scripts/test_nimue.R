@@ -62,13 +62,13 @@ events$exposure$add_listener(
   )
 )
 
-renderer <- Render$new(timesteps)
-vaxx_renderer <- Render$new(timesteps)
+renderer <- Render$new(parameters$time_period)
+vaxx_renderer <- Render$new(parameters$time_period)
 processes <- list(
   vaccination_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
-  individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories()),
-  integer_count_render_process(renderer = vaxx_renderer,variable = variables$vaccine_states,margin = 1:4)
+  categorical_count_renderer_process_daily(renderer = renderer, variable = variables$state, categories = variables$states$get_categories(),dt = dt),
+  integer_count_render_process_daily(renderer = vaxx_renderer,variable = variables$vaccine_states,margin = 1:4,dt = dt)
 )
 
 setup_events_nimue(parameters = parameters,events = events,variables = variables,dt = dt)
@@ -96,8 +96,7 @@ safir_dt[, IHospital := IOxGetDie_count + IOxNotGetDie_count + IOxNotGetLive_cou
 safir_dt[, c("IOxGetDie_count", "IOxNotGetDie_count", "IOxNotGetLive_count", "IOxGetLive_count") := NULL]
 safir_dt <- melt(safir_dt,id.vars = "timestep",variable.name = "compartment",value.name = "value")
 safir_dt[, compartment := gsub("(^)(\\w*)(_count)", "\\2", compartment)]
-safir_dt[, "t" := timestep * dt]
-safir_dt[, timestep := NULL]
+setnames(safir_dt,old = "timestep",new = "t")
 safir_dt <- safir_dt[compartment %in% nimue_compartments, ]
 safir_dt[ ,"model" := "safir"]
 
@@ -121,8 +120,7 @@ safir_vax_dt[ , "vaccinated" := X2_count + X3_count ]
 safir_vax_dt[ , c("X2_count","X3_count") := NULL]
 setnames(x = safir_vax_dt,old = c("X1_count","X4_count"),new = c("unvaccinated","priorvaccinated"))
 safir_vax_dt <- melt(safir_vax_dt,id.vars = "timestep",variable.name = "compartment")
-safir_vax_dt[, t := timestep * dt]
-safir_vax_dt[, timestep := NULL]
+setnames(safir_vax_dt,old = "timestep",new = "t")
 safir_vax_dt[, "model" := "safir"]
 
 nimue_vax_dt <- as.data.table(format(increasing, compartments = NULL,summaries = c("unvaccinated","vaccinated","priorvaccinated")))

@@ -31,7 +31,8 @@ infection_process <- function(parameters, variables, events, dt) {
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)
-          lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          # lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          lambda <- parameters$beta_set[ceiling(timestep * dt)] * as.vector(m %*% inf_ages)
 
           # Transition from S to E
           susceptible <- variables$states$get_index_of("S")

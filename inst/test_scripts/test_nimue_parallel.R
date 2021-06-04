@@ -28,7 +28,7 @@ increasing <- run(
 
 
 # safir runs
-dt <- 0.1
+dt <- 0.05
 nrep <- 40
 options("mc.cores" = 20)
 
