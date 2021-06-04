@@ -96,7 +96,6 @@ system.time(
 )
 
 # extract data - state
-safir_compartments<- c("S","E","D","R","IMild","ICase","IRec","IOxGetDie","IOxNotGetDie","IOxNotGetLive","IOxGetLive","IMVNotGetDie","IMVNotGetLive","IMVGetLive","IMVGetDie")
 nimue_compartments<- c("S","E","D","R","IMild","ICase","IRec","IICU","IHospital")
 
 df <- renderer$to_dataframe()

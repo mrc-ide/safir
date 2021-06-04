@@ -43,6 +43,11 @@ append_vaccine_nimue <- function(parameters, ...) {
     y = nimue_pars$vaccine_efficacy_infection
   )
 
+  parameters$prob_severe_death_no_treatment <- nimue_pars$prob_severe_death_no_treatment
+  parameters$prob_severe_death_treatment <- nimue_pars$prob_severe_death_treatment
+  parameters$prob_non_severe_death_no_treatment <- nimue_pars$prob_non_severe_death_no_treatment
+  parameters$prob_non_severe_death_treatment <- nimue_pars$prob_non_severe_death_treatment
+
   return(parameters)
 }
 
