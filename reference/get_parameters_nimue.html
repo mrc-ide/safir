@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get parameters from squire model — get_parameters • safir</title>
+<title>Get parameters for safir (nimue vaccine model) — get_parameters_nimue • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Get parameters from squire model — get_parameters" />
-<meta property="og:description" content="Get parameters from squire model" />
+<meta property="og:title" content="Get parameters for safir (nimue vaccine model) — get_parameters_nimue" />
+<meta property="og:description" content="This calls parameters from nimue." />
 
 
 
@@ -124,58 +124,42 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get parameters from squire model</h1>
+    <h1>Get parameters for safir (nimue vaccine model)</h1>
     
-    <div class="hidden name"><code>get_parameters.Rd</code></div>
+    <div class="hidden name"><code>get_parameters_nimue.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get parameters from squire model</p>
+    <p>This calls <code><a href='https://rdrr.io/pkg/nimue/man/parameters.html'>parameters</a></code> from <a href='https://mrc-ide.github.io/nimue/index.html'>nimue</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_parameters</span><span class='op'>(</span>
-  iso3c <span class='op'>=</span> <span class='cn'>NULL</span>,
-  population <span class='op'>=</span> <span class='cn'>NULL</span>,
-  contact_matrix_set <span class='op'>=</span> <span class='cn'>NULL</span>,
-  time_period <span class='op'>=</span> <span class='fl'>365</span>,
-  max_age <span class='op'>=</span> <span class='fl'>100</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_parameters_nimue</span><span class='op'>(</span><span class='va'>population</span>, <span class='va'>contact_mat</span>, <span class='va'>time_period</span>, max_age <span class='op'>=</span> <span class='fl'>100</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>iso3c</th>
-      <td><p>Character for country iso3c</p></td>
-    </tr>
-    <tr>
       <th>population</th>
-      <td><p>Population vector (for each age group). Default = NULL,
-which will cause population to be sourced from <code>country</code></p></td>
+      <td><p>integer vector of population by age group</p></td>
     </tr>
     <tr>
-      <th>contact_matrix_set</th>
-      <td><p>Contact matrices used in simulation. Default =
-NULL, which will generate this based on the <code>country</code>.</p></td>
+      <th>contact_mat</th>
+      <td><p>a contact matrix from <code><a href='https://rdrr.io/pkg/squire/man/get_mixing_matrix.html'>get_mixing_matrix</a></code></p></td>
     </tr>
     <tr>
       <th>time_period</th>
-      <td><p>Length of simulation. Default = 365</p></td>
+      <td><p>maximum time of simulation</p></td>
     </tr>
     <tr>
       <th>max_age</th>
-      <td><p>the maximum age for humans</p></td>
+      <td><p>max age for humans</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other parameters for <a href='https://rdrr.io/pkg/squire/man/parameters_explicit_SEEIR.html'>squire::parameters_explicit_SEEIR</a></p></td>
+      <td><p>Other parameters for <code><a href='https://rdrr.io/pkg/nimue/man/parameters.html'>parameters</a></code></p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>squire model parameters</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

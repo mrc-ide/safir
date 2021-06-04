@@ -54,7 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/CodeDesign.html">Code Design</a>
+      <a href="../articles/code_design.html">Code Design</a>
     </li>
     <li>
       <a href="../articles/compare_nimue.html">Nimue Validation Run</a>
@@ -110,7 +110,7 @@
 
 <span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
 <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">:::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
-<span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">1e2</span><span class="op">)</span>
+<span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2e2</span><span class="op">)</span>
 <span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
 
 <span class="va">tmax</span> <span class="op">&lt;-</span> <span class="fl">365</span>
@@ -136,16 +136,11 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
 
-<span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span>
+<span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_parameters_nimue.html">get_parameters_nimue</a></span><span class="op">(</span>
   population <span class="op">=</span> <span class="va">pop</span><span class="op">$</span><span class="va">n</span>,
-  contact_matrix_set <span class="op">=</span> <span class="va">contact_mat</span>,
-  iso3c <span class="op">=</span> <span class="va">iso3c</span>,
+  contact_mat <span class="op">=</span> <span class="va">contact_mat</span>,
+  time_period <span class="op">=</span> <span class="va">tmax</span>,
   R0 <span class="op">=</span> <span class="va">R0</span>,
-  time_period <span class="op">=</span> <span class="va">tmax</span>
-<span class="op">)</span>
-
-<span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/append_vaccine_nimue.html">append_vaccine_nimue</a></span><span class="op">(</span>
-  parameters <span class="op">=</span> <span class="va">parameters</span>,
   max_vaccine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span>,
   tt_vaccine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, length.out <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span>,
   vaccine_efficacy_disease <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">17</span><span class="op">)</span>,
@@ -195,7 +190,7 @@
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt; 215.178  11.655 237.982</span></code></pre></div>
+<span class="co">#&gt; 108.404   6.487 120.132</span></code></pre></div>
 </div>
 <div id="plot-vaccinations" class="section level2">
 <h2 class="hasAnchor">
