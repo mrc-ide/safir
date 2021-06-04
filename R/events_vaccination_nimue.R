@@ -1,5 +1,6 @@
 # --------------------------------------------------
-#   create event functions
+#   create event functions (nimue vaccine model)
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
 #   1. create_events
 #   2. create_event_scheduler_listener

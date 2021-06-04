@@ -1,7 +1,7 @@
 # --------------------------------------------------
-#   model categorical states
+#   Categorical infection states (squire)
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
-#   1. create_state_variables
 # --------------------------------------------------
 
 

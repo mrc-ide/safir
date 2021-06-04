@@ -32,24 +32,6 @@ dt <- 0.1
 nrep <- 40
 options("mc.cores" = 20)
 
-# parameters <- safir::get_parameters(
-#   population = pop$n,
-#   contact_matrix_set = contact_mat,
-#   iso3c = iso3c,
-#   R0 = R0,
-#   time_period = tmax
-# )
-#
-# parameters <- append_vaccine_nimue(
-#   parameters = parameters,
-#   population = pop$n,
-#   contact_mat = contact_mat,
-#   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
-#   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
-#   vaccine_efficacy_disease = rep(0, 17),
-#   vaccine_efficacy_infection = rep(0.9, 17)
-# )
-
 parameters <- get_parameters_nimue(
   population = pop$n,
   contact_mat = contact_mat,

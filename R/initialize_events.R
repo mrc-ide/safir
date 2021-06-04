@@ -1,5 +1,6 @@
 # --------------------------------------------------
-#   initialize event scheduling
+#   initialize event scheduling (squire transmission model)
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
 #   1. setup_events
 # --------------------------------------------------

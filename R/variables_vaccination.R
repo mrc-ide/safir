@@ -1,8 +1,7 @@
 # --------------------------------------------------
-#   vaccination variables and helper fn
-#   May 2021
-#   1. create_vaccine_variables
-#   2. get_proportion_vaccinated
+#   Create and query vaccination variables
+#   Sean L. Wu (slwood89@gmail.com)
+#   June 2021
 # --------------------------------------------------
 
 
@@ -10,7 +9,7 @@
 #   nimue version
 # --------------------------------------------------
 
-#' @title Create vaccination variables for nimue style vaccinations
+#' @title Create vaccination variables (nimue vaccine model)
 #' @description Create all individual variables for humans
 #'
 #' @param variables a list
@@ -30,7 +29,7 @@ create_vaccine_variables_nimue <- function(variables, pop) {
   return(variables)
 }
 
-#' @title Get proportion of an age group that is vaccinated for nimue style vaccination
+#' @title Get proportion of an age group that is vaccinated (nimue vaccine model)
 #' @description Get proportion of an age group that has received a particular vaccine dose
 #' by this timestep.
 #' @param variables a list
@@ -46,45 +45,45 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 }
 
 
-# --------------------------------------------------
-#   full version
-# --------------------------------------------------
-
-#' @title Create vaccination variables
-#' @description Create all individual variables for humans
+#' # --------------------------------------------------
+#' #   full version
+#' # --------------------------------------------------
 #'
-#' @param pop population list
-#' @param vaxx_types a character vector of possible vaccine types
-#' @param max_dose maximum number of possible doses (2 for now)
+#' #' @title Create vaccination variables
+#' #' @description Create all individual variables for humans
+#' #'
+#' #' @param pop population list
+#' #' @param vaxx_types a character vector of possible vaccine types
+#' #' @param max_dose maximum number of possible doses (2 for now)
+#' #'
+#' #' @return named list of individual::Variable
+#' #' @export
+#' create_vaccine_variables <- function(pop, vaxx_types = c("AZ", "MD", "PF", "JJ", "null"), max_dose = 2) {
 #'
-#' @return named list of individual::Variable
-#' @export
-create_vaccine_variables <- function(pop, vaxx_types = c("AZ", "MD", "PF", "JJ", "null"), max_dose = 2) {
-
-  n <- sum(pop$n)
-  vaxx <- list()
-
-  vaxx$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
-  vaxx$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = vaxx_types,initial_values = rep("null",n)))
-
-  return(vaxx)
-}
-
-
-#' @title Get proportion of an age group that is vaccinated
-#' @description Get proportion of an age group that has received a particular vaccine dose
-#' by this timestep.
-#' @param variables a list
-#' @param timestep the current time step
-#' @param age an age group (can be a vector of Multiple age groups)
-#' @param dose which dose to get proportion of age group who has received it
+#'   n <- sum(pop$n)
+#'   vaxx <- list()
 #'
-#' @export
-get_proportion_vaccinated <- function(variables, timestep, age, dose) {
-  age_bset <- variables$discrete_age$get_index_of(age)
-  N <- age_bset$size()
-  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(a = 0,b = timestep)
-  vaccinated_bset$and(age_bset)
-  return( vaccinated_bset$size() / N )
-}
+#'   vaxx$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
+#'   vaxx$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = vaxx_types,initial_values = rep("null",n)))
+#'
+#'   return(vaxx)
+#' }
+#'
+#'
+#' #' @title Get proportion of an age group that is vaccinated
+#' #' @description Get proportion of an age group that has received a particular vaccine dose
+#' #' by this timestep.
+#' #' @param variables a list
+#' #' @param timestep the current time step
+#' #' @param age an age group (can be a vector of Multiple age groups)
+#' #' @param dose which dose to get proportion of age group who has received it
+#' #'
+#' #' @export
+#' get_proportion_vaccinated <- function(variables, timestep, age, dose) {
+#'   age_bset <- variables$discrete_age$get_index_of(age)
+#'   N <- age_bset$size()
+#'   vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(a = 0,b = timestep)
+#'   vaccinated_bset$and(age_bset)
+#'   return( vaccinated_bset$size() / N )
+#' }
 

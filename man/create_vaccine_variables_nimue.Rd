@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables_vaccination.R
 \name{create_vaccine_variables_nimue}
 \alias{create_vaccine_variables_nimue}
-\title{Create vaccination variables for nimue style vaccinations}
+\title{Create vaccination variables (nimue vaccine model)}
 \usage{
 create_vaccine_variables_nimue(variables, pop)
 }

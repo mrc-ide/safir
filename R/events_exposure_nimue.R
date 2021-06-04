@@ -1,5 +1,6 @@
 # --------------------------------------------------
-#   exposure event
+#   exposure event (nimue vaccine model)
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
 #   1. create_exposure_scheduler_listener
 # --------------------------------------------------

@@ -1,11 +1,11 @@
 # --------------------------------------------------
-#   infection process
-#   May 2021
-#   1. infection_process
+#   infection process for squire transmission model
+#   Sean L. Wu (slwood89@gmail.com)
+#   June 2021
 # --------------------------------------------------
 
 
-#' @title Transitions from S
+#' @title Infection process (squire model)
 #'
 #' @description S -> E if infected.
 #'

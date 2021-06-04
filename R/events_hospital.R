@@ -1,5 +1,6 @@
 # --------------------------------------------------
-#   hospitilisation scheduler listener
+#   hospitilisation scheduler listener (squire transmission model)
+#   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
 #   1. create_hospital_scheduler_listener
 #   2. schedule_outcome

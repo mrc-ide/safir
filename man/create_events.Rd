@@ -8,8 +8,6 @@ create_events(parameters)
 }
 \arguments{
 \item{parameters}{write me!}
-
-\item{vaccines}{not currently used}
 }
 \description{
 Create events
