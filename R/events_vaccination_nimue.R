@@ -39,7 +39,7 @@ create_events_nimue <- function(events, parameters) {
 #' @param dt size of time step
 create_v0_to_v1v2_listener_nimue <- function(variables, events, parameters, func, shift, dt) {
 
-  dwell <- func(mu = parameters$gamma_vaccine_delay, dt = dt, shift = shift)
+  dwell <- func(mu = parameters$dur_vaccine_delay, dt = dt, shift = shift)
 
   stopifnot(all(nimue_events_names %in% names(events)))
   stopifnot(all(nimue_states_names %in% names(variables)))
@@ -64,7 +64,7 @@ create_v0_to_v1v2_listener_nimue <- function(variables, events, parameters, func
 #' @param dt size of time step
 create_v1v2_to_v3v4_listener_nimue <- function(variables, events, parameters, func, shift, dt) {
 
-  dwell <- func(mu = parameters$gamma_V, dt = dt, shift = shift)
+  dwell <- func(mu = parameters$dur_V, dt = dt, shift = shift)
 
   stopifnot(all(nimue_events_names %in% names(events)))
   stopifnot(all(nimue_states_names %in% names(variables)))

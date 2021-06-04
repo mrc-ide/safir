@@ -101,7 +101,7 @@ assert_single_logical <- function(x, name = deparse(substitute(x))) {
 # x is numeric
 #' @noRd
 assert_numeric <- function(x, message = "%s must be numeric", name = deparse(substitute(x))) {
-  if (!is.numeric(x)) {
+  if (!is.numeric(x) || identical(x, numeric(0))) {
     stop(sprintf(message, name), call. = FALSE)
   }
   return(TRUE)
