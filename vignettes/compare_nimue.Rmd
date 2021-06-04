@@ -57,16 +57,11 @@ Do a **safir** run. This takes around 3-4 minutes. That's too long and I'll figu
 ```{r}
 dt <- 0.1
 
-parameters <- safir::get_parameters(
+parameters <- get_parameters_nimue(
   population = pop$n,
-  contact_matrix_set = contact_mat,
-  iso3c = iso3c,
+  contact_mat = contact_mat,
+  time_period = tmax,
   R0 = R0,
-  time_period = tmax
-)
-
-parameters <- append_vaccine_nimue(
-  parameters = parameters,
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),
