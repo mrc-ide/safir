@@ -44,7 +44,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
         // calculate FoI for each age group
         Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
-        std::vector<double> beta(17, get_beta_cpp(parameters["beta_set"], tnow));
+        std::vector<double> beta(17, get_vector_cpp(parameters["beta_set"], tnow));
         std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
         std::vector<double> lambda(17);
         std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());

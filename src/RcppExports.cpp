@@ -6,6 +6,23 @@
 
 using namespace Rcpp;
 
+// vaccination_process_nimue_cpp_internal
+Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
+RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type eligible(eligibleSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type vaccinated(vaccinatedSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type empty(emptySEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type v0_to_v1v2(v0_to_v1v2SEXP);
+    Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccination_process_nimue_cpp_internal(parameters, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt));
+    return rcpp_result_gen;
+END_RCPP
+}
 // infection_process_cpp_internal
 Rcpp::XPtr<process_t> infection_process_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
 RcppExport SEXP _safir_infection_process_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
@@ -75,15 +92,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_beta_cpp
-double get_beta_cpp(SEXP beta_set, const size_t i);
-RcppExport SEXP _safir_get_beta_cpp(SEXP beta_setSEXP, SEXP iSEXP) {
+// get_vector_cpp
+double get_vector_cpp(SEXP vector_set, const size_t i);
+RcppExport SEXP _safir_get_vector_cpp(SEXP vector_setSEXP, SEXP iSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type beta_set(beta_setSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type vector_set(vector_setSEXP);
     Rcpp::traits::input_parameter< const size_t >::type i(iSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_beta_cpp(beta_set, i));
+    rcpp_result_gen = Rcpp::wrap(get_vector_cpp(vector_set, i));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -124,17 +141,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_proportion_vaccinated_nimue_internal
+double get_proportion_vaccinated_nimue_internal(Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<individual_index_t> vaccinated, const int age);
+RcppExport SEXP _safir_get_proportion_vaccinated_nimue_internal(SEXP discrete_ageSEXP, SEXP vaccinatedSEXP, SEXP ageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type vaccinated(vaccinatedSEXP);
+    Rcpp::traits::input_parameter< const int >::type age(ageSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_proportion_vaccinated_nimue_internal(discrete_age, vaccinated, age));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 7},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
-    {"_safir_get_beta_cpp", (DL_FUNC) &_safir_get_beta_cpp, 2},
+    {"_safir_get_vector_cpp", (DL_FUNC) &_safir_get_vector_cpp, 2},
     {"_safir_matrix_vec_mult_cpp", (DL_FUNC) &_safir_matrix_vec_mult_cpp, 2},
     {"_safir_matrix_2vec_mult_cpp", (DL_FUNC) &_safir_matrix_2vec_mult_cpp, 3},
     {"_safir_mult_2matrix_rowsum", (DL_FUNC) &_safir_mult_2matrix_rowsum, 2},
+    {"_safir_get_proportion_vaccinated_nimue_internal", (DL_FUNC) &_safir_get_proportion_vaccinated_nimue_internal, 3},
     {NULL, NULL, 0}
 };
 

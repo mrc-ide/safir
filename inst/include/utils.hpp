@@ -8,6 +8,7 @@
 #define UTILS_HPP
 
 #include <Rcpp.h>
+#include <individual.h>
 
 Rcpp::IntegerMatrix cross_tab_margins(
     const Rcpp::IntegerVector& a,
@@ -33,8 +34,8 @@ Rcpp::NumericMatrix get_contact_matrix_cpp(
     const int i
 );
 
-double get_beta_cpp(
-    SEXP beta_set,
+double get_vector_cpp(
+    SEXP vector_set,
     const size_t i
 );
 
@@ -52,6 +53,12 @@ std::vector<double> matrix_2vec_mult_cpp(
 std::vector<double> mult_2matrix_rowsum(
     const Rcpp::NumericMatrix& a,
     const Rcpp::NumericMatrix& b
+);
+
+double get_proportion_vaccinated_nimue_internal(
+    Rcpp::XPtr<IntegerVariable> discrete_age,
+    Rcpp::XPtr<individual_index_t> vaccinated,
+    const int age
 );
 
 #endif

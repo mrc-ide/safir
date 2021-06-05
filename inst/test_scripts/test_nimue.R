@@ -27,7 +27,7 @@ increasing <- run(
 
 
 # safir run
-dt <- 0.01
+dt <- 0.1
 
 parameters <- get_parameters_nimue(
   population = pop$n,

@@ -112,17 +112,17 @@ Rcpp::NumericMatrix get_contact_matrix_cpp(
   return out;
 };
 
-//' @title Get a beta value
-//' @description Get a beta value at some specific day
-//' @param beta_set the set of beta values
+//' @title Get a value from a vector
+//' @description Get a value at some specific day
+//' @param vector_set the set of values
 //' @param i the day (assumes zero indexing)
 //' @export
 // [[Rcpp::export]]
-double get_beta_cpp(
-    SEXP beta_set,
+double get_vector_cpp(
+    SEXP vector_set,
     const size_t i
 ){
-  double* beta_set_ptr = REAL(beta_set);
+  double* beta_set_ptr = REAL(vector_set);
   return beta_set_ptr[i];
 };
 
@@ -186,4 +186,17 @@ std::vector<double> mult_2matrix_rowsum(
     }
   }
   return out;
+};
+
+// [[Rcpp::export]]
+double get_proportion_vaccinated_nimue_internal(
+    Rcpp::XPtr<IntegerVariable> discrete_age,
+    Rcpp::XPtr<individual_index_t> vaccinated,
+    const int age
+) {
+  individual_index_t age_bset = discrete_age->get_index_of_set(age);
+  double N = age_bset.size();
+  individual_index_t vaccinated_bset(*vaccinated);
+  vaccinated_bset &= age_bset;
+  return static_cast<double>(vaccinated_bset.size()) / N;
 };
