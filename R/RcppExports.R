@@ -6,12 +6,14 @@
 #' for type checking, \code{\link{infection_process_cpp}}
 #' @param parameters a list of parameters from \code{\link{get_parameters_nimue}}
 #' @param states a \code{\link[individual]{CategoricalVariable}}
-#' @param vaccine_states a \code{\link[individual]{IntegerVariable}}
+#' @param eligible a \code{\link[individual]{Bitset}}
+#' @param vaccinated a \code{\link[individual]{Bitset}}
+#' @param empty a \code{\link[individual]{Bitset}}
 #' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-#' @param exposure a \code{\link[individual]{TargetedEvent}}
+#' @param v0_to_v1v2 a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
-vaccination_process_nimue_cpp_internal <- function(parameters, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt) {
-    .Call('_safir_vaccination_process_nimue_cpp_internal', PACKAGE = 'safir', parameters, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt)
+vaccination_process_nimue_cpp_internal <- function(parameters, states, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt) {
+    .Call('_safir_vaccination_process_nimue_cpp_internal', PACKAGE = 'safir', parameters, states, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt)
 }
 
 #' @title C++ infection process (squire transmission model)

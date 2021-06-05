@@ -7,19 +7,20 @@
 using namespace Rcpp;
 
 // vaccination_process_nimue_cpp_internal
-Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
-RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
+Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
+RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type eligible(eligibleSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type vaccinated(vaccinatedSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type empty(emptySEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type v0_to_v1v2(v0_to_v1v2SEXP);
     Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
-    rcpp_result_gen = Rcpp::wrap(vaccination_process_nimue_cpp_internal(parameters, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt));
+    rcpp_result_gen = Rcpp::wrap(vaccination_process_nimue_cpp_internal(parameters, states, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -156,7 +157,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 7},
+    {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},

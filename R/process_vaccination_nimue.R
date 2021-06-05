@@ -77,3 +77,35 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
   ) # end return
 }
+
+
+#' @title C++ vaccination process (nimue vaccine model)
+#'
+#' @description This samples vaccination events (if there are vaccines available that day)
+#' for individuals in S, E, R states.
+#' Calls \code{\link{vaccination_process_nimue_cpp_internal}} to return an external pointer object.
+#'
+#' @param parameters Model parameters
+#' @param variables Model variable
+#' @param events Model events
+#' @param dt the time step
+#' @export
+vaccination_process_nimue_cpp <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("eligible","vaccinated","empty","discrete_age") %in% names(variables)))
+  stopifnot("v0_to_v1v2" %in% names(events))
+
+  return(
+    vaccination_process_nimue_cpp_internal(
+      parameters = parameters,
+      states = variables$states$.variable,
+      eligible = variables$eligible$.bitset,
+      vaccinated = variables$vaccinated$.bitset,
+      empty = variables$empty$.bitset,
+      discrete_age = variables$discrete_age$.variable,
+      v0_to_v1v2 = events$v0_to_v1v2$.event,
+      dt = dt
+    )
+  )
+}
+

@@ -6,6 +6,7 @@
 \usage{
 vaccination_process_nimue_cpp_internal(
   parameters,
+  states,
   eligible,
   vaccinated,
   empty,
@@ -17,15 +18,19 @@ vaccination_process_nimue_cpp_internal(
 \arguments{
 \item{parameters}{a list of parameters from \code{\link{get_parameters_nimue}}}
 
-\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
-
-\item{dt}{size of time step}
-
 \item{states}{a \code{\link[individual]{CategoricalVariable}}}
 
-\item{vaccine_states}{a \code{\link[individual]{IntegerVariable}}}
+\item{eligible}{a \code{\link[individual]{Bitset}}}
 
-\item{exposure}{a \code{\link[individual]{TargetedEvent}}}
+\item{vaccinated}{a \code{\link[individual]{Bitset}}}
+
+\item{empty}{a \code{\link[individual]{Bitset}}}
+
+\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
+
+\item{v0_to_v1v2}{a \code{\link[individual]{TargetedEvent}}}
+
+\item{dt}{size of time step}
 }
 \description{
 this is an internal function, you should use the R interface
