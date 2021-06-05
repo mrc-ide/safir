@@ -35,7 +35,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
       if (infectious.size() > 0) {
 
-        // current day
+        // current day (subtract one for zero-based indexing)
         size_t tnow = std::ceil((double)t * dt) - 1.;
 
         // group infection by age
