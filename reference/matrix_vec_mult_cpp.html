@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Infection process (squire transmission model) — infection_process • safir</title>
+<title>Multiply a matrix by a integer vector — matrix_vec_mult_cpp • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Infection process (squire transmission model) — infection_process" />
-<meta property="og:description" content="S -&amp;gt; E if infected." />
+<meta property="og:title" content="Multiply a matrix by a integer vector — matrix_vec_mult_cpp" />
+<meta property="og:description" content="Multiply a matrix by a integer vector" />
 
 
 
@@ -124,35 +124,27 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Infection process (squire transmission model)</h1>
+    <h1>Multiply a matrix by a integer vector</h1>
     
-    <div class="hidden name"><code>infection_process.Rd</code></div>
+    <div class="hidden name"><code>matrix_vec_mult_cpp.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S -&gt; E if infected.</p>
+    <p>Multiply a matrix by a integer vector</p>
     </div>
 
-    <pre class="usage"><span class='fu'>infection_process</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>matrix_vec_mult_cpp</span><span class='op'>(</span><span class='va'>m</span>, <span class='va'>a</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>Model parameters</p></td>
+      <th>m</th>
+      <td><p>a matrix</p></td>
     </tr>
     <tr>
-      <th>variables</th>
-      <td><p>Model variable</p></td>
-    </tr>
-    <tr>
-      <th>events</th>
-      <td><p>Model events</p></td>
-    </tr>
-    <tr>
-      <th>dt</th>
-      <td><p>the time step</p></td>
+      <th>a</th>
+      <td><p>a vector (must have length equal to number of columns of <code>m</code>)</p></td>
     </tr>
     </table>
 

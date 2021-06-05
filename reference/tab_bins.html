@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Infection process (squire transmission model) — infection_process • safir</title>
+<title>Tabulate a vector of observations — tab_bins • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Infection process (squire transmission model) — infection_process" />
-<meta property="og:description" content="S -&amp;gt; E if infected." />
+<meta property="og:title" content="Tabulate a vector of observations — tab_bins" />
+<meta property="og:description" content="Tabulate a vector a whose values fall into a set of integers
+of maximum value nbins. This function does no argument checking so please
+ensure the maximum value of observations is not greater than nbins." />
 
 
 
@@ -124,39 +126,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Infection process (squire transmission model)</h1>
+    <h1>Tabulate a vector of observations</h1>
     
-    <div class="hidden name"><code>infection_process.Rd</code></div>
+    <div class="hidden name"><code>tab_bins.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S -&gt; E if infected.</p>
+    <p>Tabulate a vector <code>a</code> whose values fall into a set of integers
+of maximum value <code>nbins</code>. This function does no argument checking so please
+ensure the maximum value of observations is not greater than <code>nbins</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>infection_process</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>tab_bins</span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>nbins</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>Model parameters</p></td>
+      <th>a</th>
+      <td><p>a set of observations</p></td>
     </tr>
     <tr>
-      <th>variables</th>
-      <td><p>Model variable</p></td>
-    </tr>
-    <tr>
-      <th>events</th>
-      <td><p>Model events</p></td>
-    </tr>
-    <tr>
-      <th>dt</th>
-      <td><p>the time step</p></td>
+      <th>nbins</th>
+      <td><p>number of bins</p></td>
     </tr>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>nbin</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>
+<span class='va'>a</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample.int</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>nbin</span>,size <span class='op'>=</span> <span class='fl'>100</span>,replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/tabulate.html'>tabulate</a></span><span class='op'>(</span>bin <span class='op'>=</span> <span class='va'>a</span>,nbins <span class='op'>=</span> <span class='va'>nbin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 12 12  9  6 12 16 12  6  9  6</div><div class='input'><span class='fu'>tab_bins</span><span class='op'>(</span>a <span class='op'>=</span> <span class='va'>a</span>,nbins <span class='op'>=</span> <span class='va'>nbin</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 12 12  9  6 12 16 12  6  9  6</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

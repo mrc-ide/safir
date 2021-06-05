@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Infection process (squire transmission model) — infection_process • safir</title>
+<title>C++ infection process (nimue vaccine model) — infection_process_nimue_cpp_internal • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Infection process (squire transmission model) — infection_process" />
-<meta property="og:description" content="S -&amp;gt; E if infected." />
+<meta property="og:title" content="C++ infection process (nimue vaccine model) — infection_process_nimue_cpp_internal" />
+<meta property="og:description" content="this is an internal function, you should use the R interface
+for type checking, infection_process_cpp" />
 
 
 
@@ -124,35 +125,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Infection process (squire transmission model)</h1>
+    <h1>C++ infection process (nimue vaccine model)</h1>
     
-    <div class="hidden name"><code>infection_process.Rd</code></div>
+    <div class="hidden name"><code>infection_process_nimue_cpp_internal.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>S -&gt; E if infected.</p>
+    <p>this is an internal function, you should use the R interface
+for type checking, <code><a href='infection_process_cpp.html'>infection_process_cpp</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>infection_process</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>infection_process_nimue_cpp_internal</span><span class='op'>(</span>
+  <span class='va'>parameters</span>,
+  <span class='va'>states</span>,
+  <span class='va'>vaccine_states</span>,
+  <span class='va'>discrete_age</span>,
+  <span class='va'>exposure</span>,
+  <span class='va'>dt</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>parameters</th>
-      <td><p>Model parameters</p></td>
+      <td><p>a list of parameters from <code><a href='get_parameters_nimue.html'>get_parameters_nimue</a></code></p></td>
     </tr>
     <tr>
-      <th>variables</th>
-      <td><p>Model variable</p></td>
+      <th>states</th>
+      <td><p>a <code><a href='https://rdrr.io/pkg/individual/man/CategoricalVariable.html'>CategoricalVariable</a></code></p></td>
     </tr>
     <tr>
-      <th>events</th>
-      <td><p>Model events</p></td>
+      <th>vaccine_states</th>
+      <td><p>a <code><a href='https://rdrr.io/pkg/individual/man/IntegerVariable.html'>IntegerVariable</a></code></p></td>
+    </tr>
+    <tr>
+      <th>discrete_age</th>
+      <td><p>a <code><a href='https://rdrr.io/pkg/individual/man/IntegerVariable.html'>IntegerVariable</a></code></p></td>
+    </tr>
+    <tr>
+      <th>exposure</th>
+      <td><p>a <code><a href='https://rdrr.io/pkg/individual/man/TargetedEvent.html'>TargetedEvent</a></code></p></td>
     </tr>
     <tr>
       <th>dt</th>
-      <td><p>the time step</p></td>
+      <td><p>size of time step</p></td>
     </tr>
     </table>
 
