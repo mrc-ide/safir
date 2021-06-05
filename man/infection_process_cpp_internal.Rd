@@ -6,6 +6,17 @@
 \usage{
 infection_process_cpp_internal(parameters, states, discrete_age, exposure, dt)
 }
+\arguments{
+\item{parameters}{a list of parameters from \code{\link{get_parameters}}}
+
+\item{states}{a \code{\link[individual]{CategoricalVariable}}}
+
+\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
+
+\item{exposure}{a \code{\link[individual]{TargetedEvent}}}
+
+\item{dt}{size of time step}
+}
 \description{
 this is an internal function, you should use the R interface
 for type checking, \code{\link{infection_process_cpp}}
