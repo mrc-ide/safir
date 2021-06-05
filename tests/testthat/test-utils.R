@@ -22,27 +22,3 @@ test_that("remove_non_numerics removes characters and characters of arrays", {
   ))
   expect_equal(actual, list(c = c(1, 2)))
 })
-
-test_that("cross tab works", {
-
-  a_mar <- 4
-  b_mar <- 3
-
-  a <- c(1,2,3,4,1,2,3,4)
-  b <- c(1,1,1,2,2,2,3,3)
-
-  expect_true(all(cross_tab_margins(a,b,a_mar,b_mar) == table(a,b)))
-
-})
-
-test_that("tab_bins works", {
-
-  nbin <- 10
-  a <- sample.int(n = nbin,size = 100,replace = T)
-
-  tabR <- tabulate(bin = a,nbins = nbin)
-  tabC <- tab_bins(a = a,nbins = nbin)
-
-  expect_identical(tabR,tabC)
-
-})
