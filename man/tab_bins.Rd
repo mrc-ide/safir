@@ -18,7 +18,7 @@ ensure the maximum value of observations is not greater than \code{nbins}.
 }
 \examples{
 nbin <- 10
-a <- sample.int(n = nbin,size = 100,replace = T)
+a <- sample.int(n = nbin,size = 100,replace = TRUE)
 tabulate(bin = a,nbins = nbin)
 tab_bins(a = a,nbins = nbin)
 }
