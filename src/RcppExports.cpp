@@ -21,6 +21,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// infection_process_nimue_cpp_internal
+Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> vaccine_states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
+RcppExport SEXP _safir_infection_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP vaccine_statesSEXP, SEXP discrete_ageSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type vaccine_states(vaccine_statesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type exposure(exposureSEXP);
+    Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
+    rcpp_result_gen = Rcpp::wrap(infection_process_nimue_cpp_internal(parameters, states, vaccine_states, discrete_age, exposure, dt));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cross_tab_margins
 Rcpp::IntegerMatrix cross_tab_margins(const Rcpp::IntegerVector& a, const Rcpp::IntegerVector& b, const int a_margin, const int b_margin);
 RcppExport SEXP _safir_cross_tab_margins(SEXP aSEXP, SEXP bSEXP, SEXP a_marginSEXP, SEXP b_marginSEXP) {
@@ -84,27 +100,41 @@ BEGIN_RCPP
 END_RCPP
 }
 // matrix_2vec_mult_cpp
-std::vector<double> matrix_2vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<int>& a, const std::vector<double>& b);
+std::vector<double> matrix_2vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<double>& a, const std::vector<double>& b);
 RcppExport SEXP _safir_matrix_2vec_mult_cpp(SEXP mSEXP, SEXP aSEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type m(mSEXP);
-    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type a(aSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type b(bSEXP);
     rcpp_result_gen = Rcpp::wrap(matrix_2vec_mult_cpp(m, a, b));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mult_2matrix_rowsum
+std::vector<double> mult_2matrix_rowsum(const Rcpp::NumericMatrix& a, const Rcpp::NumericMatrix& b);
+RcppExport SEXP _safir_mult_2matrix_rowsum(SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(mult_2matrix_rowsum(a, b));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
+    {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {"_safir_get_beta_cpp", (DL_FUNC) &_safir_get_beta_cpp, 2},
     {"_safir_matrix_vec_mult_cpp", (DL_FUNC) &_safir_matrix_vec_mult_cpp, 2},
     {"_safir_matrix_2vec_mult_cpp", (DL_FUNC) &_safir_matrix_2vec_mult_cpp, 3},
+    {"_safir_mult_2matrix_rowsum", (DL_FUNC) &_safir_mult_2matrix_rowsum, 2},
     {NULL, NULL, 0}
 };
 

@@ -16,6 +16,13 @@ Rcpp::IntegerMatrix cross_tab_margins(
     const int b_margin
 );
 
+Rcpp::NumericMatrix cross_tab_margins_internal(
+        const std::vector<int>& a,
+        const std::vector<int>& b,
+        const int a_margin,
+        const int b_margin
+);
+
 std::vector<int> tab_bins(
     const std::vector<int>& a,
     const int nbins
@@ -38,8 +45,13 @@ std::vector<double> matrix_vec_mult_cpp(
 
 std::vector<double> matrix_2vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int>& a,
-    const std::vector<int>& b
+    const std::vector<double>& a,
+    const std::vector<double>& b
+);
+
+std::vector<double> mult_2matrix_rowsum(
+    const Rcpp::NumericMatrix& a,
+    const Rcpp::NumericMatrix& b
 );
 
 #endif

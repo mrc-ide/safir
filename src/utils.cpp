@@ -37,6 +37,22 @@ Rcpp::IntegerMatrix cross_tab_margins(
   return out;
 };
 
+Rcpp::NumericMatrix cross_tab_margins_internal(
+    const std::vector<int>& a,
+    const std::vector<int>& b,
+    const int a_margin,
+    const int b_margin
+) {
+
+  Rcpp::NumericMatrix out(a_margin, b_margin);
+
+  for (auto i = 0u; i < a.size(); ++i) {
+    out(a[i]-1, b[i]-1)++;
+  }
+
+  return out;
+};
+
 //' @title Tabulate a vector of observations
 //' @description Tabulate a vector \code{a} whose values fall into a set of integers
 //' of maximum value \code{nbins}. This function does no argument checking so please
@@ -132,22 +148,42 @@ std::vector<double> matrix_vec_mult_cpp(
 
 //' @title Multiply a matrix by a integer vector and a double vector
 //' @param m a matrix
-//' @param a a vector of int (must have length equal to number of columns of \code{m})
+//' @param a a vector of double (must have length equal to number of columns of \code{m})
 //' @param b a vector of double (must have length equal to number of columns of \code{m})
 //' @export
 // [[Rcpp::export]]
 std::vector<double> matrix_2vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int>& a,
+    const std::vector<double>& a,
     const std::vector<double>& b
 ) {
   std::vector<double> out(a.size(), 0.);
 
   for (auto j = 0u; j < m.ncol(); ++j) {
     for (auto i = 0u; i < m.ncol(); ++i) {
-      out[i] += m(i,j) * (double)a[j] * b[j];
+      out[i] += m(i,j) * a[j] * b[j];
     }
   }
 
+  return out;
+};
+
+//' @title Element-wise multiply two matrices and take row sums
+//' @description This function does no argument checking, please make sure \code{a} and \code{b}
+//' are matrices of the same dimension.
+//' @param a a matrix
+//' @param b a matrix
+//' @export
+// [[Rcpp::export]]
+std::vector<double> mult_2matrix_rowsum(
+    const Rcpp::NumericMatrix& a,
+    const Rcpp::NumericMatrix& b
+) {
+  std::vector<double> out(a.nrow(), 0.);
+  for (auto i = 0u; i < a.nrow(); ++i) {
+    for (auto j = 0u; j < a.ncol(); ++j) {
+      out[i] += a(i,j) * b(i,j);
+    }
+  }
   return out;
 };

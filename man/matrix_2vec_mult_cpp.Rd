@@ -9,7 +9,7 @@ matrix_2vec_mult_cpp(m, a, b)
 \arguments{
 \item{m}{a matrix}
 
-\item{a}{a vector of int (must have length equal to number of columns of \code{m})}
+\item{a}{a vector of double (must have length equal to number of columns of \code{m})}
 
 \item{b}{a vector of double (must have length equal to number of columns of \code{m})}
 }

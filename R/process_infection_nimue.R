@@ -68,3 +68,31 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
   ) # return
 }
+
+#' @title C++ infection process (nimue vaccine model)
+#'
+#' @description Simulates the infection process for the nimue vaccine model.
+#' Calls \code{\link{infection_process_nimue_cpp_internal}} to return an external pointer object.
+#'
+#' @param parameters Model parameters
+#' @param variables Model variable
+#' @param events Model events
+#' @param dt the time step
+#' @export
+infection_process_cpp <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("states","discrete_age","vaccine_states") %in% names(variables)))
+  stopifnot("exposure" %in% names(events))
+
+  return(
+    infection_process_nimue_cpp_internal(
+      parameters = parameters,
+      states = variables$states$.variable,
+      vaccine_states = variables$vaccine_states$.variable,
+      discrete_age = variables$discrete_age$.variable,
+      exposure = events$exposure$.event,
+      dt = dt
+    )
+  )
+}
+

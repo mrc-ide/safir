@@ -5,7 +5,7 @@
 # --------------------------------------------------
 
 
-#' @title Infection process (squire model)
+#' @title Infection process (squire transmission model)
 #'
 #' @description S -> E if infected.
 #'
@@ -56,7 +56,7 @@ infection_process <- function(parameters, variables, events, dt) {
 }
 
 
-#' @title C++ infection process (squire model)
+#' @title C++ infection process (squire transmission model)
 #'
 #' @description Simulates the infection process for the squire transmission model.
 #' Calls \code{\link{infection_process_cpp_internal}} to return an external pointer object.
@@ -67,6 +67,9 @@ infection_process <- function(parameters, variables, events, dt) {
 #' @param dt the time step
 #' @export
 infection_process_cpp <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("states","discrete_age") %in% names(variables)))
+  stopifnot("exposure" %in% names(events))
 
   return(
     infection_process_cpp_internal(
