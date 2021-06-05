@@ -35,4 +35,14 @@ test_that("cross tab works", {
 
 })
 
+test_that("tab_bins works", {
 
+  nbin <- 10
+  a <- sample.int(n = nbin,size = 100,replace = T)
+
+  tabR <- tabulate(bin = a,nbins = nbin)
+  tabC <- tab_bins(a = a,nbins = nbin)
+
+  expect_identical(tabR,tabC)
+
+})

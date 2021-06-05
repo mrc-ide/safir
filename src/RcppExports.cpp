@@ -19,9 +19,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tab_bins
+std::vector<int> tab_bins(const std::vector<int>& a, const int nbins);
+RcppExport SEXP _safir_tab_bins(SEXP aSEXP, SEXP nbinsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const int >::type nbins(nbinsSEXP);
+    rcpp_result_gen = Rcpp::wrap(tab_bins(a, nbins));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_contact_matrix_cpp
+Rcpp::NumericMatrix get_contact_matrix_cpp(SEXP array, const int i);
+RcppExport SEXP _safir_get_contact_matrix_cpp(SEXP arraySEXP, SEXP iSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type array(arraySEXP);
+    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_contact_matrix_cpp(array, i));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
+    {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
+    {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {NULL, NULL, 0}
 };
 

@@ -27,7 +27,7 @@ infection_process <- function(parameters, variables, events, dt) {
 
           # Group infection by age
           ages <- variables$discrete_age$get_values(infectious)
-          inf_ages <- tabulate(ages, nbins = parameters$N_age)
+          inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)

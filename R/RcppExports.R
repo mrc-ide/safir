@@ -19,3 +19,28 @@ cross_tab_margins <- function(a, b, a_margin, b_margin) {
     .Call('_safir_cross_tab_margins', PACKAGE = 'safir', a, b, a_margin, b_margin)
 }
 
+#' @title Tabulate a vector of observations
+#' @description Tabulate a vector \code{a} whose values fall into a set of integers
+#' of maximum value \code{nbins}. This function does no argument checking so please
+#' ensure the maximum value of observations is not greater than \code{nbins}.
+#' @param a a set of observations
+#' @param nbins number of bins
+#' @examples
+#' nbin <- 10
+#' a <- sample.int(n = nbin,size = 100,replace = T)
+#' tabulate(bin = a,nbins = nbin)
+#' tab_bins(a = a,nbins = nbin)
+#' @export
+tab_bins <- function(a, nbins) {
+    .Call('_safir_tab_bins', PACKAGE = 'safir', a, nbins)
+}
+
+#' @title Get contact matrix
+#' @description Get the contact matrix at some specific day (1st dimension of array).
+#' @param array the mixing matrix array (days x age x age)
+#' @param i the day (indexes the first dimension, assumes zero indexing)
+#' @export
+get_contact_matrix_cpp <- function(array, i) {
+    .Call('_safir_get_contact_matrix_cpp', PACKAGE = 'safir', array, i)
+}
+
