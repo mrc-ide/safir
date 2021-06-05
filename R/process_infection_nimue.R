@@ -79,7 +79,7 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 #' @param events Model events
 #' @param dt the time step
 #' @export
-infection_process_cpp <- function(parameters, variables, events, dt) {
+infection_process_nimue_cpp <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("states","discrete_age","vaccine_states") %in% names(variables)))
   stopifnot("exposure" %in% names(events))
