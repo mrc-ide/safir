@@ -49,4 +49,5 @@ Depends:
     R (>= 2.10)
 VignetteBuilder: knitr
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    individual

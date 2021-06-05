@@ -11,7 +11,7 @@ contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 # use as many as you want normally.
 options("mc.cores" = 20)
 
-nrep <- 20
+nrep <- 40
 # Scale it for speed
 pop$n <- as.integer(pop$n / 100)
 

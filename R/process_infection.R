@@ -5,7 +5,7 @@
 # --------------------------------------------------
 
 
-#' @title Infection process (squire model)
+#' @title Infection process (squire transmission model)
 #'
 #' @description S -> E if infected.
 #'
@@ -27,11 +27,12 @@ infection_process <- function(parameters, variables, events, dt) {
 
           # Group infection by age
           ages <- variables$discrete_age$get_values(infectious)
-          inf_ages <- tabulate(ages, nbins = parameters$N_age)
+          inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)
-          lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          # lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
+          lambda <- parameters$beta_set[ceiling(timestep * dt)] * as.vector(m %*% inf_ages)
 
           # Transition from S to E
           susceptible <- variables$states$get_index_of("S")
@@ -52,4 +53,31 @@ infection_process <- function(parameters, variables, events, dt) {
       }
 
     )
+}
+
+
+#' @title C++ infection process (squire transmission model)
+#'
+#' @description Simulates the infection process for the squire transmission model.
+#' Calls \code{\link{infection_process_cpp_internal}} to return an external pointer object.
+#'
+#' @param parameters Model parameters
+#' @param variables Model variable
+#' @param events Model events
+#' @param dt the time step
+#' @export
+infection_process_cpp <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("states","discrete_age") %in% names(variables)))
+  stopifnot("exposure" %in% names(events))
+
+  return(
+    infection_process_cpp_internal(
+      parameters = parameters,
+      states = variables$states$.variable,
+      discrete_age = variables$discrete_age$.variable,
+      exposure = events$exposure$.event,
+      dt = dt
+    )
+  )
 }

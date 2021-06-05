@@ -153,17 +153,6 @@ render_graph(graph, layout = "neato",width = 600,height = 500)
 
 Here's why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let's consider **safir** to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination's protective effect doesn't kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn't matter. It's still not going to make sense as $\Delta t \to 0$ but it will be a pretty good approximation.
 
-### What needs to be done
-
-NOT DONE:
-  1. How to speed up `vaccination_process_nimue`? if nobody will be vaccinated that day, even if `mv > 0`, how to detect and exit early?
-
-ALL DONE:
-Needs to schedule events:
-  1. `infection_process_nimue`
-  2. new listener for exposure, like `create_exposure_scheduler_listener`. It would need to only schedule new vaccinations for those who have not already been vaccinated, and are eligible.
-  3. new listener for recovery `create_recovery_vaccination_listener` or the like
-  
 Need to set up event progression for vaccines.
 
 It looks like this right now
@@ -196,3 +185,8 @@ There are some new data structures stored in the list `variables`.
   * `eligible`: a bitset of individuals who are eligible for vaccination, used in `vaccination_process_nimue`
   * `vaccinated`: gets set when someone goes from state 1 = v0 to 2 = v1,v2
   * `empty`: used to quickly empty the `eligible` bitset, see `vaccination_process_nimue`.
+
+## Performance
+
+To-do list:
+  * optimize renderers for output, have something that can optionally only output daily.
