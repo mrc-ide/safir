@@ -43,7 +43,6 @@ discrete_age1 <- individual::IntegerVariable$new(initial_values = age0)
 exposure1 <- individual::TargetedEvent$new(population_size = n)
 
 set.seed(5436L)
-# inf_proc_Cpp <- safir:::infection_process_cpp_internal(parameters = parameters,states = states1$.variable,discrete_age = discrete_age1$.variable,exposure = exposure1$.event,dt = dt)
 inf_proc_Cpp <- infection_process_cpp(parameters = parameters,variables = list(states=states1,discrete_age=discrete_age1),events = list(exposure=exposure1),dt =dt)
 individual:::execute_process(process = inf_proc_Cpp,timestep = 100)
 

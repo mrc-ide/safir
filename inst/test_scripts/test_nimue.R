@@ -7,7 +7,7 @@ library(ggplot2)
 
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
-pop$n <- as.integer(pop$n / 2e2)
+pop$n <- as.integer(pop$n / 5e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
 tmax <- 250
@@ -66,7 +66,7 @@ renderer <- Render$new(parameters$time_period)
 vaxx_renderer <- Render$new(parameters$time_period)
 processes <- list(
   vaccination_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
-  infection_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
+  infection_process_nimue_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer, variable = variables$state, categories = variables$states$get_categories(),dt = dt),
   integer_count_render_process_daily(renderer = vaxx_renderer,variable = variables$vaccine_states,margin = 1:4,dt = dt)
 )
