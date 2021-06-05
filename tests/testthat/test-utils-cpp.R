@@ -13,7 +13,7 @@ test_that("cross tab works", {
 test_that("tab_bins works", {
 
   nbin <- 10
-  a <- sample.int(n = nbin,size = 100,replace = T)
+  a <- sample.int(n = nbin,size = 100,replace = TRUE)
 
   tabR <- tabulate(bin = a,nbins = nbin)
   tabC <- tab_bins(a = a,nbins = nbin)
@@ -23,8 +23,8 @@ test_that("tab_bins works", {
 })
 
 test_that("get proportion vaccinated works", {
-  age <- IntegerVariable$new(initial_values = sample.int(10,1e4,T))
-  vaxx <- Bitset$new(1e4)
+  age <- individual::IntegerVariable$new(initial_values = sample.int(10,1e4,T))
+  vaxx <- individual::Bitset$new(1e4)
   vaxx$insert(sample.int(n = 1e4,size = 4e3,replace = F))
 
   pr_r <- sapply(X = 1:10,FUN = function(x){

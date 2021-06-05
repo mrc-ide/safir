@@ -61,7 +61,7 @@ Rcpp::NumericMatrix cross_tab_margins_internal(
 //' @param nbins number of bins
 //' @examples
 //' nbin <- 10
-//' a <- sample.int(n = nbin,size = 100,replace = T)
+//' a <- sample.int(n = nbin,size = 100,replace = TRUE)
 //' tabulate(bin = a,nbins = nbin)
 //' tab_bins(a = a,nbins = nbin)
 //' @export

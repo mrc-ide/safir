@@ -13,6 +13,7 @@
 #' @param processes a list of processes to execute on each timestep
 #' @param timesteps the number of timesteps to simulate
 #' @param progress dispaly a progress bar?
+#' @importFrom utils setTxtProgressBar txtProgressBar
 #' @export
 simulation_loop_nimue <- function(
   variables = list(),
