@@ -17,7 +17,7 @@
 #' @export
 vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
-  stopifnot(all(c("eligible","vaccinated","empty","discrete_age") %in% names(variables)))
+  stopifnot(all(c("states","eligible","vaccinated","empty","discrete_age") %in% names(variables)))
   stopifnot("v0_to_v1v2" %in% names(events))
 
   return(
@@ -92,7 +92,7 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 #' @export
 vaccination_process_nimue_cpp <- function(parameters, variables, events, dt) {
 
-  stopifnot(all(c("eligible","vaccinated","empty","discrete_age") %in% names(variables)))
+  stopifnot(all(c("states","eligible","vaccinated","empty","discrete_age") %in% names(variables)))
   stopifnot("v0_to_v1v2" %in% names(events))
 
   return(

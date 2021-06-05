@@ -10,8 +10,12 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 5e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 250
+tmax <- 365
 R0 <- 4
+
+vaccine_coverage_mat <- strategy_matrix("Elderly",0.25)
+tt_vaccine <- c(0, 10:100)
+max_vaccine <- c(0, seq(1e3, 5e4, length.out = length(tt_vaccine)-1))
 
 # nimue run
 increasing <- run(
@@ -19,12 +23,10 @@ increasing <- run(
   population = pop$n,
   R0 = R0,
   contact_matrix_set = contact_mat,
-  max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
-  tt_vaccine = c(0, seq(10, 50, length.out = 40)),
-  vaccine_efficacy_disease = rep(0, 17),
-  vaccine_efficacy_infection = rep(0.9, 17)
+  max_vaccine = max_vaccine,
+  tt_vaccine = tt_vaccine,
+  vaccine_coverage_mat = vaccine_coverage_mat
 )
-
 
 # safir run
 dt <- 0.01
@@ -34,10 +36,9 @@ parameters <- get_parameters_nimue(
   contact_mat = contact_mat,
   time_period = tmax,
   R0 = R0,
-  max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
-  tt_vaccine = c(0, seq(10, 50, length.out = 40)),
-  vaccine_efficacy_disease = rep(0, 17),
-  vaccine_efficacy_infection = rep(0.9, 17)
+  max_vaccine = max_vaccine,
+  tt_vaccine = tt_vaccine,
+  vaccine_coverage_mat = vaccine_coverage_mat
 )
 
 timesteps <- parameters$time_period/dt
