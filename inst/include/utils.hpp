@@ -33,7 +33,13 @@ double get_beta_cpp(
 
 std::vector<double> matrix_vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int> a
+    const std::vector<int>& a
+);
+
+std::vector<double> matrix_2vec_mult_cpp(
+    const Rcpp::NumericMatrix& m,
+    const std::vector<int>& a,
+    const std::vector<int>& b
 );
 
 #endif

@@ -72,14 +72,27 @@ BEGIN_RCPP
 END_RCPP
 }
 // matrix_vec_mult_cpp
-std::vector<double> matrix_vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<int> a);
+std::vector<double> matrix_vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<int>& a);
 RcppExport SEXP _safir_matrix_vec_mult_cpp(SEXP mSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type m(mSEXP);
-    Rcpp::traits::input_parameter< const std::vector<int> >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
     rcpp_result_gen = Rcpp::wrap(matrix_vec_mult_cpp(m, a));
+    return rcpp_result_gen;
+END_RCPP
+}
+// matrix_2vec_mult_cpp
+std::vector<double> matrix_2vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<int>& a, const std::vector<double>& b);
+RcppExport SEXP _safir_matrix_2vec_mult_cpp(SEXP mSEXP, SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(matrix_2vec_mult_cpp(m, a, b));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -91,6 +104,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {"_safir_get_beta_cpp", (DL_FUNC) &_safir_get_beta_cpp, 2},
     {"_safir_matrix_vec_mult_cpp", (DL_FUNC) &_safir_matrix_vec_mult_cpp, 2},
+    {"_safir_matrix_2vec_mult_cpp", (DL_FUNC) &_safir_matrix_2vec_mult_cpp, 3},
     {NULL, NULL, 0}
 };
 

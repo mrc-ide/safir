@@ -73,3 +73,12 @@ matrix_vec_mult_cpp <- function(m, a) {
     .Call('_safir_matrix_vec_mult_cpp', PACKAGE = 'safir', m, a)
 }
 
+#' @title Multiply a matrix by a integer vector and a double vector
+#' @param m a matrix
+#' @param a a vector of int (must have length equal to number of columns of \code{m})
+#' @param b a vector of double (must have length equal to number of columns of \code{m})
+#' @export
+matrix_2vec_mult_cpp <- function(m, a, b) {
+    .Call('_safir_matrix_2vec_mult_cpp', PACKAGE = 'safir', m, a, b)
+}
+

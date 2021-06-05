@@ -117,13 +117,35 @@ double get_beta_cpp(
 // [[Rcpp::export]]
 std::vector<double> matrix_vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int> a
+    const std::vector<int>& a
 ) {
   std::vector<double> out(a.size(), 0.);
 
   for (auto j = 0u; j < m.ncol(); ++j) {
     for (auto i = 0u; i < m.ncol(); ++i) {
       out[i] += m(i,j) * (double)a[j];
+    }
+  }
+
+  return out;
+};
+
+//' @title Multiply a matrix by a integer vector and a double vector
+//' @param m a matrix
+//' @param a a vector of int (must have length equal to number of columns of \code{m})
+//' @param b a vector of double (must have length equal to number of columns of \code{m})
+//' @export
+// [[Rcpp::export]]
+std::vector<double> matrix_2vec_mult_cpp(
+    const Rcpp::NumericMatrix& m,
+    const std::vector<int>& a,
+    const std::vector<double>& b
+) {
+  std::vector<double> out(a.size(), 0.);
+
+  for (auto j = 0u; j < m.ncol(); ++j) {
+    for (auto i = 0u; i < m.ncol(); ++i) {
+      out[i] += m(i,j) * (double)a[j] * b[j];
     }
   }
 
