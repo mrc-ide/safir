@@ -8,5 +8,6 @@
 #define SAFIR_TYPES_HPP
 
 #include <individual.h>
+#include "utils.hpp"
 
 #endif

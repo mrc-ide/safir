@@ -21,9 +21,19 @@ std::vector<int> tab_bins(
     const int nbins
 );
 
-Rcpp::NumericMatrix get_mixing_matrix_cpp(
+Rcpp::NumericMatrix get_contact_matrix_cpp(
     SEXP array,
     const int i
+);
+
+double get_beta_cpp(
+    SEXP beta_set,
+    const size_t i
+);
+
+std::vector<double> matrix_vec_mult_cpp(
+    const Rcpp::NumericMatrix& m,
+    const std::vector<int> a
 );
 
 #endif

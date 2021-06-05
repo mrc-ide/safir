@@ -1,0 +1,70 @@
+/* --------------------------------------------------------------------------------
+ *  infection process for squire transmission model
+ *  Sean L. Wu (slwood89@gmail.com)
+ *  June 2021
+ -------------------------------------------------------------------------------- */
+
+#include <Rcpp.h>
+#include <individual.h>
+#include "../inst/include/utils.hpp"
+
+//' @title C++ infection process (squire model)
+//' @description this is an internal function, you should use the R interface
+//' for type checking, \code{\link{infection_process_cpp}}
+// [[Rcpp::export]]
+Rcpp::XPtr<process_t> infection_process_cpp_internal(
+    Rcpp::List parameters,
+    Rcpp::XPtr<CategoricalVariable> states,
+    Rcpp::XPtr<IntegerVariable> discrete_age,
+    Rcpp::XPtr<TargetedEvent> exposure,
+    const double dt
+) {
+
+  // the states we need to pull
+  std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
+
+  return Rcpp::XPtr<process_t>(
+    new process_t([parameters, states, discrete_age, exposure, dt, inf_states](size_t t){
+
+      individual_index_t infectious = states->get_index_of(inf_states);
+
+      if (infectious.size() > 0) {
+
+        // current day
+        size_t tnow = std::ceil((double)t * dt) - 1.;
+
+        // group infection by age
+        std::vector<int> ages = discrete_age->get_values(infectious);
+        std::vector<int> inf_ages = tab_bins(ages, 17);
+
+        // calculate FoI for each age group
+        Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
+        std::vector<double> beta(17, get_beta_cpp(parameters["beta_set"], tnow));
+        std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
+        std::vector<double> lambda(17);
+        std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
+
+        // transition from S to E
+        individual_index_t susceptible = states->get_index_of("S");
+        std::vector<int> sus_ages = discrete_age->get_values(susceptible);
+
+        // FoI for each susceptible person
+        std::vector<double> lambda_sus(sus_ages.size());
+        for (auto i = 0u; i < sus_ages.size(); ++i) {
+          lambda_sus[i] = lambda[sus_ages[i] - 1] * dt;
+          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1., 1, 0);
+        }
+
+        // infected
+        bitset_sample_multi_internal(susceptible, lambda_sus.begin(), lambda_sus.end());
+
+        // newly infected queue the exposure event
+        if (susceptible.size() > 0) {
+          exposure->schedule(susceptible, 0.);
+        }
+      }
+
+    }),
+    true
+  );
+};

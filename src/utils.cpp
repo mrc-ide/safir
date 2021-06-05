@@ -95,3 +95,37 @@ Rcpp::NumericMatrix get_contact_matrix_cpp(
 
   return out;
 };
+
+//' @title Get a beta value
+//' @description Get a beta value at some specific day
+//' @param beta_set the set of beta values
+//' @param i the day (assumes zero indexing)
+//' @export
+// [[Rcpp::export]]
+double get_beta_cpp(
+    SEXP beta_set,
+    const size_t i
+){
+  double* beta_set_ptr = REAL(beta_set);
+  return beta_set_ptr[i];
+};
+
+//' @title Multiply a matrix by a integer vector
+//' @param m a matrix
+//' @param a a vector (must have length equal to number of columns of \code{m})
+//' @export
+// [[Rcpp::export]]
+std::vector<double> matrix_vec_mult_cpp(
+    const Rcpp::NumericMatrix& m,
+    const std::vector<int> a
+) {
+  std::vector<double> out(a.size(), 0.);
+
+  for (auto j = 0u; j < m.ncol(); ++j) {
+    for (auto i = 0u; i < m.ncol(); ++i) {
+      out[i] += m(i,j) * (double)a[j];
+    }
+  }
+
+  return out;
+};
