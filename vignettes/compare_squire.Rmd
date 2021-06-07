@@ -28,6 +28,7 @@ library(ggplot2)
 library(parallel)
 
 iso3c <- "ATG"
+contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 pop <- safir:::get_population(iso3c)
 
 # use as many as you want normally.
@@ -43,7 +44,7 @@ time_period <- 200
 
 parameters <- safir::get_parameters(
   population = pop$n,
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = iso3c),
+  contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
   time_period = time_period
@@ -58,7 +59,7 @@ We're going to compare it to squire. Let's run that first.
 out <- squire::run_explicit_SEEIR_model(
   population = pop$n,
   country = "Antigua and Barbuda",
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = "ATG"),
+  contact_matrix_set = contact_mat,
   time_period = 200,
   replicates = nrep,
   day_return = TRUE,

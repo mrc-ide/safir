@@ -57,16 +57,16 @@ system.time(
     attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
     attach_event_listeners_nimue(variables = variables,events = events,parameters = parameters,dt = dt)
 
-    # this is bad and i should feel bad
-    events$exposure$.listeners[[2]] <- NULL
-    events$exposure$add_listener(
-      safir:::create_exposure_scheduler_listener_nimue(
-        events = events,
-        variables = variables,
-        parameters = parameters,
-        dt = dt
-      )
-    )
+    # # this is bad and i should feel bad
+    # events$exposure$.listeners[[2]] <- NULL
+    # events$exposure$add_listener(
+    #   safir:::create_exposure_scheduler_listener_nimue(
+    #     events = events,
+    #     variables = variables,
+    #     parameters = parameters,
+    #     dt = dt
+    #   )
+    # )
 
     renderer <- Render$new(timesteps)
     processes <- list(

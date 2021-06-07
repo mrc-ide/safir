@@ -53,7 +53,7 @@ increasing <- run(
 
 ## Run **safir**
 
-Do a **safir** run. This takes around 3-4 minutes. That's too long and I'll figure out how to speed it up after it's verified against **nimue**.
+Do a **safir** run. Because running the individual based verion of **nimue** is computationally expensive, we use `categorical_count_renderer_process_daily` and `integer_count_render_process_daily` to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes `vaccination_process_nimue_cpp` and `infection_process_nimue_cpp`.
 ```{r}
 dt <- 0.1
 
@@ -78,17 +78,6 @@ events <- create_events_nimue(events = events,parameters = parameters)
 
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_nimue(variables = variables,events = events,parameters = parameters,dt = dt)
-
-# this is bad and i should feel bad
-events$exposure$.listeners[[2]] <- NULL
-events$exposure$add_listener(
-  safir:::create_exposure_scheduler_listener_nimue(
-    events = events,
-    variables = variables,
-    parameters = parameters,
-    dt = dt
-  )
-)
 
 renderer <- Render$new(parameters$time_period)
 vaxx_renderer <- Render$new(parameters$time_period)
@@ -143,7 +132,7 @@ ggplot(data = combined_vax_dt) +
 
 ## Plot compartments
 
-Compare state (compartments) output. It's slightly off in deaths, for some reason.
+Compare state (compartments) output. Because **nimue** is an ODE model the convergence of **safir** to it's results is highly dependent upon the size of dt. Smaller dt will lead to more similar results. The stochastic version of **squire**, on the other hand, uses a discretization of the continuous time Markov process so results should look exactly identical between those two with the same dt.
 ```{r}
 # extract data - state
 safir_compartments<- c("S","E","D","R","IMild","ICase","IRec","IOxGetDie","IOxNotGetDie","IOxNotGetLive","IOxGetLive","IMVNotGetDie","IMVNotGetLive","IMVGetLive","IMVGetDie")
