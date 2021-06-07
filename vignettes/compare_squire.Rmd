@@ -19,7 +19,7 @@ options("dplyr.summarise.inform" = FALSE)
 
 ## Setup
 
-Let's compare **safir** to **squire**. Set up our parameters for running. We use a time step of 0.1 days.
+Let's compare **safir** to **squire**. Set up our parameters for running. We use a time step of 0.1 days. We use `get_parameters` to grab parameters directly from the **squire** package.
 
 ```{r}
 library(safir)
@@ -28,6 +28,7 @@ library(ggplot2)
 library(parallel)
 
 iso3c <- "ATG"
+contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 pop <- safir:::get_population(iso3c)
 
 # use as many as you want normally.
@@ -43,7 +44,7 @@ time_period <- 200
 
 parameters <- safir::get_parameters(
   population = pop$n,
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = iso3c),
+  contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
   time_period = time_period
@@ -58,7 +59,7 @@ We're going to compare it to squire. Let's run that first.
 out <- squire::run_explicit_SEEIR_model(
   population = pop$n,
   country = "Antigua and Barbuda",
-  contact_matrix_set = squire::get_mixing_matrix(iso3c = "ATG"),
+  contact_matrix_set = contact_mat,
   time_period = 200,
   replicates = nrep,
   day_return = TRUE,
@@ -70,6 +71,11 @@ out <- squire::run_explicit_SEEIR_model(
 ## Run **safir**
 
 Now we can run safir in parallel. Note that the timesteps is the maximum day divided by the size of the step, `dt`.
+
+To set up the model, first call `create_variables` which creates the categorical states and ages for the simulated population. Then `create_events` and `attach_event_listeners` creates the list of events and attaches listeners which handle state changes and queue future events. Next, a renderer objects is made. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken.
+
+Next the list of processes can be made. We use `infection_process_cpp` which is a C++ version of `infection_process` to speed up the simulation. Tests are included in the package to ensure the same results are returned when using identical random number seeds. Finally the simulation can be run.
+
 
 ```{r}
 system.time(

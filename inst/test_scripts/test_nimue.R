@@ -1,4 +1,5 @@
-rm(list=ls());gc();dev.off()
+rm(list=ls());gc();
+# dev.off()
 library(safir)
 library(nimue)
 library(individual)
@@ -7,13 +8,13 @@ library(ggplot2)
 
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
-pop$n <- as.integer(pop$n / 5e2)
+pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 365
+tmax <- 200
 R0 <- 4
 
-vaccine_coverage_mat <- strategy_matrix("Elderly",0.25)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
 tt_vaccine <- c(0, 10:100)
 max_vaccine <- c(0, seq(1e3, 5e4, length.out = length(tt_vaccine)-1))
 
@@ -23,9 +24,9 @@ increasing <- run(
   population = pop$n,
   R0 = R0,
   contact_matrix_set = contact_mat,
+  vaccine_coverage_mat = vaccine_coverage_mat,
   max_vaccine = max_vaccine,
-  tt_vaccine = tt_vaccine,
-  vaccine_coverage_mat = vaccine_coverage_mat
+  tt_vaccine = tt_vaccine
 )
 
 # safir run
@@ -52,16 +53,16 @@ events <- create_events_nimue(events = events,parameters = parameters)
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_nimue(variables = variables,events = events,parameters = parameters,dt = dt)
 
-# this is bad and i should feel bad
-events$exposure$.listeners[[2]] <- NULL
-events$exposure$add_listener(
-  safir:::create_exposure_scheduler_listener_nimue(
-    events = events,
-    variables = variables,
-    parameters = parameters,
-    dt = dt
-  )
-)
+# # this is bad and i should feel bad
+# events$exposure$.listeners[[2]] <- NULL
+# events$exposure$add_listener(
+#   safir:::create_exposure_scheduler_listener_nimue(
+#     events = events,
+#     variables = variables,
+#     parameters = parameters,
+#     dt = dt
+#   )
+# )
 
 renderer <- Render$new(parameters$time_period)
 vaxx_renderer <- Render$new(parameters$time_period)

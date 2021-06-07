@@ -146,5 +146,17 @@ attach_event_listeners_nimue <- function(
     )
   )
 
+  # modify exposure event
+  events$exposure$.listeners[[2]] <- NULL
+  events$exposure$add_listener(
+    create_exposure_scheduler_listener_nimue(
+      events = events,
+      variables = variables,
+      parameters = parameters,
+      dt = dt,
+      shift = 0L
+    )
+  )
+
 }
 

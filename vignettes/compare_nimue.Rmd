@@ -33,7 +33,7 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 250
+tmax <- 200
 R0 <- 4
 
 # nimue run
@@ -53,7 +53,12 @@ increasing <- run(
 
 ## Run **safir**
 
-Do a **safir** run. This takes around 3-4 minutes. That's too long and I'll figure out how to speed it up after it's verified against **nimue**.
+Do a **safir** run. Because running the individual based verion of **nimue** is computationally expensive, we use `categorical_count_renderer_process_daily` and `integer_count_render_process_daily` to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes `vaccination_process_nimue_cpp` and `infection_process_nimue_cpp` (R versions are `vaccination_process_nimue` and `infection_process_nimue_cpp`; tests are included in the package to ensure the same results are returned when using identical random number seeds).
+
+The function `get_parameters_nimue` grabs parameters directly from the **nimue** package. Then make the basic **squire** transmission model variables using `create_variables`. Then, attach additional variables to model **nimue** vaccines using `create_vaccine_variables_nimue`. The same routine is used to make events, calling `create_events` and `create_events_nimue`. Listeners are attached similarly.
+
+Next, make renderer objects. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken. The process list can then be made, and finally `setup_events_nimue` is called to queue initial events (this allows the model to be initialized from any valid state, not just S and E individuals).
+
 ```{r}
 dt <- 0.1
 
@@ -79,21 +84,10 @@ events <- create_events_nimue(events = events,parameters = parameters)
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_nimue(variables = variables,events = events,parameters = parameters,dt = dt)
 
-# this is bad and i should feel bad
-events$exposure$.listeners[[2]] <- NULL
-events$exposure$add_listener(
-  safir:::create_exposure_scheduler_listener_nimue(
-    events = events,
-    variables = variables,
-    parameters = parameters,
-    dt = dt
-  )
-)
-
 renderer <- Render$new(parameters$time_period)
 vaxx_renderer <- Render$new(parameters$time_period)
 processes <- list(
-  vaccination_process_nimue(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccination_process_nimue_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_nimue_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer, variable = variables$state, categories = variables$states$get_categories(),dt = dt),
   integer_count_render_process_daily(renderer = vaxx_renderer,variable = variables$vaccine_states,margin = 1:4,dt = dt)
@@ -143,7 +137,7 @@ ggplot(data = combined_vax_dt) +
 
 ## Plot compartments
 
-Compare state (compartments) output. It's slightly off in deaths, for some reason.
+Compare state (compartments) output. Because **nimue** is an ODE model the convergence of **safir** to it's results is highly dependent upon the size of dt. Smaller dt will lead to more similar results. The stochastic version of **squire**, on the other hand, uses a discretization of the continuous time Markov process so results should look exactly identical between those two with the same dt.
 ```{r}
 # extract data - state
 safir_compartments<- c("S","E","D","R","IMild","ICase","IRec","IOxGetDie","IOxNotGetDie","IOxNotGetLive","IOxGetLive","IMVNotGetDie","IMVNotGetLive","IMVGetLive","IMVGetDie")

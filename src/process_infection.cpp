@@ -28,8 +28,12 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   // the states we need to pull
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
+  // vectors we can build once
+  std::vector<double> beta(17, 0.);
+  std::vector<double> lambda(17, 0.);
+
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, exposure, dt, inf_states](size_t t){
+    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
 
       individual_index_t infectious = states->get_index_of(inf_states);
 
@@ -44,9 +48,8 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
         // calculate FoI for each age group
         Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
-        std::vector<double> beta(17, get_vector_cpp(parameters["beta_set"], tnow));
+        std::fill(beta.begin(), beta.end(), get_vector_cpp(parameters["beta_set"], tnow));
         std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
-        std::vector<double> lambda(17);
         std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
 
         // transition from S to E

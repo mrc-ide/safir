@@ -11,7 +11,7 @@
 #'
 #' @param events a list of events in the model
 #' @param variables the available human variables
-#' @param parameters model parameters
+#' @param parameters model parameters from \code{\link{get_parameters_nimue}}
 #' @param dt the time step
 #' @param shift passed to \code{\link{make_rerlang}}
 #' @noRd
