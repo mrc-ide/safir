@@ -1,4 +1,5 @@
-rm(list=ls());gc();dev.off()
+rm(list=ls());gc();
+# dev.off()
 library(safir)
 library(nimue)
 library(individual)
@@ -10,10 +11,10 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 5e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 365
+tmax <- 200
 R0 <- 4
 
-vaccine_coverage_mat <- strategy_matrix("Elderly",0.25)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
 tt_vaccine <- c(0, 10:100)
 max_vaccine <- c(0, seq(1e3, 5e4, length.out = length(tt_vaccine)-1))
 
@@ -23,9 +24,9 @@ increasing <- run(
   population = pop$n,
   R0 = R0,
   contact_matrix_set = contact_mat,
+  vaccine_coverage_mat = vaccine_coverage_mat,
   max_vaccine = max_vaccine,
-  tt_vaccine = tt_vaccine,
-  vaccine_coverage_mat = vaccine_coverage_mat
+  tt_vaccine = tt_vaccine
 )
 
 # safir run
