@@ -32,7 +32,6 @@ test_that("get contact matrix works", {
     population = pop$n,
     contact_matrix_set = contact_mat,
     iso3c = iso3c,
-    R0 = R0,
     time_period = 100
   )
 
@@ -67,6 +66,7 @@ test_that("c++ matrix ops work", {
 })
 
 test_that("get proportion vaccinated works", {
+
   age <- individual::IntegerVariable$new(initial_values = sample.int(10,1e4,T))
   vaxx <- individual::Bitset$new(1e4)
   vaxx$insert(sample.int(n = 1e4,size = 4e3,replace = F))

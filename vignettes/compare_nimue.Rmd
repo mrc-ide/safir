@@ -33,7 +33,7 @@ pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 250
+tmax <- 200
 R0 <- 4
 
 # nimue run
@@ -53,7 +53,12 @@ increasing <- run(
 
 ## Run **safir**
 
-Do a **safir** run. Because running the individual based verion of **nimue** is computationally expensive, we use `categorical_count_renderer_process_daily` and `integer_count_render_process_daily` to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes `vaccination_process_nimue_cpp` and `infection_process_nimue_cpp`.
+Do a **safir** run. Because running the individual based verion of **nimue** is computationally expensive, we use `categorical_count_renderer_process_daily` and `integer_count_render_process_daily` to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes `vaccination_process_nimue_cpp` and `infection_process_nimue_cpp` (R versions are `vaccination_process_nimue` and `infection_process_nimue_cpp`; tests are included in the package to ensure the same results are returned when using identical random number seeds).
+
+The function `get_parameters_nimue` grabs parameters directly from the **nimue** package. Then make the basic **squire** transmission model variables using `create_variables`. Then, attach additional variables to model **nimue** vaccines using `create_vaccine_variables_nimue`. The same routine is used to make events, calling `create_events` and `create_events_nimue`. Listeners are attached similarly.
+
+Next, make renderer objects. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken. The process list can then be made, and finally `setup_events_nimue` is called to queue initial events (this allows the model to be initialized from any valid state, not just S and E individuals).
+
 ```{r}
 dt <- 0.1
 

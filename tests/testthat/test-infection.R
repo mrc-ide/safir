@@ -1,67 +1,69 @@
-#
-# test_that("infection_process does not schedule infections when no-one is infected", {
-#
-#   pop <- get_population("ATG")
-#
-#   pop$n <- as.integer(pop$n / 100)
-#
-#   parameters <- get_parameters(
-#     iso3c = "ATG",
-#     population = pop$n,
-#     R0 = 2,
-#     time_period = 100,
-#     tt_contact_matrix = 0
-#   )
-#
-#   events <- create_events(parameters)
-#   variables <- create_variables(pop, parameters)
-#   attach_event_listeners(
-#     variables,
-#     events,
-#     parameters
-#   )
-#   variables$states <- mock_category(c("S", "IMild", "IAsymp", "ICase"), rep("S", 5))
-#   events$exposure <- mock_event()
-#
-#   process <- infection_process(parameters, variables, events)
-#   process(0)
-#
-#   mockery::expect_called(events$exposure$schedule, 0)
-# })
-#
-# test_that("infection_process does not schedule when no-one infects by chance", {
-#
-#   pop <- get_population("ATG")
-#
-#   pop$n <- as.integer(pop$n / 100)
-#
-#   parameters <- get_parameters(
-#     iso3c = "ATG",
-#     population = pop$n,
-#     R0 = 2,
-#     time_period = 100,
-#     tt_contact_matrix = 0
-#   )
-#
-#   events <- create_events(parameters)
-#   variables <- create_variables(pop, parameters)
-#   attach_event_listeners(
-#     variables,
-#     events,
-#     parameters
-#   )
-#   variables$states <- mock_category(c("S", "IMild", "IAsymp", "ICase"), c(rep("S", 3), "ICase", "ICase"))
-#   events$exposure <- mock_event()
-#
-#   process <- infection_process(parameters, variables, events)
-#
-#   mockery::stub(process, 'bernoulli_multi_p', mockery::mock(rep(FALSE, 3)))
-#
-#   process(1)
-#   mockery::expect_called(events$exposure$schedule, 0)
-# })
-#
-#
+
+test_that("infection_process does not schedule infections when no-one is infected", {
+
+  pop <- get_population("ATG")
+
+  pop$n <- as.integer(pop$n / 100)
+
+  parameters <- get_parameters(
+    iso3c = "ATG",
+    population = pop$n,
+    R0 = 2,
+    time_period = 100,
+    tt_contact_matrix = 0
+  )
+
+  events <- create_events(parameters)
+  variables <- create_variables(pop, parameters)
+  attach_event_listeners(
+    variables,
+    events,
+    parameters,
+    dt = 0.1
+  )
+  variables$states <- mock_category(c("S", "IMild", "IAsymp", "ICase"), rep("S", 5))
+  events$exposure <- mock_event()
+
+  process <- infection_process(parameters, variables, events)
+  process(0)
+
+  mockery::expect_called(events$exposure$schedule, 0)
+})
+
+test_that("infection_process does not schedule when no-one infects by chance", {
+
+  pop <- get_population("ATG")
+
+  pop$n <- as.integer(pop$n / 100)
+
+  parameters <- get_parameters(
+    iso3c = "ATG",
+    population = pop$n,
+    R0 = 2,
+    time_period = 100,
+    tt_contact_matrix = 0
+  )
+
+  events <- create_events(parameters)
+  variables <- create_variables(pop, parameters)
+  attach_event_listeners(
+    variables,
+    events,
+    parameters,
+    dt = 0.1
+  )
+  variables$states <- mock_category(c("S", "IMild", "IAsymp", "ICase"), c(rep("S", 3), "ICase", "ICase"))
+  events$exposure <- mock_event()
+
+  process <- infection_process(parameters, variables, events,dt = 0.1)
+
+  mockery::stub(process, 'bernoulli_multi_p', mockery::mock(rep(FALSE, 3)))
+
+  process(1)
+  mockery::expect_called(events$exposure$schedule, 0)
+})
+
+
 # test_that("infection_process gives correct lambda for infections", {
 #
 #
@@ -84,13 +86,14 @@
 #   attach_event_listeners(
 #     variables,
 #     events,
-#     parameters
+#     parameters,
+#     dt = 0.1
 #   )
 #   variables$states <- mock_category(c("S", "IMild", "IAsymp", "ICase"), c(rep("ICase", 4), rep("S", 3)))
 #   variables$discrete_age <- mock_integer(c(1, 2, 3, 3, 2, 3, 1))
 #   events$exposure <- mock_event()
 #
-#   process <- infection_process(parameters, variables, events)
+#   process <- infection_process(parameters, variables, events,dt = 0.1)
 #
 #   bernoulli_mock <- mockery::mock(c(FALSE, TRUE, TRUE))
 #   mockery::stub(process, 'bernoulli_multi_p', bernoulli_mock)
