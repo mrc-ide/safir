@@ -86,8 +86,6 @@ Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(
         // if no vaccination targets remain don't run the code to distribute vaccines
         if (std::accumulate(vaccination_target.begin(), vaccination_target.end(), 0) > 0) {
 
-          Rcpp::Rcout << "distributing vaxx on step: " << current_index + 1 << " --- \n";
-
           // clear out eligible
           *eligible &= *empty;
 
