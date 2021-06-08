@@ -113,7 +113,7 @@
 <span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2e2</span><span class="op">)</span>
 <span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
 
-<span class="va">tmax</span> <span class="op">&lt;-</span> <span class="fl">250</span>
+<span class="va">tmax</span> <span class="op">&lt;-</span> <span class="fl">200</span>
 <span class="va">R0</span> <span class="op">&lt;-</span> <span class="fl">4</span>
 
 <span class="co"># nimue run</span>
@@ -132,7 +132,9 @@
 <h2 class="hasAnchor">
 <a href="#run-safir" class="anchor"></a>Run <strong>safir</strong>
 </h2>
-<p>Do a <strong>safir</strong> run. This takes around 3-4 minutes. That’s too long and I’ll figure out how to speed it up after it’s verified against <strong>nimue</strong>.</p>
+<p>Do a <strong>safir</strong> run. Because running the individual based verion of <strong>nimue</strong> is computationally expensive, we use <code>categorical_count_renderer_process_daily</code> and <code>integer_count_render_process_daily</code> to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes <code>vaccination_process_nimue_cpp</code> and <code>infection_process_nimue_cpp</code> (R versions are <code>vaccination_process_nimue</code> and <code>infection_process_nimue_cpp</code>; tests are included in the package to ensure the same results are returned when using identical random number seeds).</p>
+<p>The function <code>get_parameters_nimue</code> grabs parameters directly from the <strong>nimue</strong> package. Then make the basic <strong>squire</strong> transmission model variables using <code>create_variables</code>. Then, attach additional variables to model <strong>nimue</strong> vaccines using <code>create_vaccine_variables_nimue</code>. The same routine is used to make events, calling <code>create_events</code> and <code>create_events_nimue</code>. Listeners are attached similarly.</p>
+<p>Next, make renderer objects. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken. The process list can then be made, and finally <code>setup_events_nimue</code> is called to queue initial events (this allows the model to be initialized from any valid state, not just S and E individuals).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dt</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
 
@@ -158,21 +160,10 @@
 <span class="fu"><a href="../reference/attach_event_listeners.html">attach_event_listeners</a></span><span class="op">(</span>variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,parameters <span class="op">=</span> <span class="va">parameters</span>, dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 <span class="fu"><a href="../reference/attach_event_listeners_nimue.html">attach_event_listeners_nimue</a></span><span class="op">(</span>variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,parameters <span class="op">=</span> <span class="va">parameters</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 
-<span class="co"># this is bad and i should feel bad</span>
-<span class="va">events</span><span class="op">$</span><span class="va">exposure</span><span class="op">$</span><span class="va">.listeners</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="va">events</span><span class="op">$</span><span class="va">exposure</span><span class="op">$</span><span class="fu">add_listener</span><span class="op">(</span>
-  <span class="fu">safir</span><span class="fu">:::</span><span class="fu">create_exposure_scheduler_listener_nimue</span><span class="op">(</span>
-    events <span class="op">=</span> <span class="va">events</span>,
-    variables <span class="op">=</span> <span class="va">variables</span>,
-    parameters <span class="op">=</span> <span class="va">parameters</span>,
-    dt <span class="op">=</span> <span class="va">dt</span>
-  <span class="op">)</span>
-<span class="op">)</span>
-
 <span class="va">renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://rdrr.io/pkg/individual/man/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
 <span class="va">vaxx_renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://rdrr.io/pkg/individual/man/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
 <span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-  <span class="fu"><a href="../reference/vaccination_process_nimue.html">vaccination_process_nimue</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
+  <span class="fu"><a href="../reference/vaccination_process_nimue_cpp.html">vaccination_process_nimue_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/infection_process_nimue_cpp.html">infection_process_nimue_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/categorical_count_renderer_process_daily.html">categorical_count_renderer_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">renderer</span>, variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">state</span>, categories <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/integer_count_render_process_daily.html">integer_count_render_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">vaxx_renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">vaccine_states</span>,margin <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
@@ -190,7 +181,7 @@
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  73.933   4.282  82.727</span></code></pre></div>
+<span class="co">#&gt;  47.723   2.375  52.102</span></code></pre></div>
 </div>
 <div id="plot-vaccinations" class="section level2">
 <h2 class="hasAnchor">
@@ -223,7 +214,7 @@
 <div id="plot-compartments" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-compartments" class="anchor"></a>Plot compartments</h2>
-<p>Compare state (compartments) output. It’s slightly off in deaths, for some reason.</p>
+<p>Compare state (compartments) output. Because <strong>nimue</strong> is an ODE model the convergence of <strong>safir</strong> to it’s results is highly dependent upon the size of dt. Smaller dt will lead to more similar results. The stochastic version of <strong>squire</strong>, on the other hand, uses a discretization of the continuous time Markov process so results should look exactly identical between those two with the same dt.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># extract data - state</span>
 <span class="va">safir_compartments</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"S"</span>,<span class="st">"E"</span>,<span class="st">"D"</span>,<span class="st">"R"</span>,<span class="st">"IMild"</span>,<span class="st">"ICase"</span>,<span class="st">"IRec"</span>,<span class="st">"IOxGetDie"</span>,<span class="st">"IOxNotGetDie"</span>,<span class="st">"IOxNotGetLive"</span>,<span class="st">"IOxGetLive"</span>,<span class="st">"IMVNotGetDie"</span>,<span class="st">"IMVNotGetLive"</span>,<span class="st">"IMVGetLive"</span>,<span class="st">"IMVGetDie"</span><span class="op">)</span>
