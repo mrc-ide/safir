@@ -43,9 +43,13 @@ There's some functions in weighted_efficacy.R we should be familiar with:
 
 * `assign_doses`: this function is simple, given an integer number of doses and a vector of eligible populations (by age), distributes the doses. If num doses > sum(target_pop), everyone gets one. If not, assign doses weighted proportionally to population size.
 
-* `coverage`: this function takes a data structure (`dose_times`) that is a list of length `N_age` and in each element is a matrix of dims (`N_pop_age` (size of age group) X `N_doses`). So if age group 1 had 5 people and this vaccine had 2 doses, it would be a 5x2 matrix. If a person hasn't recieved that dose yet, the element of the matrix is `NA`. If they have, the time it was given is the integer day. `coverage` then computes the coverage % for each age for the user input `dose_number`. So the output is a vector of length equal to the list length `N_age`.
+* `coverage`: this function takes a data structure (`dose_times`) that is a list of length `N_age` and in each element is a matrix of dims (`N_pop_age` (size of age group) X `N_doses`). So if age group 1 had 5 people and this vaccine had 2 doses, it would be a 5x2 matrix. If a person hasn't recieved that dose yet, the element of the matrix is `NA`. If they have, the time it was given is the integer day. `coverage` then computes the coverage % for each age for the user input `dose_number`. So the output is a vector of length equal to the list length `N_age`. The **safir** equivalent is `get_proportion_vaccinated` and `get_proportion_vaccinated_type`.
 
 * `eligable_for_second`: this function takes the same data structure (`dose_times`) as `coverage`. It returns a list of length `N_age` of vectors of length equal to `N_pop_age`. Each element says if this person is eligible for 2nd dose. It checks for each person if `t - first_dose_time >= dose_period` (where `dose_period` is days between dose 1 and dose 2), and that person has not already had their second dose.
+
+* `administer_first_dose`: this simple function takes in a vector of doses by age group, and the `dose_times` data structure. It updates `dose_times` (`NA` values become current `t`)
+
+* `administer_second_dose`: same as `administer_first_dose` but uses `eligable_for_second` to check if those people are eligible before administration.
 
 * `target_pop`: this function finds the number of individuals in each age group to vaccinate for a given dose `dose_number`.
   ```{r}
@@ -65,9 +69,6 @@ The way it works is like this:
 1. the code computes `current_coverage <- coverage(dose_times, dose_number)`
 2. `n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * sapply(dose_times, nrow))` this first computes the fraction remaining to vaccinate `pmax(0, (prioritisation - current_coverage))`, which may be zero if that age group is not in the current row of the prioritization matrix. Then multiplying by the number of people in each age group and taking ceiling gives the number who are eligible for vaccination by age group.
 3.  if this is for second dose, there's some more logic. `eligable <- sapply(eligable_for_second(dose_times, t, dose_period), sum)` gives the number of people in each age group who are eligible for 2nd dose (past the `dose_period`). Then `n_to_cover <- pmin(n_to_cover, eligable) * d2_prioritise` gets the final number who may be vaccinated, which is the minimum of this value, and `n_to_cover`, which was computed without regard to time. Finally multiply by the `d2_prioritise` for age groups being prioritized (or not).
-
-* `administer_first_dose`: this simple function takes in a vector of doses by age group, and the `dose_times` data structure. It updates `dose_times` (`NA` values become current `t`)
-* `administer_second_dose`: same as `administer_first_dose` but uses `eligable_for_second` to check if those people are eligible before administration.
 
 So those are the individual functions. They all get wrapped up in the big one, `weighted_efficacy` which actually runs the vaccine distribution "simulation". This one has four steps:
 
