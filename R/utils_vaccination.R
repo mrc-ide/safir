@@ -45,25 +45,44 @@ get_proportion_vaccinated_type <- function(variables, age, type, dose) {
 
 
 #' @title Identity those persons eligible for a dose
-#' @description Find those individuals who have had the dose preceding \code{dose_number},
+#' @description Find those individuals who have had the dose preceding \code{dose},
 #' have not yet received the next one, and are beyond the \code{dose_period}.
 #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
 #' This function should only be called if simulation time is greater than the \code{dose_period}
-#' @param dose_number which dose? (must be greater than 1)
-#' @param dose_period days between \code{dose_number} and the previous dose (please make sure \code{dose_number / dt} produces an integer number of timesteps)
+#' @param dose which dose? (must be greater than 1)
+#' @param dose_period days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)
 #' @param variables a list
 #' @param t the current time step
 #' @param dt size of the time step
 #' @return an \code{\link[individual]{Bitset}}
 #' @export
-eligible_for_dose_vaccine <- function(dose_number, dose_period, variables, t, dt, N) {
-  stopifnot(dose_number > 1)
+eligible_for_dose_vaccine <- function(dose, dose_period, variables, t, dt) {
+  stopifnot(dose > 1)
   # who has gotten the previous dose? (with correction for dt < 1)
-  had_previous_beyond_threshold <- variables$dose_time[[dose_number - 1]]$get_index_of(a = 0, b = t - as.integer(dose_period/dt))
+  had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = t - as.integer(dose_period/dt))
   # who has not gotten the next one?
-  not_had_next <- variables$dose_time[[dose_number]]$get_index_of(set = -1)
+  not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
   # return people past the threshold and who haven't gotten the next one yet
   return(not_had_next$and(had_previous_beyond_threshold))
 }
 
 # eligible_for_dose_vaccine_type same as above but with types
+
+# # combines target_pop with assign_doses
+# target_assign_pop_vaccine <- function(dose, type, dose_period, variables, t, N_age, prioritisation, vaxx_priority) {
+#
+#   # Current coverage of specified dose number
+#   current_coverage <- sapply(X = 1:N_age,FUN = function(a){
+#     get_proportion_vaccinated(variables = variables,age = a,dose = dose)
+#   })
+#
+#   # Remaining population left to cover with current dose number to reach target coverage in prioritisation step
+#   age_group_size <- sapply(X = 1:N_age,FUN = function(a){variables$discrete_age$get_size_of(set = a)})
+#   n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * age_group_size)
+#
+#   if (dose > 1) {
+#     # Population eligible for current dose number - must be a certain period after previous dose
+#     eligable <- sapply(eligable_for_second(dose_times, t, dose_period), sum)
+#   }
+#
+# }

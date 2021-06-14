@@ -82,6 +82,26 @@ So those are the individual functions. They all get wrapped up in the big one, `
 
 We just need to replicate this at each step in **safir**. The big remaining question is just how `infection_efficacy` and `disease_efficacy` work in **safir**.
 
+### **safir** implementation
+
+#### *nimue*
+In **nimue**, phase 2 is reached when dose 1 coverage >= final step of prioritization matrix and dose 2 coverage for groups prioritized for dose 2 >= final step of prioritization matrix.
+
+#### **safir**
+In **safir** we will have arbitrarily many doses. How do we do this same thing when `N_dose = 2` but also generalize to the general case? We track what dose we are giving out by the variable `phase`.
+
+Within each value of `phase` (for now, arbitrarily assume `phase = 1`), we need to give out doses according to the prioritization matrix. On a step:
+  
+  1. find out what step of `vaccine_coverage_mat` we are on using existing code, distribute `phase` doses to age groups in that step whose coverage < that step's prioritization coverage
+  2. give out remaining doses as `phase + 1` doses to age groups in this step who are eligible *and* are prioritized based on `vaxx_priority[phase, ]`.
+  3. if doses still remain, assign `phase` doses to individuals based on going through the rest of the `vaccine_coverage_mat`
+  4. if we are at the final stage of prioritization and all `phase` dose coverage is fulfilled, and `phase + 1` coverage fulfilled for `vaxx_priority[phase, ]` age groups, set `phase = phase + 1` and advance.
+  
+The only slight modification is what goes on during the final phase. In this case the algorithm is much simpler. It just gives out final doses for everyone until the coverage targets are hit. If for whatever reason the maximum phase is 1, then treat the initial phase as the maximum phase.
+
+  1. find out what step of `vaccine_coverage_mat` we are on using existing code, distribute `phase` doses to age groups in that step whose coverage < that step's prioritization coverage.
+  2. if doses still remain, assign `phase` doses to individuals based on going through the rest of the `vaccine_coverage_mat`
+
 ### Parameters needed
 
 We need new parameters in the list of named parameters.
@@ -89,6 +109,11 @@ We need new parameters in the list of named parameters.
   * `N_dose`: number of doses. Can be a scalar or a vector (by num types).
   * `N_type`: number of types of vaccines
   * `vaxx_types`: character vector of type names
+  * `vaxx_priority`: a matrix, `N_dose - 1` by `N_age` (so if `N_dose` is 1, this is set to `NULL`). This matrix goes from 1,...,`N_dose - 1` and tells us, on this phase, what age group should get prioritized for the next dose.
+  
+We need a new variable to be in the list `variables`
+
+  * `phase`: an integer in `1:N_dose`, telling us what phase we are on. The phase advances to `phase + 1` when for the current phase, all current dose coverage >= final step of prioritization matrix *and* next dose coverage for prioritized groups >= final step of prioritization matrix.
 
 ## Vaccination
 

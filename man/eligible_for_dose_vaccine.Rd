@@ -4,12 +4,12 @@
 \alias{eligible_for_dose_vaccine}
 \title{Identity those persons eligible for a dose}
 \usage{
-eligible_for_dose_vaccine(dose_number, dose_period, variables, t, dt)
+eligible_for_dose_vaccine(dose, dose_period, variables, t, dt)
 }
 \arguments{
-\item{dose_number}{which dose? (must be greater than 1)}
+\item{dose}{which dose? (must be greater than 1)}
 
-\item{dose_period}{days between \code{dose_number} and the previous dose (please make sure \code{dose_number / dt} produces an integer number of timesteps)}
+\item{dose_period}{days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)}
 
 \item{variables}{a list}
 
@@ -21,7 +21,8 @@ eligible_for_dose_vaccine(dose_number, dose_period, variables, t, dt)
 an \code{\link[individual]{Bitset}}
 }
 \description{
-Find those individuals who have had the dose preceding \code{dose_number},
+Find those individuals who have had the dose preceding \code{dose},
 have not yet received the next one, and are beyond the \code{dose_period}.
 This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
+This function should only be called if simulation time is greater than the \code{dose_period}
 }
