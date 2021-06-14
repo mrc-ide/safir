@@ -63,8 +63,9 @@ create_vaccine_variables <- function(variables, pop, vaxx_types = c("AZ", "MD", 
 
   n <- sum(pop$n)
 
+  variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
-  variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = vaxx_types,initial_values = rep("novax",n)))
+  variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = vaxx_types,initial_values = rep("novax",n)),simplify = FALSE)
 
   return(variables)
 }

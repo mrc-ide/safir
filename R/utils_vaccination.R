@@ -22,6 +22,7 @@ get_proportion_vaccinated <- function(variables, age, dose) {
   return( vaccinated_bset$size() / N )
 }
 
+
 #' @title Get proportion of an age group that is vaccinated, by type
 #' @description Get proportion of an age group that has received a particular vaccine type and dose
 #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
@@ -42,10 +43,12 @@ get_proportion_vaccinated_type <- function(variables, age, type, dose) {
   return( vaccinated_bset$size() / N )
 }
 
+
 #' @title Identity those persons eligible for a dose
 #' @description Find those individuals who have had the dose preceding \code{dose_number},
 #' have not yet received the next one, and are beyond the \code{dose_period}.
 #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
+#' This function should only be called if simulation time is greater than the \code{dose_period}
 #' @param dose_number which dose? (must be greater than 1)
 #' @param dose_period days between \code{dose_number} and the previous dose (please make sure \code{dose_number / dt} produces an integer number of timesteps)
 #' @param variables a list
@@ -53,7 +56,7 @@ get_proportion_vaccinated_type <- function(variables, age, type, dose) {
 #' @param dt size of the time step
 #' @return an \code{\link[individual]{Bitset}}
 #' @export
-eligible_for_dose_vaccine <- function(dose_number, dose_period, variables, t, dt) {
+eligible_for_dose_vaccine <- function(dose_number, dose_period, variables, t, dt, N) {
   stopifnot(dose_number > 1)
   # who has gotten the previous dose? (with correction for dt < 1)
   had_previous_beyond_threshold <- variables$dose_time[[dose_number - 1]]$get_index_of(a = 0, b = t - as.integer(dose_period/dt))
@@ -62,3 +65,5 @@ eligible_for_dose_vaccine <- function(dose_number, dose_period, variables, t, dt
   # return people past the threshold and who haven't gotten the next one yet
   return(not_had_next$and(had_previous_beyond_threshold))
 }
+
+# eligible_for_dose_vaccine_type same as above but with types

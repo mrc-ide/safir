@@ -35,7 +35,7 @@ Most of the simulation updates state by TargetedEvents. When a targeted event fi
 
 There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.
 
-## Vaccination (multiple dosing)
+## Vaccination (multiple dosing model)
 
 Now that **nimue** has an approximation of multiple dosing strategies based on weighting the time varying efficacy let's see how to do this in **safir**.
 
@@ -81,6 +81,14 @@ So those are the individual functions. They all get wrapped up in the big one, `
   4. When all of dose1 coverages are >= the final step of the prioritisation matrix AND all of dose 2 coverages for age groups prioritised for 2nd dose >= the final step of the prioritisation matrix, we "reset" the prioritisation matrix to the first row and step through ensuring all remaining dose2 coverage > current prioritisation coverage (https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L260-L268)
 
 We just need to replicate this at each step in **safir**. The big remaining question is just how `infection_efficacy` and `disease_efficacy` work in **safir**.
+
+### Parameters needed
+
+We need new parameters in the list of named parameters.
+
+  * `N_dose`: number of doses. Can be a scalar or a vector (by num types).
+  * `N_type`: number of types of vaccines
+  * `vaxx_types`: character vector of type names
 
 ## Vaccination
 
