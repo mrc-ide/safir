@@ -206,6 +206,8 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
 #' @param n_to_cover Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop}}
 assign_doses <- function(t, dt, doses, n_to_cover, variables, events, phase, parameters) {
 
+  stop("not done writing this one yet!")
+
   # eligible people by age
   eligible <- eligible_for_dose_vaccine(dose = phase,parameters = parameters,variables = variables,t = t, dt = dt)
   eligible_age_counts <- rep(0, parameters$N_age)
@@ -224,12 +226,27 @@ assign_doses <- function(t, dt, doses, n_to_cover, variables, events, phase, par
     # queue a vaccine for everyone (queue event for everyone)
     # now use the vector assigned to send out vaccines
     for (a in 1:parameters$N_age) {
-      # event$thing$schedule(eligible_age_bset[a])
+      stopifnot(eligible_age_bset[a]$size() != n_to_cover[a]) # take this out when done debugging
+      # event$thing$schedule(eligible_age_bset[a]) SCHEDULE IT
     }
-
 
   } else {
     # dose scarcity; need to allocate proportional to group size
+    group_weights <- eligible_age_counts / sum(eligible_age_counts)
+    assigned <- floor(doses * group_weights)
+    if(sum(assigned) != doses){
+      assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (doses %% length(group_weights)))
+    }
+    # now use the vector assigned to send out vaccines
+    for (a in 1:parameters$N_age) {
+
+      num_to_retain <- assigned[a]
+      n <- eligible_age_bset[a]
+      to_remove <- sample.int(n = n,size = n - num_to_keep,replace = FALSE)
+      eligible_age_bset[a]$remove(to_remove)
+      # event$thing$schedule(eligible_age_bset[a]) SCHEDULE IT
+
+    }
 
   }
 
