@@ -2,6 +2,7 @@
 
 export("%>%")
 export(age_group_eligible_for_dose_vaccine)
+export(assign_doses)
 export(attach_event_listeners)
 export(attach_event_listeners_nimue)
 export(categorical_count_renderer_process_daily)

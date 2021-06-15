@@ -340,3 +340,40 @@ test_that("target_pop working in general case", {
   )
 
 })
+
+
+test_that("simple assign doses is working", {
+
+  parameters <- list(
+    population = rep(10,3),
+    N_age = 3,
+    dose_period = c(NaN, 6, 4),
+    N_phase = 3
+  )
+
+  n <- sum(parameters$population)
+  variables <- list(
+    discrete_age = IntegerVariable$new(rep(1:3,times=parameters$population)),
+    dose_time = NULL
+  )
+
+  # won't assign no doses
+  variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
+  variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
+  variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+
+  variables$phase <- 1
+  safir::assign_doses(t = 14,dt = 1,doses = 0,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
+
+  expect_equal(
+    nimue:::assign_doses(doses = 0,target_pop =  c(10, 10, 10)),
+    c(0,0,0)
+  )
+  expect_equal(
+    events$scheduled_dose[[1]]$get_scheduled()$size(),
+    0
+  )
+
+
+})
