@@ -14,8 +14,8 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   variables$dose_type <- list()
   variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
   variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
-  variables$dose_type[[1]] <- CategoricalVariable$new(categories = "a",initial_values = rep("a",length(dose_1)))
-  variables$dose_type[[2]] <- CategoricalVariable$new(categories = "a",initial_values = rep("a",length(dose_2)))
+  variables$dose_type[[1]] <- CategoricalVariable$new(categories = c("a"),initial_values = rep("a",length(dose_1)))
+  variables$dose_type[[2]] <- CategoricalVariable$new(categories = c("a"),initial_values = rep("a",length(dose_2)))
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
 
   cov_safir <- sapply(X = 1:length(dose_times),FUN = function(a){
@@ -73,7 +73,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   dose_period <- 14
   dt <- 1
 
-  eligible <- eligible_for_dose_vaccine(dose_number = 2,dose_period = dose_period,variables = variables,t = t,dt = dt)
+  eligible <- eligible_for_dose_vaccine(dose = 2,dose_period = dose_period,variables = variables,t = t,dt = dt)
 
   expect_equal(
     which(unlist(nimue:::eligable_for_second(dose_times, t, dose_period))),

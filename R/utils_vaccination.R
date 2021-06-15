@@ -16,7 +16,7 @@
 get_proportion_vaccinated <- function(variables, age, dose) {
   age_bset <- variables$discrete_age$get_index_of(age)
   N <- age_bset$size()
-  vaccinated_bset <- variables$dose_type[[dose]]$get_index_of("UNVACC") # haven't gotten this dose
+  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
   vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
   vaccinated_bset$and(age_bset)
   return( vaccinated_bset$size() / N )
@@ -37,7 +37,7 @@ get_proportion_vaccinated_type <- function(variables, age, type, dose) {
   age_bset <- variables$discrete_age$get_index_of(age)
   N <- age_bset$size()
   type_bset <- variables$dose_type[[dose]]$get_index_of(type)
-  vaccinated_bset <- variables$dose_type[[dose]]$get_index_of("UNVACC") # haven't gotten this dose
+  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
   vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
   vaccinated_bset$and(age_bset)$and(type_bset)
   return( vaccinated_bset$size() / N )
