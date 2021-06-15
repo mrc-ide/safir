@@ -87,7 +87,11 @@ age_group_eligible_for_dose_vaccine <- function(dose, dose_period, N_age, variab
   out <- rep(0, N_age)
   if (dose > 1) {
     # who has gotten the previous dose? (with correction for dt < 1)
-    had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = t - as.integer(dose_period/dt))
+    threshold <- t - as.integer(dose_period/dt)
+    if (threshold < 0) {
+      return(out)
+    }
+    had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
     # who has not gotten the next one?
     not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
     # people past the threshold and who haven't gotten the next one yet
@@ -148,8 +152,11 @@ get_current_prioritization_step <- function(variables, parameters, dose) {
 #' @export
 target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
 
-  if (phase == parameters$N_phase & !is.null(vaxx_priority)) {
-    stop("on final phase no vaxx_priority for next phase should be given")
+  if (phase == variables$phase & phase == parameters$N_phase & !is.null(vaxx_priority)) {
+    stop("on final phase no vaxx_priority for next phase should NULL")
+  }
+  if (variables$phase == phase & !is.null(vaxx_priority)) {
+    stop("if giving vaccines to the current phase (not prioritized for phase + 1), vaxx_priority should be NULL")
   }
 
   # current coverage by age in this phase
@@ -165,8 +172,25 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
   # Remaining population left to cover with current dose number (phase) to reach target coverage in prioritisation step
   n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * age_size)
 
-  # eligible group
-  eligible <- eligible_for_dose_vaccine(dose = phase,dose_period = parameters$dose_period[dose],variables = variables,t = t, dt = dt)
+  if (phase > 1) {
+
+    # eligible group
+    eligible <- age_group_eligible_for_dose_vaccine(dose = phase,dose_period = parameters$dose_period[phase],N_age = parameters$N_age,variables = variables,t = t, dt = dt)
+
+    if (!is.null(vaxx_priority)) {
+      # giving priority vaccine doses to phase + 1
+      n_to_cover <- pmin(n_to_cover, eligible) * vaxx_priority
+      return(n_to_cover)
+    } else {
+      # normal phase; do not check vaxx_priority
+      n_to_cover <- pmin(n_to_cover, eligible)
+      return(n_to_cover)
+    }
+
+  } else {
+    # phase 1, we can find out just from proportion with coverage the number to give
+    return(n_to_cover)
+  }
 
 }
 

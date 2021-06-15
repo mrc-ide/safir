@@ -151,5 +151,156 @@ test_that('prioritization steps are working', {
     }
   }
 
+})
+
+
+test_that("target_pop are giving the same results between safir and nimue", {
+  dose_times <- list(matrix(c(1, 2, NA, NA, 3, NA), nrow = 3),
+                     matrix(c(NA, NA, NA, NA, 3, 4), nrow = 3),
+                     matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
+
+  dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
+  dose_1[which(is.na(dose_1))] <- -1
+
+  dose_2 <- unlist(lapply(dose_times,function(x){x[,2]}))
+  dose_2[which(is.na(dose_2))] <- -1
+
+  variables <- list()
+  variables$dose_time <- list()
+  variables$dose_type <- list()
+  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
+  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
+  variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
+
+  parameters <- list(
+    N_age = 3,
+    dose_period = c(NaN, 14, NaN),
+    N_phase = 3
+  )
+
+  # Dose 1
+  d1_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = rep(1, 3),
+                     t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  variables$phase <- 1
+  d1_s <- safir::target_pop(
+    phase = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3)
+  )
+
+  expect_equal(d1_n,d1_s)
+
+  # Dose 1 as a function of prioritisation matrix
+  d1_pri_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = c(0, 1, 0),
+                         t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  d1_pri_s <- safir::target_pop(
+    phase = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = c(0,1,0)
+  )
+
+  expect_equal(d1_pri_n,d1_pri_s)
+
+  # Dose 2 - none as all d2_prioritise set to FALSE
+  d2_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+                     t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  variables$phase <- 1
+  d2_s <- safir::target_pop(
+    phase = 2,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(0, 3)
+  )
+
+  expect_equal(d2_n,d2_s)
+
+  # Dose 2 - none as too soon after dose 1
+  d2_t_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+             t = 1, dose_period = 14, d2_prioritise = rep(TRUE, 3))
+
+  variables$phase <- 1
+  d2_t_s <- safir::target_pop(
+    phase = 2,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(1, 3)
+  )
+
+  expect_equal(d2_t_n,d2_t_s)
+
+  # Dose 2
+  d2_ok_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+                        t = 15, dose_period = 14, d2_prioritise = rep(TRUE, 3))
+
+  variables$phase <- 1
+  d2_ok_s <- safir::target_pop(
+    phase = 2,variables = variables,parameters = parameters,t = 15,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(1, 3)
+  )
+
+  expect_equal(d2_ok_n,d2_ok_s)
+})
+
+
+test_that("target_pop working in general case", {
+
+  n <- 15
+  variables <- list(
+    discrete_age = IntegerVariable$new(rep(1:3,each=5)),
+    dose_time = NULL
+  )
+  variables$dose_time[[1]] <- IntegerVariable$new(rep(1:3,each=5))
+  variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
+  variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+
+  parameters <- list(
+    N_age = 3,
+    dose_period = c(NaN, 6, 4),
+    N_phase = 3
+  )
+
+  # all phase 1 targets reached
+  variables$phase <- 1
+  expect_equal(
+    safir::target_pop(
+      phase = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3)
+    ),
+    rep(0, 3)
+  )
+
+  # at time 8 only groups 1 and 2 are good for phase 2
+  variables$phase <- 2
+  expect_equal(
+    safir::target_pop(
+      phase = 2,variables = variables,parameters = parameters,t = 8,dt = 1,prioritisation = rep(1,3)
+    ),
+    c(5,5,0)
+  )
+
+  # phase 2 vaccinate group 3 at t = 9, they are prioritized for phase 3
+  variables$dose_time[[2]] <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
+  variables$phase <- 2
+  # should be up for phase 3 if t =13
+  expect_equal(
+    safir::target_pop(
+      phase = 3,variables = variables,parameters = parameters,t = 13,dt = 1,prioritisation = rep(1,3),vaxx_priority = c(0,0,1)
+    ),
+    c(0,0,5)
+  )
+  # not if t=12
+  expect_equal(
+    safir::target_pop(
+      phase = 3,variables = variables,parameters = parameters,t = 12,dt = 1,prioritisation = rep(1,3),vaxx_priority = c(0,0,1)
+    ),
+    c(0,0,0)
+  )
+
+  # phase 3, group 3 should all be ready to go regardless of priority if t = 13
+  variables$phase <- 3
+  expect_equal(
+    safir::target_pop(
+      phase = 3,variables = variables,parameters = parameters,t = 13,dt = 1,prioritisation = rep(1,3)
+    ),
+    c(0,0,5)
+  )
+  #  not if t = 12
+  expect_equal(
+    safir::target_pop(
+      phase = 3,variables = variables,parameters = parameters,t = 12,dt = 1,prioritisation = rep(1,3)
+    ),
+    c(0,0,0)
+  )
 
 })
