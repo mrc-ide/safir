@@ -4,12 +4,7 @@
 \alias{create_vaccine_variables}
 \title{Create vaccination variables}
 \usage{
-create_vaccine_variables(
-  variables,
-  pop,
-  vaxx_types = c("AZ", "MD", "PF", "JJ", "novax"),
-  max_dose = 2
-)
+create_vaccine_variables(variables, pop, vaxx_types, max_dose = 2)
 }
 \arguments{
 \item{variables}{a list}

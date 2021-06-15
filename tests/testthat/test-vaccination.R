@@ -81,6 +81,35 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   )
 })
 
+test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equivalent results with same input', {
+  dose_times <- list(matrix(c(1, 2, NA, NA, 3, NA), nrow = 3),
+                     matrix(c(NA, NA, NA, NA, 3, 4), nrow = 3),
+                     matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
+
+  dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
+  dose_1[which(is.na(dose_1))] <- -1
+
+  dose_2 <- unlist(lapply(dose_times,function(x){x[,2]}))
+  dose_2[which(is.na(dose_2))] <- -1
+
+  variables <- list()
+  variables$discrete_age <- IntegerVariable$new(rep(1:3,each=3))
+  variables$dose_time <- list()
+  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
+  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
+
+  t <- 200
+  dose_period <- 14
+  dt <- 1
+
+  eligible <- age_group_eligible_for_dose_vaccine(dose = 2,dose_period = dose_period,variables = variables,t = t,dt = dt,N_age = 3)
+
+  expect_equal(
+    sapply(nimue:::eligable_for_second(dose_times, t, dose_period),sum),
+    eligible
+  )
+})
+
 
 test_that('prioritization steps are working', {
 
