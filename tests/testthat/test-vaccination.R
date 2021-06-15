@@ -116,7 +116,7 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
   variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
 
-  t <- 200
+  t <- 1
   dt <- 1
 
   parameters <- list(
@@ -129,6 +129,20 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   expect_equal(
     sapply(nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2]),sum),
     eligible
+  )
+
+  t <- 1
+  parameters$dose_period[2] <- 0
+  expect_equal(
+    age_group_eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt),
+    sapply(nimue:::eligable_for_second(dose_times, t, 0),sum)
+  )
+
+  t <- 200
+  parameters$dose_period[2] <- 14
+  expect_equal(
+    age_group_eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt),
+    sapply(nimue:::eligable_for_second(dose_times, t, 14),sum)
   )
 })
 
