@@ -351,9 +351,11 @@ test_that("simple assign doses is working", {
     N_phase = 3
   )
 
+  pop_ages <- rep(1:3,times=parameters$population)
+
   n <- sum(parameters$population)
   variables <- list(
-    discrete_age = IntegerVariable$new(rep(1:3,times=parameters$population)),
+    discrete_age = IntegerVariable$new(pop_ages),
     dose_time = NULL
   )
 
@@ -371,9 +373,42 @@ test_that("simple assign doses is working", {
     c(0,0,0)
   )
   expect_equal(
-    events$scheduled_dose[[1]]$get_scheduled()$size(),
-    0
+    sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
+    c(0,0,0)
   )
 
+  # assigns all doses
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  variables$phase <- 1
+  safir::assign_doses(t = 14,dt = 1,doses = 30,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
+
+  sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+
+  expect_equal(
+    pop_ages,
+    sched
+  )
+
+  # assigns partial doses (1)
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  variables$phase <- 1
+  safir::assign_doses(t = 14,dt = 1,doses = 15,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
+
+  sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  expect_equal(
+    c(5,5,5),
+    as.vector(table(sched))
+  )
+
+  # assigns partial doses (2)
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  variables$phase <- 1
+  safir::assign_doses(t = 14,dt = 1,doses = 16,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
+
+  sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  expect_equal(
+    c(5,5,6),
+    as.vector(table(sched))
+  )
 
 })

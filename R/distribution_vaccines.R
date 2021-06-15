@@ -232,7 +232,7 @@ assign_doses <- function(t, dt, doses, n_to_cover, variables, events, phase, par
     # queue a vaccine for everyone (queue event for everyone)
     # now use the vector assigned to send out vaccines
     for (a in 1:parameters$N_age) {
-      stopifnot(eligible_age_counts[a] != n_to_cover[a]) # take this out when done debugging
+      stopifnot(eligible_age_counts[a] == n_to_cover[a]) # take this out when done debugging
       # event$thing$schedule(eligible_age_bset[a]) SCHEDULE IT
       events$scheduled_dose[[phase]]$schedule(target = eligible_age_bset[[a]], delay = 0)
     }
