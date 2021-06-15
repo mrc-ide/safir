@@ -80,3 +80,47 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
     eligible$to_vector()
   )
 })
+
+
+test_that('prioritization steps are working', {
+
+  n <- 1e4
+  ages_size <- distribute(n = n,p = 17)
+  ages <- rep(x = 1:17, times = ages_size)
+
+  strat <- strategy_matrix(strategy = "Elderly")
+
+  parameters <- list(
+    N_age = 17,
+    N_prioritisation_steps = nrow(strat),
+    vaccine_coverage_mat = strat
+  )
+
+  for (i in 1:nrow(strat)) {
+
+    variables <- list(discrete_age = IntegerVariable$new(initial_values = ages), dose_time = NULL)
+    variables$dose_time[[1]] <- IntegerVariable$new(initial_values = rep(-1,n))
+
+    ages_to_vaxx <- which(strat[i, ] > 0)
+    perc_to_vaxx <- strat[i, ages_to_vaxx]
+    for (a in seq_along(ages_to_vaxx)) {
+      bset_a <- variables$discrete_age$get_index_of(set = ages_to_vaxx[a])
+      bset_a <- filter_bitset(bitset = bset_a,other = 1:floor(bset_a$size() * (perc_to_vaxx[a]+0.05)))
+      variables$dose_time[[1]]$queue_update(values = 1,index = bset_a)
+      variables$dose_time[[1]]$.update()
+    }
+
+    step <- get_current_prioritization_step(variables = variables,parameters = parameters,dose = 1)
+    if (i < nrow(strat)) {
+      expect_equal(
+        step, i + 1
+      )
+    } else {
+      expect_equal(
+        step, i
+      )
+    }
+  }
+
+
+})
