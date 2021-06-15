@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_vaccination.R
 \name{get_proportion_vaccinated_type}
 \alias{get_proportion_vaccinated_type}
-\title{Get proportion of an age group that is vaccinated, by type}
+\title{Get proportion of an age group that is vaccinated (multi-dose, with types)}
 \usage{
 get_proportion_vaccinated_type(variables, age, type, dose)
 }

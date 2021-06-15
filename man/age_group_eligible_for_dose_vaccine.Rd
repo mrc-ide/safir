@@ -2,14 +2,14 @@
 % Please edit documentation in R/utils_vaccination.R
 \name{age_group_eligible_for_dose_vaccine}
 \alias{age_group_eligible_for_dose_vaccine}
-\title{Find number of individuals in each age group eligible for a dose}
+\title{Find number of individuals in each age group eligible for a dose (multi-dose, no types)}
 \usage{
-age_group_eligible_for_dose_vaccine(dose, dose_period, N_age, variables, t, dt)
+age_group_eligible_for_dose_vaccine(dose, parameters, variables, t, dt)
 }
 \arguments{
 \item{dose}{which dose?}
 
-\item{dose_period}{days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)}
+\item{parameters}{a list}
 
 \item{variables}{a list}
 

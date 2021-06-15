@@ -2,7 +2,7 @@
 % Please edit documentation in R/events_vaccination.R
 \name{create_vaccination_dose_listener}
 \alias{create_vaccination_dose_listener}
-\title{Create listener for vaccination dose}
+\title{Create listener for vaccination dose (multi-dose, no types)}
 \usage{
 create_vaccination_dose_listener(variables, parameters, type, dose)
 }

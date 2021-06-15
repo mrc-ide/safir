@@ -6,7 +6,7 @@
 # --------------------------------------------------
 
 
-#' @title Get proportion of an age group that is vaccinated
+#' @title Get proportion of an age group that is vaccinated (multi-dose, no types)
 #' @description Get proportion of an age group that has received a particular vaccine dose
 #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
 #' @param variables a list
@@ -24,7 +24,7 @@ get_proportion_vaccinated <- function(variables, age, dose) {
 }
 
 
-#' @title Get proportion of an age group that is vaccinated, by type
+#' @title Get proportion of an age group that is vaccinated (multi-dose, with types)
 #' @description Get proportion of an age group that has received a particular vaccine type and dose
 #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
 #' @param variables a list
@@ -45,25 +45,29 @@ get_proportion_vaccinated_type <- function(variables, age, type, dose) {
 }
 
 
-#' @title Identity those persons eligible for a dose
+#' @title Identity those persons eligible for a dose (multi-dose, no types)
 #' @description Find those individuals who have had the dose preceding \code{dose},
 #' have not yet received the next one, and are beyond the \code{dose_period}.
 #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
 #' This function should only be called if simulation time is greater than the \code{dose_period}
 #' @param dose which dose?
-#' @param dose_period days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)
+#' @param parameters a list
 #' @param variables a list
 #' @param t the current time step
 #' @param dt size of the time step
 #' @return an \code{\link[individual]{Bitset}}
 #' @export
-eligible_for_dose_vaccine <- function(dose, dose_period, variables, t, dt) {
+eligible_for_dose_vaccine <- function(dose, parameters, variables, t, dt) {
   if (dose > 1) {
     # who has gotten the previous dose? (with correction for dt < 1)
-    had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = t - as.integer(dose_period/dt))
+    threshold <- t - as.integer(parameters$dose_period[dose]/dt)
+    if (threshold < 0) {
+      return(individual::Bitset$new(sum(parameters$population)))
+    }
+    had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
     # who has not gotten the next one?
     not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
-    # return people past the threshold and who haven't gotten the next one yet
+    # people past the threshold and who haven't gotten the next one yet
     return(not_had_next$and(had_previous_beyond_threshold))
   } else {
     not_had_first_dose <- variables$dose_time[[dose]]$get_index_of(set = -1)
@@ -71,23 +75,23 @@ eligible_for_dose_vaccine <- function(dose, dose_period, variables, t, dt) {
   }
 }
 
-#' @title Find number of individuals in each age group eligible for a dose
+#' @title Find number of individuals in each age group eligible for a dose (multi-dose, no types)
 #' @description Find those individuals who have had the dose preceding \code{dose},
 #' have not yet received the next one, and are beyond the \code{dose_period}.
 #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
 #' This function should only be called if simulation time is greater than the \code{dose_period}
 #' @param dose which dose?
-#' @param dose_period days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)
+#' @param parameters a list
 #' @param variables a list
 #' @param t the current time step
 #' @param dt size of the time step
 #' @return a vector of population sizes
 #' @export
-age_group_eligible_for_dose_vaccine <- function(dose, dose_period, N_age, variables, t, dt) {
-  out <- rep(0, N_age)
+age_group_eligible_for_dose_vaccine <- function(dose, parameters, variables, t, dt) {
+  out <- rep(0, parameters$N_age)
   if (dose > 1) {
     # who has gotten the previous dose? (with correction for dt < 1)
-    threshold <- t - as.integer(dose_period/dt)
+    threshold <- t - as.integer(parameters$dose_period[dose]/dt)
     if (threshold < 0) {
       return(out)
     }
@@ -97,7 +101,7 @@ age_group_eligible_for_dose_vaccine <- function(dose, dose_period, N_age, variab
     # people past the threshold and who haven't gotten the next one yet
     not_had_next$and(had_previous_beyond_threshold)
     # calculate by age
-    for (a in 1:N_age) {
+    for (a in 1:parameters$N_age) {
       bset_a <- variables$discrete_age$get_index_of(set = a)
       bset_a$and(not_had_next)
       out[a] <- bset_a$size()
@@ -105,7 +109,7 @@ age_group_eligible_for_dose_vaccine <- function(dose, dose_period, N_age, variab
   } else {
     not_had_first_dose <- variables$dose_time[[dose]]$get_index_of(set = -1)
     # calculate by age
-    for (a in 1:N_age) {
+    for (a in 1:parameters$N_age) {
       bset_a <- variables$discrete_age$get_index_of(set = a)
       bset_a$and(not_had_first_dose)
       out[a] <- bset_a$size()
@@ -140,7 +144,7 @@ get_current_prioritization_step <- function(variables, parameters, dose) {
 }
 
 
-#' @title Target number of individual in each age group to vaccinate
+#' @title Target number of individual in each age group to vaccinate (multi-dose, no types)
 #' @param phase which dose?
 #' @param variables a list
 #' @param parameters Model parameters
@@ -175,7 +179,7 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
   if (phase > 1) {
 
     # eligible group
-    eligible <- age_group_eligible_for_dose_vaccine(dose = phase,dose_period = parameters$dose_period[phase],N_age = parameters$N_age,variables = variables,t = t, dt = dt)
+    eligible <- age_group_eligible_for_dose_vaccine(dose = phase,parameters = parameters, variables = variables,t = t, dt = dt)
 
     if (!is.null(vaxx_priority)) {
       # giving priority vaccine doses to phase + 1
@@ -190,6 +194,43 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
   } else {
     # phase 1, we can find out just from proportion with coverage the number to give
     return(n_to_cover)
+  }
+
+}
+
+
+#' Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
+#' @description Please make sure you are subtracting these doses from some daily total outside of this function.
+#' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
+#' @param doses Total available doses
+#' @param n_to_cover Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop}}
+assign_doses <- function(t, dt, doses, n_to_cover, variables, events, phase, parameters) {
+
+  # eligible people by age
+  eligible <- eligible_for_dose_vaccine(dose = phase,parameters = parameters,variables = variables,t = t, dt = dt)
+  eligible_age_counts <- rep(0, parameters$N_age)
+  eligible_age_bset <- replicate(n = parameters$N_age,expr = NULL,simplify = FALSE)
+  for (a in 1:parameters$N_age) {
+    # who is eligible and in this age group?
+    eligible_age_bset[a] <- variables$discrete_age$get_index_of(set = a)
+    eligible_age_bset[a]$and(eligible)
+    # put size of group in a vector
+    eligible_age_counts[a] <- eligible_age_bset[a]$size()
+  }
+
+  # no dose scarcity
+  if (sum(n_to_cover) <= doses) {
+
+    # queue a vaccine for everyone (queue event for everyone)
+    # now use the vector assigned to send out vaccines
+    for (a in 1:parameters$N_age) {
+      # event$thing$schedule(eligible_age_bset[a])
+    }
+
+
+  } else {
+    # dose scarcity; need to allocate proportional to group size
+
   }
 
 }

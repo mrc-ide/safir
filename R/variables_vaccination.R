@@ -46,33 +46,42 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 
 
 # --------------------------------------------------
-#   full version
+#   multiple doses, no types
 # --------------------------------------------------
 
-#' @title Create vaccination variables
+#' @title Create vaccination variables (multi-dose, no types)
 #' @description Create all individual variables for humans
 #'
 #' @param variables a list
 #' @param pop population list
-#' @param vaxx_types a character vector of possible vaccine types
 #' @param max_dose maximum number of possible doses
 #'
 #' @return named list of individual::Variable
 #' @export
-create_vaccine_variables <- function(variables, pop, vaxx_types, max_dose = 2) {
-
-  stopifnot(length(vaxx_types) > 0)
-  stopifnot(!"UNVACC" %in% vaxx_types)
+create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
   n <- sum(pop$n)
 
   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
-  variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = c(vaxx_types, "UNVACC"),initial_values = rep("UNVACC",n)),simplify = FALSE)
   variables$phase <- individual::IntegerVariable$new(initial_values = 1)
 
   return(variables)
 }
 
 
+# create_vaccine_variables <- function(variables, pop, vaxx_types, max_dose = 2) {
+#
+#   stopifnot(length(vaxx_types) > 0)
+#   stopifnot(!"UNVACC" %in% vaxx_types)
+#
+#   n <- sum(pop$n)
+#
+#   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
+#   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
+#   variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = c(vaxx_types, "UNVACC"),initial_values = rep("UNVACC",n)),simplify = FALSE)
+#   variables$phase <- individual::IntegerVariable$new(initial_values = 1)
+#
+#   return(variables)
+# }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_vaccination.R
 \name{target_pop}
 \alias{target_pop}
-\title{Target number of individual in each age group to vaccinate}
+\title{Target number of individual in each age group to vaccinate (multi-dose, no types)}
 \usage{
 target_pop(
   phase,
@@ -31,5 +31,5 @@ target_pop(
 the current phase}
 }
 \description{
-Target number of individual in each age group to vaccinate
+Target number of individual in each age group to vaccinate (multi-dose, no types)
 }

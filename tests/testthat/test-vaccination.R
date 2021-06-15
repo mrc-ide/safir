@@ -70,13 +70,17 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
 
   t <- 200
-  dose_period <- 14
   dt <- 1
 
-  eligible <- eligible_for_dose_vaccine(dose = 2,dose_period = dose_period,variables = variables,t = t,dt = dt)
+  parameters <- list(
+    dose_period = c(NaN, 14),
+    N_age = 3
+  )
+
+  eligible <- eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt)
 
   expect_equal(
-    which(unlist(nimue:::eligable_for_second(dose_times, t, dose_period))),
+    which(unlist(nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2]))),
     eligible$to_vector()
   )
 })
@@ -99,13 +103,17 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
 
   t <- 200
-  dose_period <- 14
   dt <- 1
 
-  eligible <- age_group_eligible_for_dose_vaccine(dose = 2,dose_period = dose_period,variables = variables,t = t,dt = dt,N_age = 3)
+  parameters <- list(
+    dose_period = c(NaN, 14),
+    N_age = 3
+  )
+
+  eligible <- age_group_eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt)
 
   expect_equal(
-    sapply(nimue:::eligable_for_second(dose_times, t, dose_period),sum),
+    sapply(nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2]),sum),
     eligible
   )
 })

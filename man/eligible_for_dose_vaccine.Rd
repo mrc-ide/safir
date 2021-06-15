@@ -2,14 +2,14 @@
 % Please edit documentation in R/utils_vaccination.R
 \name{eligible_for_dose_vaccine}
 \alias{eligible_for_dose_vaccine}
-\title{Identity those persons eligible for a dose}
+\title{Identity those persons eligible for a dose (multi-dose, no types)}
 \usage{
-eligible_for_dose_vaccine(dose, dose_period, variables, t, dt)
+eligible_for_dose_vaccine(dose, parameters, variables, t, dt)
 }
 \arguments{
 \item{dose}{which dose?}
 
-\item{dose_period}{days between \code{dose} and the previous dose (please make sure \code{dose / dt} produces an integer number of timesteps)}
+\item{parameters}{a list}
 
 \item{variables}{a list}
 

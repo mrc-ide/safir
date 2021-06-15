@@ -2,16 +2,14 @@
 % Please edit documentation in R/variables_vaccination.R
 \name{create_vaccine_variables}
 \alias{create_vaccine_variables}
-\title{Create vaccination variables}
+\title{Create vaccination variables (multi-dose, no types)}
 \usage{
-create_vaccine_variables(variables, pop, vaxx_types, max_dose = 2)
+create_vaccine_variables(variables, pop, max_dose = 2)
 }
 \arguments{
 \item{variables}{a list}
 
 \item{pop}{population list}
-
-\item{vaxx_types}{a character vector of possible vaccine types}
 
 \item{max_dose}{maximum number of possible doses}
 }
