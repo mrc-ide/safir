@@ -59,17 +59,17 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 #'
 #' @return named list of individual::Variable
 #' @export
-create_vaccine_variables <- function(variables, pop, vaxx_types = c("AZ", "MD", "PF", "JJ", "novax"), max_dose = 2) {
+create_vaccine_variables <- function(variables, pop, vaxx_types, max_dose = 2) {
 
-  stopifnot("novax" %in% vaxx_types)
-  stopifnot(length(novax) >= 2)
+  stopifnot(length(vaxx_types) > 0)
+  stopifnot(!"UNVACC" %in% vaxx_types)
 
   n <- sum(pop$n)
 
   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
-  variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = vaxx_types,initial_values = rep("novax",n)),simplify = FALSE)
-  variables$phase <- 1L
+  variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = c(vaxx_types, "UNVACC"),initial_values = rep("UNVACC",n)),simplify = FALSE)
+  variables$phase <- individual::IntegerVariable$new(initial_values = 1)
 
   return(variables)
 }
