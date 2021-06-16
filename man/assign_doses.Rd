@@ -26,4 +26,5 @@ assign_doses(t, dt, doses, n_to_cover, variables, events, phase, parameters)
 \description{
 Please make sure you are subtracting these doses from some daily total outside of this function.
 It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
+Be aware that it is possible for fewer doses to be assigned than supplied, if not enough people are eligible.
 }
