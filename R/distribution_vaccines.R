@@ -325,6 +325,87 @@ target_pop_new <- function(phase, variables, parameters, t, dt, prioritisation, 
 #' @param t current time step
 #' @param dt size of time step
 #' @param doses Total available doses
+#' @param n_to_cover Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop_new}}
+#' @param eligible_age_bset a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}
+#' @param eligible_age_counts size of eligible group in each age bin from \code{\link{target_pop_new}}
+#' @param variables a list
+#' @param events a list
+#' @param phase vaccination phase (which doses are we administering)
+#' @param parameters a list
+#' @return the number of remaining doses
+#' @export
+assign_doses_new <- function(t, dt, doses, n_to_cover, eligible_age_bset, eligible_age_counts, variables, events, phase, parameters) {
+
+  stopifnot(all(n_to_cover <= eligible_age_counts))
+
+  leftover_doses <- doses
+
+  # check if any vaccines are scheduled at all
+  if (any(n_to_cover > 1 )) {
+
+    # no dose scarcity
+    if (sum(n_to_cover) <= doses) {
+
+      # loop over ages
+      for (a in 1:parameters$N_age) {
+
+        # allocated doses < eligible persons, schedule subset
+        if (eligible_age_counts[a] != n_to_cover[a]) {
+
+          num_to_retain <- n_to_cover[a]
+          n <- eligible_age_counts[a]
+          to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+          events$scheduled_dose[[phase]]$schedule(target = filter_bitset(eligible_age_bset[[a]], to_keep), delay = 0)
+
+          leftover_doses <- leftover_doses - num_to_retain
+
+        # schedule everyone
+        } else {
+          events$scheduled_dose[[phase]]$schedule(target = eligible_age_bset[[a]], delay = 0)
+
+          leftover_doses <- leftover_doses - eligible_age_counts[a]
+        }
+
+      } # end age loop
+
+    # dose scarcity; need to allocate proportional to group size
+    } else {
+
+      group_weights <- n_to_cover / sum(n_to_cover)
+      assigned <- floor(doses * group_weights)
+      if(sum(assigned) != doses){
+        assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (doses %% length(group_weights)))
+      }
+
+      # loop over ages
+      for (a in 1:parameters$N_age) {
+
+        num_to_retain <- assigned[a]
+        n <- eligible_age_counts[a]
+        to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+
+        events$scheduled_dose[[phase]]$schedule(target = filter_bitset(eligible_age_bset[[a]], to_keep), delay = 0)
+
+        leftover_doses <- leftover_doses - assigned[a]
+
+      } # end age loop
+
+    } # end dose scarcity
+
+  } # end allocation
+
+  stopifnot(leftover_doses >= 0) # assertion
+  return(leftover_doses)
+}
+
+#' Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
+#' @description Please make sure you are subtracting these doses from some daily total outside of this function.
+#' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
+#' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough doses are available. In general
+#' \code{n_to_cover} is the ideal allocation, and it is constrained by the amount available, \code{doses}
+#' @param t current time step
+#' @param dt size of time step
+#' @param doses Total available doses
 #' @param n_to_cover Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop}}
 #' @param variables a list
 #' @param events a list
