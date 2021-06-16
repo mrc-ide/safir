@@ -141,7 +141,7 @@ age_group_eligible_for_dose_vaccine_new <- function(dose, parameters, variables,
       }
       return(out)
     }
-    # who has gotten the previous dose? (with correction for dt < 1)
+    # who has gotten the previous dose in [0,threshold]?
     had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
     # who has not gotten the next one?
     not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
@@ -261,7 +261,7 @@ target_pop_old <- function(phase, variables, parameters, t, dt, prioritisation, 
 target_pop_new <- function(phase, variables, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
 
   if (phase == variables$phase & phase == parameters$N_phase & !is.null(vaxx_priority)) {
-    stop("on final phase no vaxx_priority for next phase should NULL")
+    stop("on final phase vaxx_priority should be NULL")
   }
   if (variables$phase == phase & !is.null(vaxx_priority)) {
     stop("if giving vaccines to the current phase (not prioritized for phase + 1), vaxx_priority should be NULL")

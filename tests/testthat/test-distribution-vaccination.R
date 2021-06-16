@@ -387,7 +387,7 @@ test_that("target_pop_old working in general case", {
 })
 
 
-test_that("simple assign doses is working for phase 1", {
+test_that("assign doses is working for phase 1", {
 
   parameters <- list(
     population = rep(10,3),
@@ -470,11 +470,37 @@ test_that("simple assign doses is working for phase 1", {
     as.vector(table(sched))
   )
 
+  targeted <- target_pop_new(phase = 1,variables = variables,parameters = parameters,t = 14,dt = 1,prioritisation = c(1,1,1))
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses_new(
+    t = 14,dt = 1,doses = 15,
+    n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
+    variables = variables,events = events,phase = 1,parameters = parameters
+  )
+  sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  expect_equal(
+    c(5,5,5),
+    as.vector(table(sched))
+  )
+
   # assigns partial doses (2)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
   variables$phase <- 1
   safir::assign_doses(t = 14,dt = 1,doses = 16,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
 
+  sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  expect_equal(
+    c(5,5,6),
+    as.vector(table(sched))
+  )
+
+  targeted <- target_pop_new(phase = 1,variables = variables,parameters = parameters,t = 14,dt = 1,prioritisation = c(1,1,1))
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses_new(
+    t = 14,dt = 1,doses = 16,
+    n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
+    variables = variables,events = events,phase = 1,parameters = parameters
+  )
   sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
   expect_equal(
     c(5,5,6),
@@ -506,9 +532,25 @@ test_that("simple assign doses is working for phase 2", {
   variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
 
   # won't assign doses if not past threshold
-  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  t <- 10
+  doses <- 30
   variables$phase <- 2
-  safir::assign_doses(t = 10,dt = 1,doses = 30,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 2,parameters = parameters)
+  phase <- 2
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses(t = t,dt = 1,doses = doses,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = phase,parameters = parameters)
+
+  expect_equal(
+    sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
+    c(0,0,0)
+  )
+
+  targeted <- target_pop_new(phase = phase,variables = variables,parameters = parameters,t = t,dt = 1,prioritisation = c(1,1,1))
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses_new(
+    t = t,dt = 1,doses = doses,
+    n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
+    variables = variables,events = events,phase = phase,parameters = parameters
+  )
 
   expect_equal(
     sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
@@ -516,9 +558,12 @@ test_that("simple assign doses is working for phase 2", {
   )
 
   # will assign doses if past threshold, but only to eligible persons
-  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  t <- 12
+  doses <- 30
   variables$phase <- 2
-  safir::assign_doses(t = 12,dt = 1,doses = 30,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 2,parameters = parameters)
+  phase <- 2
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses(t = t,dt = 1,doses = doses,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = phase,parameters = parameters)
 
   sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
   sched_age <- variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled())
@@ -532,40 +577,50 @@ test_that("simple assign doses is working for phase 2", {
   )
 
 
+  targeted <- target_pop_new(phase = phase,variables = variables,parameters = parameters,t = t,dt = 1,prioritisation = c(1,1,1))
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  safir::assign_doses_new(
+    t = t,dt = 1,doses = doses,
+    n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
+    variables = variables,events = events,phase = phase,parameters = parameters
+  )
+
+  sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
+  sched_age <- variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled())
+  expect_equal(
+    sched_size,
+    c(0, 25, 0)
+  )
+  expect_equal(
+    as.vector(table(sched_age)),
+    c(10, 10, 5)
+  )
 
 
-  # # assigns all doses
-  # events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
-  # variables$phase <- 1
-  # safir::assign_doses(t = 14,dt = 1,doses = 30,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
-  #
-  # sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
-  #
-  # expect_equal(
-  #   pop_ages,
-  #   sched
-  # )
-  #
-  # # assigns partial doses (1)
-  # events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
-  # variables$phase <- 1
-  # safir::assign_doses(t = 14,dt = 1,doses = 15,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
-  #
-  # sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
-  # expect_equal(
-  #   c(5,5,5),
-  #   as.vector(table(sched))
-  # )
-  #
-  # # assigns partial doses (2)
-  # events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
-  # variables$phase <- 1
-  # safir::assign_doses(t = 14,dt = 1,doses = 16,n_to_cover = c(10, 10, 10),variables = variables,events = events,phase = 1,parameters = parameters)
-  #
-  # sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
-  # expect_equal(
-  #   c(5,5,6),
-  #   as.vector(table(sched))
-  # )
+  # assign partial priority (2) doses to a certain age group
+  t <- 14
+  doses <- 8
+  variables$phase <- 1
+  phase <- 2
+
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  targeted <- target_pop_new(phase = phase,variables = variables,parameters = parameters,t = t,dt = 1,prioritisation = c(1,1,1),vaxx_priority = c(1,0,0))
+  safir::assign_doses_new(
+    t = t,dt = 1,doses = doses,
+    n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
+    variables = variables,events = events,phase = phase,parameters = parameters
+  )
+
+  sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
+  sched_age <- variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled())
+  expect_equal(
+    sched_size,
+    c(0, doses, 0)
+  )
+  expect_equal(
+    sched_age,
+    rep(1, doses)
+  )
+
 
 })

@@ -9,8 +9,8 @@ assign_doses_new(
   dt,
   doses,
   n_to_cover,
-  eligible_ages_bset,
-  eligible_ages_counts,
+  eligible_age_bset,
+  eligible_age_counts,
   variables,
   events,
   phase,
@@ -26,9 +26,9 @@ assign_doses_new(
 
 \item{n_to_cover}{Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop_new}}}
 
-\item{eligible_ages_bset}{a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}}
+\item{eligible_age_bset}{a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}}
 
-\item{eligible_ages_counts}{size of eligible group in each age bin from \code{\link{target_pop_new}}}
+\item{eligible_age_counts}{size of eligible group in each age bin from \code{\link{target_pop_new}}}
 
 \item{variables}{a list}
 
