@@ -310,6 +310,8 @@ target_pop_new <- function(phase, variables, parameters, t, dt, prioritisation, 
     out$n_to_cover <- n_to_cover
   }
 
+  stopifnot(all(out$n_to_cover <= out$eligible_age_counts))
+
   return(out)
 }
 
