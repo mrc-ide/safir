@@ -102,6 +102,73 @@ The only slight modification is what goes on during the final phase. In this cas
   1. find out what step of `vaccine_coverage_mat` we are on using existing code, distribute `phase` doses to age groups in that step whose coverage < that step's prioritization coverage.
   2. if doses still remain, assign `phase` doses to individuals based on going through the rest of the `vaccine_coverage_mat`
   
+#### target and assign/distribute
+
+Given the current `phase` (what dose we are distributing), `prioritization` (the step of prioritization strategy), and `vaxx_priority` (an optional priority )
+
+Squares are input parameters, circles are functions. `target_pop` gives us how we'd like to assign vaccines, and the external input `doses` constrains it.
+
+```{r,echo=FALSE}
+nodefontsize <- 6
+edgefontsize <- 5
+
+graph <-
+  create_graph() %>%
+  add_node(label = "phase",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "prioritization",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "vaxx_priority",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "target_pop",node_aes=node_aes(fontsize = nodefontsize)) %>%
+  add_node(label = "eligible_ages_bset",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "eligible_ages_counts",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "n_to_cover",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "doses",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "assign_doses",node_aes=node_aes(fontsize = nodefontsize))
+
+graph <-
+  graph %>%
+  set_node_position( # phase
+    node = 1,
+    x = 0, y = 3) %>%
+  set_node_position( # priority
+    node = 2,
+    x = 1, y = 3) %>%
+  set_node_position( #vaxx_priority
+    node = 3,
+    x = 2, y = 3) %>%
+  set_node_position( # target_pop
+    node = 4,
+    x = 1, y = 2) %>%
+  set_node_position( # eligible_ages_bset
+    node = 5,
+    x = 0, y = 1) %>%
+  set_node_position( # eligible_ages_counts
+    node = 6,
+    x = 1, y = 1) %>%
+  set_node_position( # n_to_cover
+    node = 7,
+    x = 2, y = 1) %>%
+  set_node_position( # doses
+    node = 8,
+    x = 3, y = 1) %>%
+  set_node_position( # assign_doses
+    node = 9,
+    x = 1, y = 0) 
+
+graph <- 
+  graph %>%
+  add_edge(from = 1, to = 4) %>%
+  add_edge(from = 2, to = 4) %>%
+  add_edge(from = 3, to = 4) %>%
+  add_edge(from = 4, to = 5) %>%
+  add_edge(from = 4, to = 6) %>%
+  add_edge(from = 4, to = 7) %>%
+  add_edge(from = 5, to = 9) %>%
+  add_edge(from = 6, to = 9) %>%
+  add_edge(from = 7, to = 9) %>%
+  add_edge(from = 8, to = 9)
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```
 
 ### Parameters needed
 

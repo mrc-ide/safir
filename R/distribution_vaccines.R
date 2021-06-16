@@ -315,11 +315,13 @@ target_pop_new <- function(phase, variables, parameters, t, dt, prioritisation, 
   return(out)
 }
 
+# assign_doses_new should return the number of remaining doses. It should never be < 0.
 
 #' Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
 #' @description Please make sure you are subtracting these doses from some daily total outside of this function.
 #' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
-#' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough people are eligible.
+#' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough doses are available. In general
+#' \code{n_to_cover} is the ideal allocation, and it is constrained by the amount available, \code{doses}
 #' @param t current time step
 #' @param dt size of time step
 #' @param doses Total available doses
