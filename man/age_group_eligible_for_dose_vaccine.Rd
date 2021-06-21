@@ -2,7 +2,7 @@
 % Please edit documentation in R/distribution_vaccines.R
 \name{age_group_eligible_for_dose_vaccine}
 \alias{age_group_eligible_for_dose_vaccine}
-\title{Find number of individuals in each age group eligible for a dose (multi-dose, no types)}
+\title{Find individuals in each age group eligible for a dose (multi-dose, no types)}
 \usage{
 age_group_eligible_for_dose_vaccine(dose, parameters, variables, t, dt)
 }
@@ -18,7 +18,7 @@ age_group_eligible_for_dose_vaccine(dose, parameters, variables, t, dt)
 \item{dt}{size of the time step}
 }
 \value{
-a vector of population sizes
+a list containing a \code{\link[individual]{Bitset}} for each age bin
 }
 \description{
 Find those individuals who have had the dose preceding \code{dose},

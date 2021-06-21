@@ -4,7 +4,18 @@
 \alias{assign_doses}
 \title{Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)}
 \usage{
-assign_doses(t, dt, doses, n_to_cover, variables, events, phase, parameters)
+assign_doses(
+  t,
+  dt,
+  doses,
+  n_to_cover,
+  eligible_age_bset,
+  eligible_age_counts,
+  variables,
+  events,
+  phase,
+  parameters
+)
 }
 \arguments{
 \item{t}{current time step}
@@ -13,7 +24,11 @@ assign_doses(t, dt, doses, n_to_cover, variables, events, phase, parameters)
 
 \item{doses}{Total available doses}
 
-\item{n_to_cover}{Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop}}}
+\item{n_to_cover}{Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop_new}}}
+
+\item{eligible_age_bset}{a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}}
+
+\item{eligible_age_counts}{size of eligible group in each age bin from \code{\link{target_pop_new}}}
 
 \item{variables}{a list}
 
@@ -22,6 +37,9 @@ assign_doses(t, dt, doses, n_to_cover, variables, events, phase, parameters)
 \item{phase}{vaccination phase (which doses are we administering)}
 
 \item{parameters}{a list}
+}
+\value{
+the number of remaining doses
 }
 \description{
 Please make sure you are subtracting these doses from some daily total outside of this function.
