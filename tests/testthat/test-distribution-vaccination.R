@@ -168,7 +168,6 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
 
   t <- 1
   dt <- 1
-
   parameters <- list(
     dose_period = c(NaN, 14),
     N_age = 3
