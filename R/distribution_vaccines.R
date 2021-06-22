@@ -56,7 +56,6 @@ get_vaccination_priority_stage <- function(variables, phase, parameters) {
       ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
 
-      next_dose_priority_p <- parameters$next_dose_priority[phase, ]
       ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
       next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
 
