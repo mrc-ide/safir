@@ -53,12 +53,14 @@ get_vaccination_priority_stage <- function(variables, phase, parameters) {
 
     # go through prioritisation steps
     for (p in 1:parameters$N_prioritisation_steps) {
-      this_dose_not_cover <- all(pr_this_dose < parameters$vaccine_coverage_mat[p, ])
+      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
 
       next_dose_priority_p <- parameters$next_dose_priority[phase, ]
-      next_dose_not_cover <- all(pr_next_dose[next_dose_priority_p] < parameters$vaccine_coverage_mat[p, next_dose_priority_p])
+      ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
+      next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
 
-      if (this_dose_not_cover & next_dose_not_cover) {
+      if (this_dose_not_cover | next_dose_not_cover) {
         return(p)
       }
     }
@@ -73,7 +75,9 @@ get_vaccination_priority_stage <- function(variables, phase, parameters) {
 
     # go through prioritisation steps
     for (p in 1:parameters$N_prioritisation_steps) {
-      this_dose_not_cover <- all(pr_this_dose < parameters$vaccine_coverage_mat[p, ])
+      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
+
       if (this_dose_not_cover) {
         return(p)
       }
