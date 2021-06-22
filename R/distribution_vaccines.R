@@ -1,6 +1,6 @@
 # --------------------------------------------------
 #   functions to work with scheduling/allocating vaccines
-#   for the general vaccine model
+#   for the general vaccine model but with no types
 #   Sean L. Wu (slwood89@gmail.com)
 #   June 2021
 # --------------------------------------------------
@@ -23,27 +23,68 @@ get_proportion_vaccinated <- function(variables, age, dose) {
   return( vaccinated_bset$size() / N )
 }
 
+# parameters$vaccine_coverage_mat is the standard strategy matrix from nimue
+# parameters$next_dose_priority is the prioritization matrix
+# phase: what dosing phase are we on
 
-#' @title Get proportion of an age group that is vaccinated (multi-dose, with types)
-#' @description Get proportion of an age group that has received a particular vaccine type and dose
-#' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
+#' @title Get prioritisation step for a specific dosing phase
+#' @description Return which row of the \code{\link[nimue]{strategy_matrix}} the vaccination
+#' program should be targeting for coverage. To complete a step, all \code{phase}
+#' dose coverage should be >= prioritisation matrix target and all \code{phase + 1}
+#' dose coverage for prioritized groups should be >= prioritisation matrix target.
+#' If these two conditions are fulfilled for the entire \code{phase}, the function returns
+#' -1 to indicate that vaccination dosing \code{phase} should be advanced.
 #' @param variables a list
-#' @param age an age group (can be a vector of Multiple age groups)
-#' @param type type of vaccine
-#' @param dose which dose to get proportion of age group who has received it
+#' @param phase current dosing phase
+#' @param parameters a list
 #'
 #' @export
-get_proportion_vaccinated_type <- function(variables, age, type, dose) {
-  # stopifnot(type %in% variables$dose_type[[dose]]$get_categories())
-  age_bset <- variables$discrete_age$get_index_of(age)
-  N <- age_bset$size()
-  type_bset <- variables$dose_type[[dose]]$get_index_of(type)
-  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
-  vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
-  vaccinated_bset$and(age_bset)$and(type_bset)
-  return( vaccinated_bset$size() / N )
-}
+get_vaccination_priority_stage <- function(variables, phase, parameters) {
 
+  stopifnot(is.finite(parameters$N_phase))
+  stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
+  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
+
+  # not final phase
+  if (phase < parameters$N_phase) {
+
+    pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
+    pr_next_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase + 1)})
+
+    # go through prioritisation steps
+    for (p in 1:parameters$N_prioritisation_steps) {
+      this_dose_not_cover <- all(pr_this_dose < parameters$vaccine_coverage_mat[p, ])
+
+      next_dose_priority_p <- parameters$next_dose_priority[phase, ]
+      next_dose_not_cover <- all(pr_next_dose[next_dose_priority_p] < parameters$vaccine_coverage_mat[p, next_dose_priority_p])
+
+      if (this_dose_not_cover & next_dose_not_cover) {
+        return(p)
+      }
+    }
+
+    # if we did not return by now it means this step is complete, return -1
+    return(-1)
+
+  #  final phase: don't need to check for next dose coverage
+  } else {
+
+    pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
+
+    # go through prioritisation steps
+    for (p in 1:parameters$N_prioritisation_steps) {
+      this_dose_not_cover <- all(pr_this_dose < parameters$vaccine_coverage_mat[p, ])
+      if (this_dose_not_cover) {
+        return(p)
+      }
+    }
+
+    # if we did not return by now it means this step is complete, return -1
+    return(-1)
+
+  }
+
+}
 
 #' @title Identity those persons eligible for a dose (multi-dose, no types)
 #' @description Find those individuals who have had the dose preceding \code{dose},
