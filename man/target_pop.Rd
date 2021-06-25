@@ -5,7 +5,7 @@
 \title{Target persons in each age group to vaccinate (multi-dose, no types)}
 \usage{
 target_pop(
-  phase,
+  dose,
   variables,
   parameters,
   t,
@@ -15,7 +15,7 @@ target_pop(
 )
 }
 \arguments{
-\item{phase}{which dose?}
+\item{dose}{which dose?}
 
 \item{variables}{a list}
 
@@ -27,8 +27,8 @@ target_pop(
 
 \item{prioritisation}{row of the prioritisation matrix for the current step}
 
-\item{vaxx_priority}{row of the vaxx_priority matrix for age groups that should get the next dose phase while still on
-the current phase}
+\item{vaxx_priority}{vaxx_priority matrix for age groups that should get the next dose
+the current dose}
 }
 \value{
 a named list with \code{n_to_cover}: number to be vaccinated in each age group,
@@ -36,5 +36,7 @@ a named list with \code{n_to_cover}: number to be vaccinated in each age group,
 \code{eligible_age_counts}: size of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
 }
 \description{
-Target persons in each age group to vaccinate (multi-dose, no types)
+For a given dose, find eligible persons in each age group to target for that vaccine dose.
+If \code{vaxx_priority} is specified, it means that we are currently vaccinating one dose ahead
+of the current vaccination phase, for those age groups prioritized to get their next dose.
 }

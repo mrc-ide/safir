@@ -23,15 +23,12 @@ get_proportion_vaccinated <- function(variables, age, dose) {
   return( vaccinated_bset$size() / N )
 }
 
-# parameters$vaccine_coverage_mat is the standard strategy matrix from nimue
-# parameters$next_dose_priority is the prioritization matrix
-# phase: what dosing phase are we on
 
 #' @title Get prioritisation step for a specific dosing phase
 #' @description Return which row of the \code{\link[nimue]{strategy_matrix}} the vaccination
 #' program should be targeting for coverage. To complete a step, all \code{phase}
-#' dose coverage should be >= prioritisation matrix target and all \code{phase + 1}
-#' dose coverage for prioritized groups should be >= prioritisation matrix target.
+#' dose coverage should be > prioritisation matrix target and all \code{phase + 1}
+#' dose coverage for prioritized groups should be > prioritisation matrix target.
 #' If these two conditions are fulfilled for the entire \code{phase}, the function returns
 #' -1 to indicate that vaccination dosing \code{phase} should be advanced.
 #' @param variables a list
@@ -194,23 +191,26 @@ get_current_prioritization_step <- function(variables, parameters, dose) {
 
 
 #' @title Target persons in each age group to vaccinate (multi-dose, no types)
-#' @param phase which dose?
+#' @description For a given dose, find eligible persons in each age group to target for that vaccine dose.
+#' If \code{vaxx_priority} is specified, it means that we are currently vaccinating one dose ahead
+#' of the current vaccination phase, for those age groups prioritized to get their next dose.
+#' @param dose which dose?
 #' @param variables a list
 #' @param parameters Model parameters
 #' @param t current time step
 #' @param dt size of time step
 #' @param prioritisation row of the prioritisation matrix for the current step
-#' @param vaxx_priority row of the vaxx_priority matrix for age groups that should get the next dose phase while still on
-#' the current phase
+#' @param vaxx_priority vaxx_priority matrix for age groups that should get the next dose
+#' the current dose
 #' @return a named list with \code{n_to_cover}: number to be vaccinated in each age group,
 #' \code{eligible_age_bsets}: \code{\link[individual]{Bitset}} of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
 #' \code{eligible_age_counts}: size of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
 #' @export
-target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
+target_pop <- function(dose, variables, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
 
-  # current coverage by age in this phase
+  # current coverage by age in this dose
   current_coverage <- sapply(X = 1:parameters$N_age,FUN = function(a){
-    get_proportion_vaccinated(variables = variables,age = a,dose = phase)
+    get_proportion_vaccinated(variables = variables,age = a,dose = dose)
   })
 
   # size of each age group
@@ -218,7 +218,7 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
     variables$discrete_age$get_size_of(set = a)
   })
 
-  # Remaining population left to cover with current dose number (phase) to reach target coverage in prioritisation step
+  # Remaining population left to cover with current dose number (dose) to reach target coverage in prioritisation step
   n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * age_size)
 
   out <- list(
@@ -228,26 +228,27 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
   )
 
   # eligible group
-  eligible_age_bsets <- age_group_eligible_for_dose_vaccine(dose = phase,parameters = parameters, variables = variables,t = t, dt = dt)
+  eligible_age_bsets <- age_group_eligible_for_dose_vaccine(dose = dose,parameters = parameters, variables = variables,t = t, dt = dt)
   eligible_age_counts <- sapply(eligible_age_bsets, function(x){x$size()})
 
   out$eligible_age_bsets <- eligible_age_bsets
   out$eligible_age_counts <- eligible_age_counts
 
-  if (phase > 1) {
+  if (dose > 1) {
 
     if (!is.null(vaxx_priority)) {
-      # giving priority vaccine doses to phase + 1
+      # giving priority vaccine doses to dose + 1
       n_to_cover <- pmin(n_to_cover, eligible_age_counts) * vaxx_priority
       out$n_to_cover <- n_to_cover
     } else {
-      # normal phase; do not check vaxx_priority
+      # normal dose; do not check vaxx_priority
       n_to_cover <- pmin(n_to_cover, eligible_age_counts)
       out$n_to_cover <- n_to_cover
     }
 
   } else {
-    # phase 1, we can find out just from proportion with coverage the number to give
+    # dose 1, we can find out just from proportion with coverage the number to give
+    # without checking eligibility after threshold
     out$n_to_cover <- n_to_cover
   }
 
@@ -262,19 +263,16 @@ target_pop <- function(phase, variables, parameters, t, dt, prioritisation, vaxx
 #' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
 #' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough doses are available. In general
 #' \code{n_to_cover} is the ideal allocation, and it is constrained by the amount available, \code{doses}
-#' @param t current time step
-#' @param dt size of time step
 #' @param doses Total available doses
 #' @param n_to_cover Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop_new}}
 #' @param eligible_age_bset a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}
 #' @param eligible_age_counts size of eligible group in each age bin from \code{\link{target_pop_new}}
-#' @param variables a list
 #' @param events a list
 #' @param phase vaccination phase (which doses are we administering)
 #' @param parameters a list
 #' @return the number of remaining doses
 #' @export
-assign_doses <- function(t, dt, doses, n_to_cover, eligible_age_bset, eligible_age_counts, variables, events, phase, parameters) {
+assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_counts, events, phase, parameters) {
 
   stopifnot(all(n_to_cover <= eligible_age_counts))
 

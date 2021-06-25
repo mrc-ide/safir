@@ -5,23 +5,16 @@
 \title{Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)}
 \usage{
 assign_doses(
-  t,
-  dt,
   doses,
   n_to_cover,
   eligible_age_bset,
   eligible_age_counts,
-  variables,
   events,
   phase,
   parameters
 )
 }
 \arguments{
-\item{t}{current time step}
-
-\item{dt}{size of time step}
-
 \item{doses}{Total available doses}
 
 \item{n_to_cover}{Number of people eligible to be vaccinated in each age group, from \code{\link{target_pop_new}}}
@@ -29,8 +22,6 @@ assign_doses(
 \item{eligible_age_bset}{a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}}
 
 \item{eligible_age_counts}{size of eligible group in each age bin from \code{\link{target_pop_new}}}
-
-\item{variables}{a list}
 
 \item{events}{a list}
 

@@ -232,3 +232,5 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
 
 })
 
+
+# add tests for obviously incorrect cases

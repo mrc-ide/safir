@@ -16,8 +16,8 @@ get_vaccination_priority_stage(variables, phase, parameters)
 \description{
 Return which row of the \code{\link[nimue]{strategy_matrix}} the vaccination
 program should be targeting for coverage. To complete a step, all \code{phase}
-dose coverage should be >= prioritisation matrix target and all \code{phase + 1}
-dose coverage for prioritized groups should be >= prioritisation matrix target.
+dose coverage should be > prioritisation matrix target and all \code{phase + 1}
+dose coverage for prioritized groups should be > prioritisation matrix target.
 If these two conditions are fulfilled for the entire \code{phase}, the function returns
 -1 to indicate that vaccination dosing \code{phase} should be advanced.
 }
