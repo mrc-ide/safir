@@ -25,8 +25,11 @@ vaccination_process <- function(parameters, variables, events, dt) {
         # get phase we are on
         phase <- variables$phase$value
 
-        # if vaccination done, return early
-        if (phase > parameters$N_phase) {
+        # how many doses we have today
+        doses_left <- parameters$vaccine_set[day]
+
+        # if vaccination done or no doses available, return early
+        if (phase > parameters$N_phase || doses_left <= 0) {
           return(invisible(NULL))
         }
 
@@ -47,9 +50,6 @@ vaccination_process <- function(parameters, variables, events, dt) {
         }
 
         stopifnot(phase <= parameters$N_phase)
-
-        # how many doses we have today
-        doses_left <- parameters$vaccine_set[day]
 
         # row of the vaccine coverage matrix
         p_step <- vaccine_coverage_mat[step, ]
