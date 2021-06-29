@@ -258,7 +258,7 @@ target_pop <- function(dose, variables, parameters, t, dt, prioritisation, vaxx_
 }
 
 
-#' Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
+#' Schedule N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
 #' @description Please make sure you are subtracting these doses from some daily total outside of this function.
 #' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
 #' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough doses are available. In general

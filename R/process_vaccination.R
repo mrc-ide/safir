@@ -25,6 +25,11 @@ vaccination_process <- function(parameters, variables, events, dt) {
         # get phase we are on
         phase <- variables$phase$value
 
+        # if vaccination done, return early
+        if (phase > parameters$N_phase) {
+          return(invisible(NULL))
+        }
+
         # calculate what step we are on
         step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
 
@@ -34,40 +39,70 @@ vaccination_process <- function(parameters, variables, events, dt) {
           phase <- variables$phase$value
           # maybe don't need this? step should always be 1 at new phase
           step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
-          # need to do something when step = -1 and we are on the last phase
+          stopifnot(step == 1)
+          # need to do something when step = -1 and we are on the last phase; return early
+          if (phase > parameters$N_phase) {
+            return(invisible(NULL))
+          }
         }
 
         stopifnot(phase <= parameters$N_phase)
 
         # how many doses we have today
-        doses_today <- parameters$vaccine_set[day]
+        doses_left <- parameters$vaccine_set[day]
 
+        # row of the vaccine coverage matrix
         p_step <- vaccine_coverage_mat[step, ]
+
+        targets <- target_pop(
+          dose = phase, variables = variables, parameters = parameters, t = timestep, dt = dt,
+          prioritisation = p_step,vaxx_priority = NULL
+        )
+        doses_given <- assign_doses(
+          doses = doses_left,
+          n_to_cover = targets$n_to_cover, eligible_age_bset = targets$eligible_age_bsets, eligible_age_counts = targets$eligible_age_counts,
+          events = events,phase = phase,parameters = parameters
+        )
+        doses_left <- doses_left - doses_given
 
         # intermediate phases: give prioritized doses
         if (phase < parameters$N_phase) {
 
-          targets <- target_pop(
-            dose = phase, variables = variables, parameters = parameters, t = timestep, dt = dt, prioritisation = p_step,vaxx_priority = NULL
+          targets_pri <- target_pop(
+            dose = phase + 1, variables = variables, parameters = parameters, t = timestep, dt = dt,
+            prioritisation = p_step,vaxx_priority = NULL
           )
-          safir::assign_doses(
-            t = t,dt = 1,doses = doses,
-            n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-            variables = variables,events = events,phase = phase,parameters = parameters
+          doses_today_pri <- assign_doses(
+            doses = doses_left,
+            n_to_cover = targets_pri$n_to_cover, eligible_age_bset = targets_pri$eligible_age_bsets, eligible_age_counts = targets_pri$eligible_age_counts,
+            events = events,phase = phase + 1,parameters = parameters
           )
-
-        # final phase: do not give prioritized doses for phase + 1
-        } else {
+          doses_left <- doses_left - doses_given
 
         }
 
+        # if remaining doses, give out for this dose according to the prioritization matrix
+        if (doses_left > 0) {
+
+          while( doses_left > 0 & step <= parameters$N_prioritisation_steps) {
+            step <- step + 1
+            p_step <- vaccine_coverage_mat[step, ]
+            targets <- target_pop(
+              dose = phase, variables = variables, parameters = parameters, t = timestep, dt = dt,
+              prioritisation = p_step,vaxx_priority = NULL
+            )
+            doses_given <- assign_doses(
+              doses = doses_left,
+              n_to_cover = targets$n_to_cover, eligible_age_bset = targets$eligible_age_bsets, eligible_age_counts = targets$eligible_age_counts,
+              events = events,phase = phase,parameters = parameters
+            )
+            doses_left <- doses_left - doses_given
+          }
+
+        } # end remaining doses check
 
 
       } # end vaccine distribution
-
-
-
-
 
     } # end function
 
