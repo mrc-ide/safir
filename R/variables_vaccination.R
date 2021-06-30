@@ -60,7 +60,7 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 #' @export
 create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
-  n <- sum(pop$n)
+  n <- sum(pop)
 
   variables$dose_num <- individual::CategoricalVariable$new(categories = as.character(0:max_dose),initial_values = rep("0",n))
   # dose time stores the time step when it happened, not necessarily the same as the day (if dt != 1)

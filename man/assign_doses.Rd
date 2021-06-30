@@ -2,7 +2,7 @@
 % Please edit documentation in R/distribution_vaccines.R
 \name{assign_doses}
 \alias{assign_doses}
-\title{Assign N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)}
+\title{Schedule N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)}
 \usage{
 assign_doses(
   doses,
