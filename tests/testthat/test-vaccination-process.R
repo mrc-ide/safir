@@ -111,3 +111,35 @@ test_that("vaccination_process phase 1 step 17; move to next phase (2) and vacci
   )
 
 })
+
+
+test_that("vaccination_process does not do anything if done with all phases", {
+
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+
+  # give everyone all doses
+  variables$dose_time[[1]]$queue_update(values = 1)
+  variables$dose_time[[1]]$.update()
+  variables$dose_time[[2]]$queue_update(values = 2)
+  variables$dose_time[[2]]$.update()
+  variables$dose_time[[3]]$queue_update(values = 3)
+  variables$dose_time[[3]]$.update()
+
+  vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
+  vax_proc(timestep = 30)
+
+  expect_equal(
+    variables$phase$value, 4
+  )
+  expect_equal(
+    events$scheduled_dose[[1]]$get_scheduled()$size(), 0
+  )
+  expect_equal(
+    events$scheduled_dose[[2]]$get_scheduled()$size(),0
+  )
+  expect_equal(
+    events$scheduled_dose[[3]]$get_scheduled()$size(), 0
+  )
+
+})

@@ -56,15 +56,14 @@ vaccination_process <- function(parameters, variables, events, dt) {
         step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
 
         # advance to next phase: recalculate
-        if (step == -1) {
+        while (step == -1) {
           variables$phase$value <- variables$phase$value + 1L
           phase <- variables$phase$value
-          # maybe don't need this? step should always be 1 at new phase
-          step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
-          # need to do something when step = -1 and we are on the last phase; return early
+          # if advancing phase goes over the total number, vaccination is done and we return
           if (phase > parameters$N_phase) {
             return(invisible(NULL))
           }
+          step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
         }
 
         stopifnot(phase <= parameters$N_phase)
