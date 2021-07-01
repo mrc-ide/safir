@@ -431,7 +431,7 @@ test_that("assign doses is working for phase 1", {
   safir::assign_doses(
     doses = 0,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = 1,parameters = parameters
+    events = events,dose = 1,parameters = parameters
   )
   expect_equal(
     sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
@@ -449,7 +449,7 @@ test_that("assign doses is working for phase 1", {
   safir::assign_doses(
     doses = 30,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = 1,parameters = parameters
+    events = events,dose = 1,parameters = parameters
   )
   sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
   expect_equal(
@@ -463,7 +463,7 @@ test_that("assign doses is working for phase 1", {
   safir::assign_doses(
     doses = 15,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = 1,parameters = parameters
+    events = events,dose = 1,parameters = parameters
   )
   sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
   expect_equal(
@@ -477,7 +477,7 @@ test_that("assign doses is working for phase 1", {
   safir::assign_doses(
     doses = 16,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = 1,parameters = parameters
+    events = events,dose = 1,parameters = parameters
   )
   sched <- variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
   expect_equal(
@@ -520,7 +520,7 @@ test_that("assign doses is working for phase 2", {
   safir::assign_doses(
     doses = doses,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = phase,parameters = parameters
+    events = events,dose = phase,parameters = parameters
   )
 
   expect_equal(
@@ -538,7 +538,7 @@ test_that("assign doses is working for phase 2", {
   safir::assign_doses(
     doses = doses,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = phase,parameters = parameters
+    events = events,dose = phase,parameters = parameters
   )
 
   sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
@@ -562,7 +562,7 @@ test_that("assign doses is working for phase 2", {
   safir::assign_doses(
     doses = doses,
     n_to_cover = targeted$n_to_cover,eligible_age_bset = targeted$eligible_age_bsets,eligible_age_counts = targeted$eligible_age_counts,
-    events = events,phase = phase,parameters = parameters
+    events = events,dose = phase,parameters = parameters
   )
 
   sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})

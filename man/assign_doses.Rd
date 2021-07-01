@@ -10,7 +10,7 @@ assign_doses(
   eligible_age_bset,
   eligible_age_counts,
   events,
-  phase,
+  dose,
   parameters
 )
 }
@@ -25,7 +25,7 @@ assign_doses(
 
 \item{events}{a list}
 
-\item{phase}{vaccination phase (which doses are we administering)}
+\item{dose}{what dose we are administering}
 
 \item{parameters}{a list}
 }

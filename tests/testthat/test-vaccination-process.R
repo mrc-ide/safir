@@ -20,17 +20,34 @@ test_that("vaccination_process working correctly", {
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
 
+  # test for phase 1 step 1
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
-
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
-  # test for phase 1 step 1
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = 1)
-
-  events$scheduled_dose[[1]]$get_scheduled()
 
   expect_true(
     all(variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled()) == 17)
   )
+  expect_equal(
+    events$scheduled_dose[[1]]$get_scheduled()$size(), parameters$vaccine_set[1]
+  )
+  expect_equal(
+    events$scheduled_dose[[2]]$get_scheduled()$size(), 0
+  )
+  expect_equal(
+    events$scheduled_dose[[3]]$get_scheduled()$size(), 0
+  )
+
+  # # test for phase 1 step 1 again (giving priority doses for dose 2)
+  # variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  # events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+  #
+  # variables$dose_time[[1]]$queue_update(values = 1,index = which(ages==17))
+  # variables$dose_time[[1]]$.update()
+  #
+  # # should schedule doses for
+  # vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
+  # vax_proc(timestep = 2)
 })
