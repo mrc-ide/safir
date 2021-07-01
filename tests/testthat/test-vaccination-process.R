@@ -27,8 +27,8 @@ test_that("vaccination_process phase 1 step 1; assigns for next step if nobody e
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
-  variables$dose_time[[1]]$queue_update(values = 1,index = which(ages==17))
-  variables$dose_time[[1]]$.update()
+  schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17),dose = 1)
+  update_vaccine_variables(variables = variables)
 
   # should schedule doses for 1st dose in age group 16 (no priority doses because it's too soon)
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
@@ -55,8 +55,8 @@ test_that("vaccination_process phase 1 step 1; assigns priority doses to next st
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
-  variables$dose_time[[1]]$queue_update(values = 1,index = which(ages==17))
-  variables$dose_time[[1]]$.update()
+  schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17),dose = 1)
+  update_vaccine_variables(variables = variables)
 
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = parameters$dose_period[2] + 1)
@@ -83,12 +83,12 @@ test_that("vaccination_process phase 1 step 17; move to next phase (2) and vacci
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   # give everyone 1st dose
-  variables$dose_time[[1]]$queue_update(values = 1)
-  variables$dose_time[[1]]$.update()
+  schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 1)
+  update_vaccine_variables(variables = variables)
   # give prioritized groups 2nd dose
   pri_bset <- variables$discrete_age$get_index_of(set = which(parameters$next_dose_priority[1, ] > 0))
-  variables$dose_time[[2]]$queue_update(values = 2,index = pri_bset)
-  variables$dose_time[[2]]$.update()
+  schedule_dose_vaccine(timestep = 2,variables = variables,target = pri_bset,dose = 2)
+  update_vaccine_variables(variables = variables)
 
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = parameters$dose_period[2] + 1)
@@ -119,12 +119,10 @@ test_that("vaccination_process does not do anything if done with all phases", {
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   # give everyone all doses
-  variables$dose_time[[1]]$queue_update(values = 1)
-  variables$dose_time[[1]]$.update()
-  variables$dose_time[[2]]$queue_update(values = 2)
-  variables$dose_time[[2]]$.update()
-  variables$dose_time[[3]]$queue_update(values = 3)
-  variables$dose_time[[3]]$.update()
+  schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 1)
+  schedule_dose_vaccine(timestep = 2,variables = variables,target = full_bset,dose = 2)
+  schedule_dose_vaccine(timestep = 3,variables = variables,target = full_bset,dose = 3)
+  update_vaccine_variables(variables = variables)
 
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = 30)

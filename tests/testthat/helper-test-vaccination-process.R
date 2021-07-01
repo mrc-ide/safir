@@ -18,3 +18,5 @@ ages <- rep(1:17, each = 100)
 
 variables <- list()
 variables$discrete_age <- IntegerVariable$new(ages)
+
+full_bset <- Bitset$new(n)$insert(1:n)
