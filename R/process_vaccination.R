@@ -61,7 +61,6 @@ vaccination_process <- function(parameters, variables, events, dt) {
           phase <- variables$phase$value
           # maybe don't need this? step should always be 1 at new phase
           step <- get_vaccination_priority_stage(variables = variables, phase = phase, parameters = parameters)
-          stopifnot(step == 1)
           # need to do something when step = -1 and we are on the last phase; return early
           if (phase > parameters$N_phase) {
             return(invisible(NULL))
