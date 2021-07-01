@@ -141,3 +141,28 @@ test_that("vaccination_process does not do anything if done with all phases", {
   )
 
 })
+
+
+test_that("vaccination_process on phase 1 step 1 advances correctly if we have an excess of doses", {
+
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
+
+  parameters$vaccine_set[10] <- n + 10
+  vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
+  vax_proc(timestep = 10)
+
+  expect_equal(
+    variables$phase$value, 4
+  )
+  expect_equal(
+    events$scheduled_dose[[1]]$get_scheduled()$size(), 0
+  )
+  expect_equal(
+    events$scheduled_dose[[2]]$get_scheduled()$size(),0
+  )
+  expect_equal(
+    events$scheduled_dose[[3]]$get_scheduled()$size(), 0
+  )
+
+})
