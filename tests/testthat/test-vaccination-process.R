@@ -77,7 +77,7 @@ test_that("vaccination_process phase 1 step 1; assigns priority doses to next st
 })
 
 
-test_that("vaccination_process phase 1 step 17; move to next phase and vaccinate persons there", {
+test_that("vaccination_process phase 1 step 17; move to next phase (2) and vaccinate persons there (step 4)", {
 
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
@@ -93,8 +93,12 @@ test_that("vaccination_process phase 1 step 17; move to next phase and vaccinate
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = parameters$dose_period[2] + 1)
 
+  expect_equal(
+    variables$phase$value, 2
+  )
+
   expect_true(
-    all(variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled()) == 17)
+    all(variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled()) == 14)
   )
   expect_equal(
     events$scheduled_dose[[1]]$get_scheduled()$size(), 0
