@@ -15,6 +15,8 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
 
+  full_bset <- Bitset$new(n)$insert(1:n)
+
   # prioritize 3 oldest age groups
   parameters$next_dose_priority <- matrix(0,nrow = 2, ncol = 17)
   parameters$next_dose_priority[1:2, 15:17] <- 1
@@ -27,10 +29,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # 0th "stage", should give stage = 1
       if (stage == 0) {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
@@ -41,26 +40,22 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # final stage, should give stage = -1 (move to next)
       } else if(stage == 17) {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         if (phase < 3) {
           for (p in 1:phase) {
             # groups for this dose
-            variables$dose_time[[p]]$queue_update(values = 1,index = 1:n)
-            variables$dose_time[[p]]$.update()
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p)
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
-              variables$dose_time[[p + 1]]$queue_update(values = 1,index = 1:n)
-              variables$dose_time[[p + 1]]$.update()
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p + 1)
             }
+            update_vaccine_variables(variables = variables)
           }
         } else {
           # groups for this dose
-          variables$dose_time[[3]]$queue_update(values = 1,index = 1:n)
-          variables$dose_time[[3]]$.update()
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 3)
+          update_vaccine_variables(variables = variables)
         }
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
@@ -72,10 +67,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # intermediate stages, should give stage + 1
       } else {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         stage_pr_vec <- parameters$vaccine_coverage_mat[stage, ]
         who_2_vaccinate <- which(stage_pr_vec > 0)
@@ -84,18 +76,20 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
           who_2_vaccinate_next <- intersect(who_2_vaccinate, which(as.logical(parameters$next_dose_priority[phase, ])))
           for (p in 1:phase) {
             # groups for this dose
-            variables$dose_time[[p]]$queue_update(values = 1,index = which(ages %in% who_2_vaccinate))
-            variables$dose_time[[p]]$.update()
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = p)
+
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
-              variables$dose_time[[p + 1]]$queue_update(values = 1,index = which(ages %in% who_2_vaccinate_next))
-              variables$dose_time[[p + 1]]$.update()
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate_next)),dose = p + 1)
             }
+
+            update_vaccine_variables(variables = variables)
           }
         } else {
           # groups for this dose
-          variables$dose_time[[3]]$queue_update(values = 1,index = which(ages %in% who_2_vaccinate))
-          variables$dose_time[[3]]$.update()
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = 3)
+          update_vaccine_variables(variables = variables)
+
         }
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
@@ -129,6 +123,8 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
 
+  full_bset <- Bitset$new(n)$insert(1:n)
+
   # prioritize 3 oldest age groups
   parameters$next_dose_priority <- matrix(0,nrow = 2, ncol = 17)
   parameters$next_dose_priority[1:2, 15:17] <- 1
@@ -141,10 +137,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # 0th "stage", should give stage = 1
       if (stage == 0) {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
@@ -155,26 +148,22 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
         # final stage, should give stage = -1 (move to next)
       } else if(stage == 17) {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         if (phase < 3) {
           for (p in 1:phase) {
             # groups for this dose
-            variables$dose_time[[p]]$queue_update(values = 1,index = 1:n)
-            variables$dose_time[[p]]$.update()
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p)
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
-              variables$dose_time[[p + 1]]$queue_update(values = 1,index = 1:n)
-              variables$dose_time[[p + 1]]$.update()
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p + 1)
             }
+            update_vaccine_variables(variables = variables)
           }
         } else {
           # groups for this dose
-          variables$dose_time[[3]]$queue_update(values = 1,index = 1:n)
-          variables$dose_time[[3]]$.update()
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 3)
+          update_vaccine_variables(variables = variables)
         }
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
@@ -186,10 +175,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
         # intermediate stages, should give stage + 1
       } else {
 
-        variables$dose_time <- list()
-        variables$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-        variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
+        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
         stage_pr_vec <- parameters$vaccine_coverage_mat[stage, ]
         who_2_vaccinate <- which(stage_pr_vec > 0)
@@ -200,23 +186,22 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
             vax_group <- which(ages %in% who_2_vaccinate)
             vax_group <- vax_group[sample.int(n = length(vax_group),size = ceiling(length(vax_group)*0.9),replace = FALSE)]
             # groups for this dose
-            variables$dose_time[[p]]$queue_update(values = 1,index = vax_group)
-            variables$dose_time[[p]]$.update()
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, vax_group),dose = p)
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
               vax_group <- which(ages %in% who_2_vaccinate_next)
               vax_group <- vax_group[sample.int(n = length(vax_group),size = ceiling(length(vax_group)*0.9),replace = FALSE)]
-              variables$dose_time[[p + 1]]$queue_update(values = 1,index = vax_group)
-              variables$dose_time[[p + 1]]$.update()
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, vax_group),dose = p + 1)
             }
+            update_vaccine_variables(variables = variables)
           }
         } else {
           vax_group <- which(ages %in% who_2_vaccinate)
           vax_group <- vax_group[sample.int(n = length(vax_group),size = ceiling(length(vax_group)*0.9),replace = FALSE)]
 
           # groups for this dose
-          variables$dose_time[[3]]$queue_update(values = 1,index = which(ages %in% who_2_vaccinate))
-          variables$dose_time[[3]]$.update()
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, vax_group),dose = 3)
+          update_vaccine_variables(variables = variables)
         }
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
@@ -231,6 +216,3 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   }
 
 })
-
-
-# add tests for obviously incorrect cases

@@ -32,8 +32,7 @@ create_vaccination_dose_listener <- function(variables, parameters, type, dose) 
   stopifnot( parameters$N_dose[which(parameters$vaxx_types == type)] >= dose )
   stopifnot( dose > 0 )
   function (timestep, target) {
-    variables$dose_num$queue_update(values = dose, index = target)
-    variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
+    schedule_dose_vaccine(timestep = timestep,variables = variables,target = target,dose = dose)
   }
 }
 

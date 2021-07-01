@@ -72,18 +72,32 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 }
 
 
-# create_vaccine_variables <- function(variables, pop, vaxx_types, max_dose = 2) {
-#
-#   stopifnot(length(vaxx_types) > 0)
-#   stopifnot(!"UNVACC" %in% vaxx_types)
-#
-#   n <- sum(pop$n)
-#
-#   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
-#   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
-#   variables$dose_type <- replicate(n = max_dose,expr = individual::CategoricalVariable$new(categories = c(vaxx_types, "UNVACC"),initial_values = rep("UNVACC",n)),simplify = FALSE)
-#   variables$phase <- individual::IntegerVariable$new(initial_values = 1)
-#
-#   return(variables)
-# }
+#' @title Schedule some individuals for a vaccination dose
+#' @description This is called from the event listeners for each dose, and also
+#' aids in better testing of the simulation model
+#' @param timestep current time step
+#' @param variables a list
+#' @param target a \code{\link[individual]{Bitset}}
+#' @param dose which dose
+#'
+#' @export
+schedule_dose_vaccine <- function(timestep, variables, target, dose) {
 
+  variables$dose_num$queue_update(value = as.character(dose),index = target)
+  variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
+
+}
+
+#' @title Update vaccine variables
+#' @description This should be called from the simulation loop. It does not
+#' update disease state.
+#' @param variables a list
+#' @export
+update_vaccine_variables <- function(variables) {
+
+  for (dose in variables$dose_time) {
+    dose$.update()
+  }
+  variables$dose_num$.update()
+
+}

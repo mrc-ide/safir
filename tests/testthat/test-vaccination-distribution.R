@@ -224,10 +224,13 @@ test_that('prioritization steps are working', {
     for (a in seq_along(ages_to_vaxx)) {
       bset_a <- variables$discrete_age$get_index_of(set = ages_to_vaxx[a])
       bset_a <- filter_bitset(bitset = bset_a,other = 1:floor(bset_a$size() * (perc_to_vaxx[a]+0.05)))
-      variables$dose_time[[1]]$queue_update(values = 1,index = bset_a)
-      variables$dose_num$queue_update(value = "1",index = bset_a)
-      variables$dose_time[[1]]$.update()
-      variables$dose_num$.update()
+      # browser()
+      schedule_dose_vaccine(timestep = 1,variables = variables,target = bset_a,dose = 1)
+      update_vaccine_variables(variables = variables)
+      # variables$dose_time[[1]]$queue_update(values = 1,index = bset_a)
+      # variables$dose_num$queue_update(value = "1",index = bset_a)
+      # variables$dose_time[[1]]$.update()
+      # variables$dose_num$.update()
     }
 
     step <- get_current_prioritization_step(variables = variables,parameters = parameters,dose = 1)
