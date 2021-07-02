@@ -4,14 +4,12 @@
 \alias{create_vaccination_dose_listener}
 \title{Create listener for vaccination dose (multi-dose, no types)}
 \usage{
-create_vaccination_dose_listener(variables, parameters, type, dose)
+create_vaccination_dose_listener(variables, parameters, dose)
 }
 \arguments{
 \item{variables}{a named list of variables}
 
 \item{parameters}{the parameters}
-
-\item{type}{character type of vaccine}
 
 \item{dose}{integer dose}
 }

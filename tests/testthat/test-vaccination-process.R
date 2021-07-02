@@ -6,11 +6,13 @@ test_that("vaccination_process phase 1 step 1 working", {
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
   vax_proc(timestep = 1)
 
+  sched <- events$scheduled_dose[[1]]$get_scheduled()$copy()
+
   expect_true(
-    all(variables$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled()) == 17)
+    all(variables$discrete_age$get_values(sched) == 17)
   )
   expect_equal(
-    events$scheduled_dose[[1]]$get_scheduled()$size(), parameters$vaccine_set[1]
+    sched$size(), parameters$vaccine_set[1]
   )
   expect_equal(
     events$scheduled_dose[[2]]$get_scheduled()$size(), 0

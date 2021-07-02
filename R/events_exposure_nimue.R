@@ -29,10 +29,6 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   return(
     function(timestep, to_move) {
 
-      # if (timestep * dt > 20) {
-      #   browser()
-      # }
-
       ages <- variables$discrete_age$get_values(to_move)
       vaxx <- variables$vaccine_states$get_values(to_move)
 
@@ -54,9 +50,6 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
       if (not_hosp$size() > 0) {
 
         ages <- variables$discrete_age$get_values(not_hosp)
-        # vaxx <- variables$vaccine_states$get_values(not_hosp)
-        # submat[, 2] <- ages
-        # submat[, 3] <- vaxx
 
         prob_asymp <- parameters$prob_asymp[ages]
 
