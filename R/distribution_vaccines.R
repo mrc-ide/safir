@@ -317,9 +317,12 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
     # dose scarcity; need to allocate proportional to group size
     } else {
 
+      # people already getting a dose, by age
       already_scheduled <- tab_bins(a = discrete_age$get_values(events$scheduled_dose[[dose]]$get_scheduled()), nbins = length(n_to_cover))
+      # don't want to assign vaccines to those already scheduled for one
       n_to_cover <- pmax(0, n_to_cover - already_scheduled)
       group_weights <- n_to_cover / sum(n_to_cover)
+      # make sure assigned vaccines never exceed the number of leftover doses
       assigned <- floor(min(sum(n_to_cover), leftover_doses) * group_weights)
       if(sum(assigned) != leftover_doses){
         assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (leftover_doses %% length(group_weights)))
