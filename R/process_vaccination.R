@@ -79,7 +79,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
         doses_left <- assign_doses(
           doses = doses_left,
           n_to_cover = targets$n_to_cover, eligible_age_bset = targets$eligible_age_bsets, eligible_age_counts = targets$eligible_age_counts,
-          events = events,dose = phase,parameters = parameters
+          events = events,dose = phase,parameters = parameters,discrete_age = variables$discrete_age
         )
 
         # intermediate phases: give prioritized doses to next group for next phase
@@ -92,7 +92,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
           doses_left <- assign_doses(
             doses = doses_left,
             n_to_cover = targets_pri$n_to_cover, eligible_age_bset = targets_pri$eligible_age_bsets, eligible_age_counts = targets_pri$eligible_age_counts,
-            events = events,dose = phase + 1,parameters = parameters
+            events = events,dose = phase + 1,parameters = parameters,discrete_age = variables$discrete_age
           )
 
         }
@@ -110,7 +110,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
             doses_left <- assign_doses(
               doses = doses_left,
               n_to_cover = targets$n_to_cover, eligible_age_bset = targets$eligible_age_bsets, eligible_age_counts = targets$eligible_age_counts,
-              events = events,dose = phase,parameters = parameters
+              events = events,dose = phase,parameters = parameters,discrete_age = variables$discrete_age
             )
           }
 

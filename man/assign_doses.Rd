@@ -11,7 +11,8 @@ assign_doses(
   eligible_age_counts,
   events,
   dose,
-  parameters
+  parameters,
+  discrete_age
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ assign_doses(
 \item{dose}{what dose we are administering}
 
 \item{parameters}{a list}
+
+\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
 }
 \value{
 the number of remaining doses

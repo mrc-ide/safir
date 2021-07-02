@@ -272,9 +272,10 @@ target_pop <- function(dose, variables, parameters, t, dt, prioritisation, vaxx_
 #' @param events a list
 #' @param dose what dose we are administering
 #' @param parameters a list
+#' @param discrete_age a \code{\link[individual]{IntegerVariable}}
 #' @return the number of remaining doses
 #' @export
-assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_counts, events, dose, parameters) {
+assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_counts, events, dose, parameters, discrete_age) {
 
   stopifnot(all(n_to_cover <= eligible_age_counts))
 
@@ -284,7 +285,7 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
   if (any(n_to_cover > 1 )) {
 
     # no dose scarcity
-    if (sum(n_to_cover) <= doses) {
+    if (sum(n_to_cover) < leftover_doses) {
 
       # loop over ages
       for (a in 1:parameters$N_age) {
@@ -300,7 +301,7 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
           to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
           events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
 
-          leftover_doses <- leftover_doses - num_to_retain
+          leftover_doses <- leftover_doses - to_schedule$size()
 
         # schedule everyone
         } else {
@@ -308,7 +309,7 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
           to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
           events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
 
-          leftover_doses <- leftover_doses - eligible_age_counts[a]
+          leftover_doses <- leftover_doses - to_schedule$size()
         }
 
       } # end age loop
@@ -316,10 +317,12 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
     # dose scarcity; need to allocate proportional to group size
     } else {
 
+      already_scheduled <- tab_bins(a = discrete_age$get_values(events$scheduled_dose[[dose]]$get_scheduled()), nbins = length(n_to_cover))
+      n_to_cover <- pmax(0, n_to_cover - already_scheduled)
       group_weights <- n_to_cover / sum(n_to_cover)
-      assigned <- floor(doses * group_weights)
-      if(sum(assigned) != doses){
-        assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (doses %% length(group_weights)))
+      assigned <- floor(min(sum(n_to_cover), leftover_doses) * group_weights)
+      if(sum(assigned) != leftover_doses){
+        assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (leftover_doses %% length(group_weights)))
       }
 
       # loop over ages
@@ -331,9 +334,9 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
 
         to_schedule <- filter_bitset(eligible_age_bset[[a]], to_keep)
         to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-        events$scheduled_dose[[dose]]$schedule(target = , delay = 0)
+        events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
 
-        leftover_doses <- leftover_doses - assigned[a]
+        leftover_doses <- leftover_doses - to_schedule$size()
 
       } # end age loop
 
