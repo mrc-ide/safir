@@ -10,15 +10,13 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   dose_2[which(is.na(dose_2))] <- -1
 
   n <- length(dose_1)
-  dose_num <- ifelse(dose_1 == -1, "0", "1")
-  dose_num[which(dose_2 > -1)] <- "2"
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
 
   variables <- list()
-  variables$dose_time <- list()
-  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
-  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = dose_num)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   cov_safir <- sapply(X = 1:length(dose_times),FUN = function(a){
     get_proportion_vaccinated(variables = variables,age = a,dose = 1)
@@ -51,15 +49,13 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   dose_2[which(is.na(dose_2))] <- -1
 
   n <- length(dose_1)
-  dose_num <- ifelse(dose_1 == -1, "0", "1")
-  dose_num[which(dose_2 > -1)] <- "2"
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
 
   variables <- list()
-  variables$dose_time <- list()
-  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
-  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = dose_num)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   # daily time step ------------------------------------------------------------
   dt <- 1
@@ -96,19 +92,21 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   dt <- 0.2
 
   dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
-  # dose_1[which(!is.na(dose_1))] <- dose_1[which(!is.na(dose_1))] / dt
   dose_1[!(dose_1 %in% c(1,-1))] <- dose_1[!(dose_1 %in% c(1,-1))] / dt
   dose_1[which(is.na(dose_1))] <- -1
 
   dose_2 <- unlist(lapply(dose_times,function(x){x[,2]}))
-  # dose_2[which(!is.na(dose_2))] <- dose_2[which(!is.na(dose_2))] / dt
   dose_2[!(dose_2 %in% c(1,-1))] <- dose_2[!(dose_2 %in% c(1,-1))] / dt
   dose_2[which(is.na(dose_2))] <- -1
 
+  n <- length(dose_1)
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
+
   variables <- list()
-  variables$dose_time <- list()
-  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
-  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
+  variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   t <- 1 # current day
   tdt <- t/dt # current time step
@@ -145,7 +143,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
 test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equivalent results with same input', {
   dose_times <- list(matrix(c(1, 2, NA, 4, 3, NA), nrow = 3),
-                     matrix(c(NA, NA, NA, NA, 3, 4), nrow = 3),
+                     matrix(c(NA, 3, 4, NA, NA, NA), nrow = 3),
                      matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
 
   dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
@@ -155,15 +153,13 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   dose_2[which(is.na(dose_2))] <- -1
 
   n <- length(dose_1)
-  dose_num <- ifelse(dose_1 == -1, "0", "1")
-  dose_num[which(dose_2 > -1)] <- "2"
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
 
   variables <- list()
-  variables$dose_time <- list()
-  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
-  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = dose_num)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   t <- 1
   dt <- 1
@@ -217,7 +213,7 @@ test_that('prioritization steps are working', {
 
     variables <- list(discrete_age = IntegerVariable$new(initial_values = ages), dose_time = NULL)
     variables$dose_time[[1]] <- IntegerVariable$new(initial_values = rep(-1,n))
-    variables$dose_num <- CategoricalVariable$new(categories = c("0","1"),initial_values = rep("0",n))
+    variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
 
     ages_to_vaxx <- which(strat[i, ] > 0)
     perc_to_vaxx <- strat[i, ages_to_vaxx]
@@ -255,15 +251,13 @@ test_that("target_pop is giving the same results as nimue", {
   dose_2[which(is.na(dose_2))] <- -1
 
   n <- length(dose_1)
-  dose_num <- ifelse(dose_1 == -1, "0", "1")
-  dose_num[which(dose_2 > -1)] <- "2"
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
 
   variables <- list()
-  variables$dose_time <- list()
-  variables$dose_time[[1]] <- IntegerVariable$new(dose_1)
-  variables$dose_time[[2]] <- IntegerVariable$new(dose_2)
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = dose_num)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   parameters <- list(
     N_age = 3,
@@ -327,15 +321,12 @@ test_that("target_pop is giving the same results as nimue", {
 test_that("target_pop is working in general case", {
 
   n <- 15
-  variables <- list(
-    discrete_age = IntegerVariable$new(rep(1:3,each=5)),
-    dose_time = NULL,
-    population = n
-  )
-  variables$dose_time[[1]] <- IntegerVariable$new(rep(1:3,each=5))
-  variables$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-  variables$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = rep("1",n))
+  dose_num <- rep(1,n)
+
+  variables <- list()
+  variables$discrete_age <- IntegerVariable$new(rep(1:3,each=5))
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 3)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(rep(1:3,each=5),rep(-1,n),rep(-1,n)),dose_num_init = dose_num)
 
   parameters <- list(
     N_age = 3,
@@ -413,15 +404,10 @@ test_that("assign doses is working for phase 1", {
   pop_ages <- rep(1:3,times=parameters$population)
 
   n <- sum(parameters$population)
-  var_local <- list(
-    discrete_age = IntegerVariable$new(pop_ages),
-    dose_time = NULL
-  )
-
-  var_local$dose_time[[1]] <- IntegerVariable$new(rep(-1,n))
-  var_local$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-  var_local$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
-  var_local$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = rep("0",n))
+  var_local <- list()
+  var_local$discrete_age <- IntegerVariable$new(pop_ages)
+  var_local <- create_vaccine_variables(variables = var_local,pop = n,max_dose = 3)
+  initialize_vaccine_variables(variables = var_local,dose_time_init = list(rep(-1,n),rep(-1,n),rep(-1,n)),dose_num_init = rep(0,n))
 
   # won't assign no doses
   targeted <- target_pop(dose = 1,variables = var_local,parameters = parameters,t = 14,dt = 1,prioritisation = c(1,1,1))
@@ -498,15 +484,11 @@ test_that("assign doses is working for phase 2", {
   pop_ages <- rep(1:3,times=parameters$population)
 
   n <- sum(parameters$population)
-  var_local <- list(
-    discrete_age = IntegerVariable$new(pop_ages),
-    dose_time = NULL
-  )
+  var_local <- list()
+  var_local$discrete_age <- IntegerVariable$new(pop_ages)
+  var_local <- create_vaccine_variables(variables = var_local,pop = n,max_dose = 3)
+  initialize_vaccine_variables(variables = var_local,dose_time_init = list(c(rep(5,n-5),rep(-1,5)),rep(-1,n),rep(-1,n)),dose_num_init = c(rep(1,n-5),rep(0,5)))
 
-  var_local$dose_time[[1]] <- IntegerVariable$new(c(rep(5,n-5),rep(-1,5)))
-  var_local$dose_time[[2]] <- IntegerVariable$new(rep(-1,n))
-  var_local$dose_time[[3]] <- IntegerVariable$new(rep(-1,n))
-  var_local$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("1",n-5),rep("0",5)))
 
   # won't assign doses if not past threshold
   t <- 10

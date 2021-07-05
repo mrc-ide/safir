@@ -62,7 +62,8 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
   n <- sum(pop)
 
-  variables$dose_num <- individual::CategoricalVariable$new(categories = as.character(0:max_dose),initial_values = rep("0",n))
+  # variables$dose_num <- individual::CategoricalVariable$new(categories = as.character(0:max_dose),initial_values = rep("0",n))
+  variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
   # dose time stores the time step when it happened, not necessarily the same as the day (if dt != 1)
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
   variables$phase <- new.env(hash = FALSE)
@@ -71,21 +72,24 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
   return(variables)
 }
 
-
-#' @title Schedule some individuals for a vaccination dose
-#' @description This is called from the event listeners for each dose, and also
-#' aids in better testing of the simulation model
-#' @param timestep current time step
-#' @param variables a list
-#' @param target a \code{\link[individual]{Bitset}}
-#' @param dose which dose
-#'
+#' @title Initialize vaccination variables (multi-dose, no types)
+#' @param variables a list from \code{\link{create_vaccine_variables}}
+#' @param dose_time_init list of dose times (must all be integer vectors of the same length, -1 is value to indicate that individual has not
+#' yet received this dose)
+#' @param dose_num_init vector of initial doses (must be self-consistent with \code{dose_time_init})
 #' @export
-schedule_dose_vaccine <- function(timestep, variables, target, dose) {
-
-  variables$dose_num$queue_update(value = as.character(dose),index = target)
-  variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
-
+initialize_vaccine_variables <- function(variables, dose_time_init, dose_num_init) {
+  stopifnot(inherits(dose_time_init, "list"))
+  stopifnot(length(dose_time_init) > 0)
+  stopifnot(length(dose_time_init[[1]]) == length(dose_num_init))
+  # if you haven't gotten the first dose, you are at dose 0
+  stopifnot(all(which(dose_time_init[[1]] < 0) == which(dose_num_init == 0)))
+  for (d in seq_along(dose_time_init)) {
+    variables$dose_time[[d]]$queue_update(values = dose_time_init[[d]])
+    variables$dose_time[[d]]$.update()
+  }
+  variables$dose_num$queue_update(value = dose_num_init)
+  variables$dose_num$.update()
 }
 
 #' @title Update vaccine variables

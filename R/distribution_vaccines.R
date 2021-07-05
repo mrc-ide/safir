@@ -19,8 +19,6 @@ get_proportion_vaccinated <- function(variables, age, dose) {
   N <- age_bset$size()
   vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
   vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
-  # if we do this one with dose number it should be like
-  # vaccinated_bset <- variables$dose_num$get_index_of(as.character(dose : max_dose))
   vaccinated_bset$and(age_bset)
   return( vaccinated_bset$size() / N )
 }

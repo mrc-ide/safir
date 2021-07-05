@@ -22,6 +22,22 @@ create_events_vaccination <- function(events, parameters) {
 }
 
 
+#' @title Schedule some individuals for a vaccination dose
+#' @description This is called from the event listeners for each dose, and also
+#' aids in better testing of the simulation model
+#' @param timestep current time step
+#' @param variables a list
+#' @param target a \code{\link[individual]{Bitset}}
+#' @param dose which dose
+#'
+#' @export
+schedule_dose_vaccine <- function(timestep, variables, target, dose) {
+
+  variables$dose_num$queue_update(value = dose,index = target)
+  variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
+
+}
+
 #' @title Create listener for vaccination dose (multi-dose, no types)
 #' @description Updates state when a vaccine dose is given. It does not schedule future events.
 #' @param variables a named list of variables
