@@ -194,6 +194,8 @@ A straightforward way to track vaccines is this. Let `max_vaxx` be the maximum n
   1. `IntegerVariable[max_vaxx]`: stores the time each dose is given.
   2. `CategoricalVariable[max_vaxx]`: store the type of vaccine for each dose.
   
+One thing is that, if all we care about is people getting 1st v. 2nd doses of **anything**, we can just do the checks for coverage for any dose, and then give people doses based on what's available at that time. Or if someone gets a certain 1st dose, they are guaranteed to get subsequent doses of that type. Something like that.
+  
 ### Transitions & scheduling
 
 The `vaccination_process()` function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is "at risk" of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only "at risk" of vaccination?) we do the normal binomial draw.

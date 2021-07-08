@@ -33,13 +33,13 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
         susceptible <- variables$states$get_index_of("S")
 
+        # infectious persons by dose/age
+
         # dose categories
-        for (d in seq_along(doses_vec)) {
-          doses_bset[[d]] <- variables$dose_num$get_index_if(doses_vec[d])
-        }
+        dose <- variables$dose_num$get_values(index = infectious)
 
         # age categories
-        ages <- variables$discrete_age$get_values(infectious)
+        ages <- variables$discrete_age$get_values(index = infectious)
 
         # # infection by vaccine status
         # inf_vaxx <- variables$vaccine_states$get_values(index = infectious)
