@@ -62,7 +62,7 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
   n <- sum(pop)
 
-  # variables$dose_num <- individual::CategoricalVariable$new(categories = as.character(0:max_dose),initial_values = rep("0",n))
+  variables$ab_titre <- individual::DoubleVariable$new(initial_values = rep(0,n))
   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
   # dose time stores the time step when it happened, not necessarily the same as the day (if dt != 1)
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
