@@ -211,9 +211,12 @@ test_that('prioritization steps are working', {
 
   for (i in 1:nrow(strat)) {
 
-    variables <- list(discrete_age = IntegerVariable$new(initial_values = ages), dose_time = NULL)
-    variables$dose_time[[1]] <- IntegerVariable$new(initial_values = rep(-1,n))
-    variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
+    # variables <- list(discrete_age = IntegerVariable$new(initial_values = ages), dose_time = NULL)
+    # variables$dose_time[[1]] <- IntegerVariable$new(initial_values = rep(-1,n))
+    # variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
+
+    variables <- list(discrete_age = IntegerVariable$new(initial_values = ages))
+    variables <- create_vaccine_variables(variables = variables,pop = ages_size,max_dose = 1)
 
     ages_to_vaxx <- which(strat[i, ] > 0)
     perc_to_vaxx <- strat[i, ages_to_vaxx]

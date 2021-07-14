@@ -9,6 +9,7 @@
 #' @title Get proportion of an age group that is vaccinated (multi-dose, no types)
 #' @description Get proportion of an age group that has received a particular vaccine dose
 #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
+#' C++ version (but calculates for all ages) is \code{\link{get_proportion_vaccinated_all_ages_cpp}}.
 #' @param variables a list
 #' @param age an age group (can be a vector of Multiple age groups)
 #' @param dose which dose to get proportion of age group who has received it
