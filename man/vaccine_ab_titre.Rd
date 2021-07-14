@@ -2,11 +2,7 @@
 % Please edit documentation in R/efficacy_vaccination.R
 \name{vaccine_ab_titre}
 \alias{vaccine_ab_titre}
-\title{#' @param ab_titre a \code{\link[individual]{DoubleVariable}} giving the antibody titre for the population
-#' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population
-#' @param dose_num a \code{\link[individual]{IntegerVariable}} giving the dose number of the population
-#'
-vaccine_ab_titre <- function(timestep, dt, ab_titre, dose_time, dose_num) {}
+\title{Process that updates the antibody (Ab) titre each time step}
 \usage{
 vaccine_ab_titre(parameters, variables, events, dt)
 }
@@ -18,22 +14,5 @@ vaccine_ab_titre(parameters, variables, events, dt)
 \item{dose_num}{a \code{\link[individual]{IntegerVariable}} giving the dose number of the population}
 }
 \description{
-#' @param ab_titre a \code{\link[individual]{DoubleVariable}} giving the antibody titre for the population
-#' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population
-#' @param dose_num a \code{\link[individual]{IntegerVariable}} giving the dose number of the population
-#'
-vaccine_ab_titre <- function(timestep, dt, ab_titre, dose_time, dose_num) {
+Process that updates the antibody (Ab) titre each time step
 }
-\section{those who have gotten at least one dose}{
-vaccinated <- dose_num$get_index_of(set = 0)
-vaccinated$not()
-}
-
-\section{calculate it....should run each day}{
-
-}
-
-\section{schedule an update}{
-
-}
-

@@ -40,13 +40,16 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
         # Transition from S to E
         susceptible <- variables$states$get_index_of("S")
+
+        # get infection modifier and ages
+        infection_efficacy <- vaccine_efficacy_infection(ab_titre = variables$ab_titre,who = susceptible)
         ages <- variables$discrete_age$get_values(susceptible)
 
         # FoI for each susceptible person
         lambda <- lambda[ages]
 
         # infected
-        susceptible$sample(rate = pexp(q = lambda * dt))
+        susceptible$sample(rate = pexp(q = lambda * infection_efficacy * dt))
 
         # newly infecteds queue the exposure event
         if (susceptible$size() > 0) {
