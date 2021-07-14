@@ -1,12 +1,11 @@
 # --------------------------------------------------
-#   exposure event (nimue vaccine model)
+#   exposure event vaccine model (multi-dose, no types)
 #   Sean L. Wu (slwood89@gmail.com)
-#   May 2021
-#   1. create_exposure_scheduler_listener
+#   July 2021
 # --------------------------------------------------
 
 
-#' @title Modelling the progression to either IMild, ICase, IAsymp (nimue vaccine model)
+#' @title Modelling the progression to either IMild, ICase, IAsymp (vaccine model, multi-dose, no types)
 #' @description Age dependent outcome of exposure
 #'
 #' @param events a list of events in the model
@@ -15,12 +14,7 @@
 #' @param dt the time step
 #' @param shift passed to \code{\link{make_rerlang}}
 #' @export
-create_exposure_scheduler_listener_nimue <- function(events, variables, parameters, dt, shift = 0) {
-
-  stopifnot(length(dim(parameters$prob_hosp)) == 3)
-  stopifnot(dim(parameters$prob_hosp)[2] == 17)
-  stopifnot(dim(parameters$prob_hosp)[3] == 4)
-  stopifnot(all(c("discrete_age", "vaccine_states") %in% names(variables)))
+create_exposure_scheduler_listener <- function(events, variables, parameters, dt, shift = 0) {
 
   ICase_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
@@ -29,18 +23,19 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   return(
     function(timestep, to_move) {
 
-      ages <- variables$discrete_age$get_values(to_move)
-      vaxx <- variables$vaccine_states$get_values(to_move)
+      # probabilities of hospitalization by age group
+      disc_ages <- variables$discrete_age$get_values(to_move)
+      prob_hosp <- parameters$prob_hosp[disc_ages]
 
-      submat <- matrix(data = NA,nrow = to_move$size(),ncol = 3)
-      submat[, 1] <- ceiling(timestep * dt)
-      submat[, 2] <- ages
-      submat[, 3] <- vaxx
-
-      prob_hosp <- parameters$prob_hosp[submat]
       hosp <- to_move$copy()
 
-      hosp$sample(prob_hosp)
+      # vaccine efficacy against severe disease
+      severe_efficacy <- vaccine_efficacy_severe(ab_titre = variables$ab_titre,who = hosp)
+
+      # sample those with severe disease
+      hosp$sample(prob_hosp * severe_efficacy)
+
+      # those without severe disease
       not_hosp <- to_move$set_difference(hosp)
 
       if (hosp$size() > 0) {
@@ -48,10 +43,8 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
       }
 
       if (not_hosp$size() > 0) {
-
-        ages <- variables$discrete_age$get_values(not_hosp)
-
-        prob_asymp <- parameters$prob_asymp[ages]
+        disc_ages <- variables$discrete_age$get_values(not_hosp)
+        prob_asymp <- parameters$prob_asymp[disc_ages]
 
         to_asymp <- not_hosp$copy()
         to_asymp$sample(prob_asymp)
@@ -72,3 +65,4 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   )
 
 }
+
