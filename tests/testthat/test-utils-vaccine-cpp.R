@@ -1,4 +1,4 @@
-test_that("get contact matrix works", {
+test_that("get_proportion_vaccinated_all_ages_cpp works", {
 
   n <- 1e3
   N_age <- 5

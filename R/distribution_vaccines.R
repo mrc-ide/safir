@@ -45,8 +45,11 @@ get_vaccination_priority_stage <- function(variables, phase, parameters) {
   # not final phase
   if (phase < parameters$N_phase) {
 
-    pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
-    pr_next_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase + 1)})
+    # pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
+    # pr_next_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase + 1)})
+
+    pr_this_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase)
+    pr_next_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase + 1)
 
     # go through prioritisation steps
     for (p in 1:parameters$N_prioritisation_steps) {
@@ -67,7 +70,9 @@ get_vaccination_priority_stage <- function(variables, phase, parameters) {
   #  final phase: don't need to check for next dose coverage
   } else {
 
-    pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
+    # pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
+
+    pr_this_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase)
 
     # go through prioritisation steps
     for (p in 1:parameters$N_prioritisation_steps) {
@@ -172,7 +177,8 @@ age_group_eligible_for_dose_vaccine <- function(dose, parameters, variables, t, 
 #' @export
 get_current_prioritization_step <- function(variables, parameters, dose) {
   # calculate prioritisation step and which age groups are eligible right now
-  pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables,age = a,dose = dose)})
+  # pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables,age = a,dose = dose)})
+  pr <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = dose)
 
   vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
   for (p in 1:parameters$N_prioritisation_steps) {
