@@ -298,11 +298,22 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
         # allocated doses < eligible persons, schedule subset
         if (eligible_age_counts[a] != n_to_cover[a]) {
 
-          num_to_retain <- n_to_cover[a]
-          n <- eligible_age_counts[a]
-          to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+          # num_to_retain <- n_to_cover[a]
+          # n <- eligible_age_counts[a]
+          # to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+          #
+          # to_schedule <- filter_bitset(eligible_age_bset[[a]], to_keep)
+          # to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
+          # events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
+          #
+          # leftover_doses <- leftover_doses - to_schedule$size()
 
-          to_schedule <- filter_bitset(eligible_age_bset[[a]], to_keep)
+          num_to_retain <- n_to_cover[a]
+          to_schedule <- eligible_age_bset[[a]]$copy()
+          if (num_to_retain < eligible_age_counts[a]) {
+            to_schedule$choose(k = num_to_retain)
+          }
+
           to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
           events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
 
@@ -336,15 +347,27 @@ assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_coun
       # loop over ages
       for (a in 1:parameters$N_age) {
 
-        num_to_retain <- assigned[a]
-        n <- eligible_age_counts[a]
-        to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+        # num_to_retain <- assigned[a]
+        # n <- eligible_age_counts[a]
+        # to_keep <- sample.int(n = n,size = num_to_retain,replace = FALSE)
+        #
+        # to_schedule <- filter_bitset(eligible_age_bset[[a]], to_keep)
+        # to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
+        # events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
+        #
+        # leftover_doses <- leftover_doses - to_schedule$size()
 
-        to_schedule <- filter_bitset(eligible_age_bset[[a]], to_keep)
+        num_to_retain <- assigned[a]
+        to_schedule <- eligible_age_bset[[a]]$copy()
+        if (num_to_retain < eligible_age_counts[a]) {
+          to_schedule$choose(k = num_to_retain)
+        }
+
         to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
         events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
 
         leftover_doses <- leftover_doses - to_schedule$size()
+
 
       } # end age loop
 

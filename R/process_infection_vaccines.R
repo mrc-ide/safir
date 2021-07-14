@@ -4,10 +4,9 @@
 #   July 2021
 # --------------------------------------------------------------------------------
 
-#' @title Infection process (nimue vaccine model)
+#' @title Infection process for vaccine model (multi-dose, no types)
 #'
-#' @description This samples infection events in the susceptible population. This incorporates
-#' the slightly more complex force of infection calculation from the nimue model.
+#' @description This samples infection events in the susceptible population.
 #'
 #' @param parameters Model parameters
 #' @param variables Model variable
@@ -17,9 +16,6 @@
 infection_process_vaccine <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("states","vaccine_states","discrete_age") %in% names(variables)))
-
-  # doses_vec <- as.character(0:parameters$N_phase)
-  # doses_bset <- replicate(n = length(doses_vec),expr = {NULL})
 
   return(
 
@@ -45,10 +41,10 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
         infection_efficacy <- vaccine_efficacy_infection(ab_titre = variables$ab_titre,who = susceptible)
         ages <- variables$discrete_age$get_values(susceptible)
 
-        # FoI for each susceptible person
+        # FoI for each susceptible based on their age group
         lambda <- lambda[ages]
 
-        # infected
+        # sample infections; individual FoI adjusted by vaccine efficacy
         susceptible$sample(rate = pexp(q = lambda * infection_efficacy * dt))
 
         # newly infecteds queue the exposure event

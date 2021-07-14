@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_infection_vaccines.R
 \name{infection_process_vaccine}
 \alias{infection_process_vaccine}
-\title{Infection process (nimue vaccine model)}
+\title{Infection process for vaccine model (multi-dose, no types)}
 \usage{
 infection_process_vaccine(parameters, variables, events, dt)
 }
@@ -16,6 +16,5 @@ infection_process_vaccine(parameters, variables, events, dt)
 \item{dt}{the time step}
 }
 \description{
-This samples infection events in the susceptible population. This incorporates
-the slightly more complex force of infection calculation from the nimue model.
+This samples infection events in the susceptible population.
 }

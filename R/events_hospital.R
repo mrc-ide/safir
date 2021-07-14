@@ -163,6 +163,15 @@ allocate_treatment <- function(
     return(need_treatment)
   }
 
-  get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
-  return(get_treatment)
+  # get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
+  # return(get_treatment)
+
+  k <- max(0, available)
+  if (k > 0) {
+    get_treatment <- need_treatment$copy()
+    get_treatment$choose(k = k)
+    return(get_treatment)
+  } else {
+    return(Bitset$new(size = need_treatment$max_size))
+  }
 }
