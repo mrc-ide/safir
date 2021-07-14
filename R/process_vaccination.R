@@ -31,6 +31,9 @@ vaccination_process <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("dose_num","dose_time","phase","discrete_age") %in% names(variables)))
   stopifnot(all(c("N_phase", "dose_period", "vaccine_coverage_mat", "N_prioritisation_steps", "next_dose_priority", "vaccine_set") %in% names(parameters)))
+  stopifnot(is.finite(parameters$N_phase))
+  stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
+  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
 
   return(
 

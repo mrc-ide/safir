@@ -42,6 +42,7 @@ create_exposure_scheduler_listener <- function(events, variables, parameters, dt
         events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))
       }
 
+      # sample asymptomatic and mild disease persons
       if (not_hosp$size() > 0) {
         disc_ages <- variables$discrete_age$get_values(not_hosp)
         prob_asymp <- parameters$prob_asymp[disc_ages]
