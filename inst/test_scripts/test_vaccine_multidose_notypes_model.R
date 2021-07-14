@@ -44,12 +44,16 @@ parameters$dose_period <- dose_period
 parameters$N_phase <- vaccine_doses
 
 
-
-
-
+# create variables
 timesteps <- parameters$time_period/dt
-variables <- safir::create_variables(pop = pop, parameters = parameters)
-events <- safir::create_events(parameters = parameters)
+variables <- create_variables(pop = pop, parameters = parameters)3
+variables <- create_vaccine_variables(variables = variables,pop = pop$n,max_dose = vaccine_doses)
+
+# create events
+events <- create_events(parameters = parameters)
+events <- create_events_vaccination(events = events,parameters = parameters)
+
+
 safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 renderer <- individual::Render$new(timesteps)
 processes <- list(

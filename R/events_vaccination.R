@@ -16,7 +16,7 @@ create_events_vaccination <- function(events, parameters) {
   N <- sum(parameters$population)
 
   # scheduled future doses
-  events$scheduled_dose <- replicate(n = parameters$N_dose,expr = individual::TargetedEvent$new(N),simplify = FALSE)
+  events$scheduled_dose <- replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(N),simplify = FALSE)
 
   return(events)
 }
