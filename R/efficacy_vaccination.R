@@ -46,6 +46,7 @@ vaccine_ab_titre <- function(parameters, variables, events, dt) {
 
       # apply the discrete difference operator
       # new_ab_values <- blah
+      new_ab_values <- pmax(x - (x * 0.01 * dt), 0) # fake dynamics
 
       # schedule an update
       ab_titre$queue_update(values = new_ab_values, index = vaccinated)
