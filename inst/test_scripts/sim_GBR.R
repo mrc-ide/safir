@@ -51,7 +51,7 @@ system.time(
     safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
     renderer <- individual::Render$new(timesteps)
     processes <- list(
-      safir::infection_process(parameters = parameters,variables = variables,events = events,dt = dt),
+      safir::infection_process_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
       individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
     )
     safir::setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
