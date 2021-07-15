@@ -21,13 +21,13 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
   return(
-    function(timestep, to_move) {
+    function(timestep, target) {
 
       # probabilities of hospitalization by age group
-      disc_ages <- variables$discrete_age$get_values(to_move)
+      disc_ages <- variables$discrete_age$get_values(target)
       prob_hosp <- parameters$prob_hosp[disc_ages]
 
-      hosp <- to_move$copy()
+      hosp <- target$copy()
 
       # vaccine efficacy against severe disease
       severe_efficacy <- vaccine_efficacy_severe(ab_titre = variables$ab_titre,who = hosp)
@@ -36,7 +36,7 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
       hosp$sample(prob_hosp * severe_efficacy)
 
       # those without severe disease
-      not_hosp <- to_move$set_difference(hosp)
+      not_hosp <- target$set_difference(hosp)
 
       if (hosp$size() > 0) {
         events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))

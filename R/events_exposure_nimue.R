@@ -27,21 +27,21 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
   return(
-    function(timestep, to_move) {
+    function(timestep, target) {
 
-      ages <- variables$discrete_age$get_values(to_move)
-      vaxx <- variables$vaccine_states$get_values(to_move)
+      ages <- variables$discrete_age$get_values(target)
+      vaxx <- variables$vaccine_states$get_values(target)
 
-      submat <- matrix(data = NA,nrow = to_move$size(),ncol = 3)
+      submat <- matrix(data = NA,nrow = target$size(),ncol = 3)
       submat[, 1] <- ceiling(timestep * dt)
       submat[, 2] <- ages
       submat[, 3] <- vaxx
 
       prob_hosp <- parameters$prob_hosp[submat]
-      hosp <- to_move$copy()
+      hosp <- target$copy()
 
       hosp$sample(prob_hosp)
-      not_hosp <- to_move$set_difference(hosp)
+      not_hosp <- target$set_difference(hosp)
 
       if (hosp$size() > 0) {
         events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))

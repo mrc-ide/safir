@@ -20,21 +20,23 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
   return(
     function(timestep) {
 
-      # those who have gotten at least one dose
+      # only those with at least 1 dose will need to have titre calculated
       vaccinated <- dose_num$get_index_of(set = 0)
-      vaccinated$not()
+      vaccinated <- vaccinated$not()
 
-      # calculate it....should run each day
+      if (vaccinated$size() > 0) {
+        # calculate it....should run each day
 
-      # current Ab titre
-      current_ab_values <- ab_titre$get_values(index = vaccinated)
+        # current Ab titre
+        current_ab_values <- ab_titre$get_values(index = vaccinated)
 
-      # apply the discrete difference operator
-      # new_ab_values <- blah
-      new_ab_values <- pmax(x - (x * 0.01 * dt), 0) # fake dynamics
+        # apply the discrete difference operator
+        # new_ab_values <- blah
+        new_ab_values <- pmax(x - (x * 0.01 * dt), 0) # fake dynamics
 
-      # schedule an update
-      ab_titre$queue_update(values = new_ab_values, index = vaccinated)
+        # schedule an update
+        ab_titre$queue_update(values = new_ab_values, index = vaccinated)
+      }
 
     }
   )

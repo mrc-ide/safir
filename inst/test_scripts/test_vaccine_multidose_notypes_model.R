@@ -33,6 +33,9 @@ parameters <- safir::get_parameters(
   R0 = R0,
   time_period = tmax
 )
+parameters$IAsymp_0[1:17] <- 3
+parameters$population <- parameters$population + 3
+pop$n <- parameters$population
 
 # attach vaccine parameters
 parameters$N_prioritisation_steps <- nrow(vaccine_coverage_mat)
@@ -55,14 +58,14 @@ attach_event_listeners(variables = variables,events = events,parameters = parame
 attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
 
 # make renderer
-renderer <- Render$new(timesteps)
+renderer <- Render$new(parameters$time_period)
 
 # processes
 processes <- list(
-  infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccination_process_new(parameters = parameters,variables = variables,events = events,dt = dt),
   vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
-  vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
-  categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
+  infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
+  categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
