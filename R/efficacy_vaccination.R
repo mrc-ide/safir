@@ -11,7 +11,7 @@
 #' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population
 #' @param dose_num a \code{\link[individual]{IntegerVariable}} giving the dose number of the population
 #' @export
-vaccine_ab_titre <- function(parameters, variables, events, dt) {
+vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
   dose_num <- variables$dose_num
   dose_time <- variables$dose_time

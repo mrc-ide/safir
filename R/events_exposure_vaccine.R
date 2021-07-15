@@ -14,7 +14,7 @@
 #' @param dt the time step
 #' @param shift passed to \code{\link{make_rerlang}}
 #' @export
-create_exposure_scheduler_listener <- function(events, variables, parameters, dt, shift = 0) {
+create_exposure_scheduler_listener_vaccine <- function(events, variables, parameters, dt, shift = 0) {
 
   ICase_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)

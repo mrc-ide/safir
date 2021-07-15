@@ -15,7 +15,7 @@
 #' @export
 infection_process_vaccine <- function(parameters, variables, events, dt) {
 
-  stopifnot(all(c("states","vaccine_states","discrete_age") %in% names(variables)))
+  stopifnot(all(c("states","discrete_age") %in% names(variables)))
 
   return(
 

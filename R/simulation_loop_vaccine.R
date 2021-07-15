@@ -29,6 +29,8 @@ simulation_loop_vaccine <- function(
     pb <- txtProgressBar(min = 1, max = timesteps, initial = 1, style = 3)
   }
 
+  events_2_loop <- which(names(events) != "scheduled_dose")
+
   # sim loop
   for (t in seq_len(timesteps)) {
 
@@ -38,7 +40,10 @@ simulation_loop_vaccine <- function(
     }
 
     # call events
-    for (event in events) {
+    for (event in events[events_2_loop]) {
+      event$.process()
+    }
+    for (event in events$scheduled_dose) {
       event$.process()
     }
 
@@ -47,7 +52,10 @@ simulation_loop_vaccine <- function(
     variables$states$.update()
 
     # event clocks tick
-    for (event in events) {
+    for (event in events[events_2_loop]) {
+      event$.tick()
+    }
+    for (event in events$scheduled_dose) {
       event$.tick()
     }
 

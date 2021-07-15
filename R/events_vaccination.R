@@ -4,6 +4,7 @@
 #   June 2021
 # --------------------------------------------------
 
+# write a function
 
 #' @title Append vaccination events
 #'
@@ -65,6 +66,13 @@ create_vaccination_dose_listener <- function(variables, parameters, dose) {
 #' @export
 attach_event_listeners_vaccination <- function(variables, events, parameters, dt) {
 
+  # refactor eventually
+  events$exposure$.listeners[[2]] <- NULL
+  events$exposure$add_listener(
+    create_exposure_scheduler_listener_vaccine(events = events,variables = variables,parameters = parameters,dt = dt)
+  )
+
+  # add to each dose
   for (d in seq_along(events$scheduled_dose)) {
     events$scheduled_dose[[d]]$add_listener(
       create_vaccination_dose_listener(variables = variables,parameters = parameters,dose = d)
