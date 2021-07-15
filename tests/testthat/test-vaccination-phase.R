@@ -3,14 +3,19 @@
 # is causing failure, then debug from there
 test_that("testing get_vaccination_priority_stage for proper prioritization matrix stage and vaccination phase", {
 
+  n <- 17 * 100
+  ages <- rep(1:17, each = 100)
+
   parameters <- list()
   parameters$vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
   parameters$N_age <- ncol(parameters$vaccine_coverage_mat)
   parameters$N_prioritisation_steps <- nrow(parameters$vaccine_coverage_mat)
   parameters$N_phase <- 3
+  parameters$population <- tab_bins(a = ages,nbins = 17)
 
-  n <- 17 * 100
-  ages <- rep(1:17, each = 100)
+  events <- list(
+    scheduled_dose = replicate(n = parameters$N_phase,expr = {TargetedEvent$new(population_size = n)})
+  )
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -31,7 +36,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
 
         variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(
@@ -58,7 +63,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
           update_vaccine_variables(variables = variables)
         }
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(
@@ -92,7 +97,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
 
         }
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(
@@ -111,14 +116,19 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
 # is causing failure, then debug from there
 test_that("testing get_vaccination_priority_stage for proper prioritization matrix stage and vaccination phase, randomized assignment of vaccines", {
 
+  n <- 17 * 100
+  ages <- rep(1:17, each = 100)
+
   parameters <- list()
   parameters$vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
   parameters$N_age <- ncol(parameters$vaccine_coverage_mat)
   parameters$N_prioritisation_steps <- nrow(parameters$vaccine_coverage_mat)
   parameters$N_phase <- 3
+  parameters$population <- tab_bins(a = ages,nbins = 17)
 
-  n <- 17 * 100
-  ages <- rep(1:17, each = 100)
+  events <- list(
+    scheduled_dose = replicate(n = parameters$N_phase,expr = {TargetedEvent$new(population_size = n)})
+  )
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -139,7 +149,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
 
         variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(
@@ -166,7 +176,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
           update_vaccine_variables(variables = variables)
         }
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(
@@ -204,7 +214,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
           update_vaccine_variables(variables = variables)
         }
 
-        calc_stage <- get_vaccination_priority_stage(variables = variables,phase = phase,parameters = parameters)
+        calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
 
         expect_equal(

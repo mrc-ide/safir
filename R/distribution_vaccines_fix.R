@@ -102,6 +102,9 @@ get_current_eligible_from_coverage <- function(timestep, dt, coverage, dose, par
 #' @export
 get_vaccination_priority_stage <- function(variables, events, phase, parameters) {
 
+  # age groups
+  age_size <- parameters$population
+
   stopifnot(is.finite(parameters$N_phase))
   stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
   stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
@@ -110,7 +113,7 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
   coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
 
   pr_this_dose <- sapply(X = coverage_this_dose, function(a){a$size()})
-  pr_this_dose <- pr_this_dose / parameters$population
+  pr_this_dose <- pr_this_dose / age_size
 
   # not final phase
   if (phase < parameters$N_phase) {
@@ -118,7 +121,7 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
     coverage_next_dose <- get_current_coverage(variables = variables, events = events, dose = phase + 1, parameters = parameters)
 
     pr_next_dose <- sapply(X = coverage_next_dose, function(a){a$size()})
-    pr_next_dose <- pr_next_dose / parameters$population
+    pr_next_dose <- pr_next_dose / age_size
 
     # go through prioritization steps
     for (p in 1:parameters$N_prioritisation_steps) {
