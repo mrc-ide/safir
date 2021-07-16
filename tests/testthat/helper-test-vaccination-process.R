@@ -16,6 +16,8 @@ parameters$next_dose_priority[2, 10:14] <- 1
 n <- 17 * 100
 ages <- rep(1:17, each = 100)
 
+parameters$population <- tab_bins(a = ages,nbins = 17)
+
 variables <- list()
 variables$discrete_age <- IntegerVariable$new(ages)
 

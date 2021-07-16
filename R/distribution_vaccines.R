@@ -1,546 +1,304 @@
-#' # --------------------------------------------------
-#' #   functions to work with scheduling/allocating vaccines
-#' #   for the general vaccine model but with no types
-#' #   Sean L. Wu (slwood89@gmail.com)
-#' #   June 2021
-#' # --------------------------------------------------
-#'
-#'
-#' #' @title Get proportion of an age group that is vaccinated (multi-dose, no types)
-#' #' @description Get proportion of an age group that has received a particular vaccine dose
-#' #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
-#' #' C++ version (but calculates for all ages) is \code{\link{get_proportion_vaccinated_all_ages_cpp}}.
-#' #' @param variables a list
-#' #' @param age an age group (can be a vector of Multiple age groups)
-#' #' @param dose which dose to get proportion of age group who has received it
-#' #'
-#' #' @export
-#' get_proportion_vaccinated <- function(variables, age, dose) {
-#'   age_bset <- variables$discrete_age$get_index_of(age)
-#'   N <- age_bset$size()
-#'   vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
-#'   vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
-#'   vaccinated_bset$and(age_bset)
-#'   return( vaccinated_bset$size() / N )
-#' }
-#'
-#' #' @title Get proportion of an age group that is vaccinated or scheduled for this dose (multi-dose, no types)
-#' #' @description Get proportion of an age group that has received a particular vaccine dose
-#' #' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
-#' #' C++ version (but calculates for all ages) is \code{\link{get_proportion_vaccinated_all_ages_cpp}}.
-#' #' @param variables a list
-#' #' @param events a list
-#' #' @param age an age group (can be a vector of Multiple age groups)
-#' #' @param dose which dose to get proportion of age group who has received it
-#' #'
-#' #' @export
-#' get_proportion_vaccinated_scheduled <- function(variables, events, age, dose) {
-#'   age_bset <- variables$discrete_age$get_index_of(age)
-#'   N <- age_bset$size()
-#'   vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
-#'   vaccinated_bset <- vaccinated_bset$not() # complement = vaccinated people
-#'   vaccinated_bset$and(events$scheduled_dose[[dose]]$get_scheduled())
-#'   vaccinated_bset$and(age_bset)
-#'   return( vaccinated_bset$size() / N )
-#' }
-#'
-#'
-#' #' @title Identity those persons eligible for a dose (multi-dose, no types)
-#' #' @description Find those individuals who have had the dose preceding \code{dose},
-#' #' have not yet received the next one, and are beyond the \code{dose_period}.
-#' #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
-#' #' This function should only be called if simulation time is greater than the \code{dose_period}
-#' #' @param dose which dose?
-#' #' @param parameters a list
-#' #' @param variables a list
-#' #' @param t the current time step
-#' #' @param dt size of the time step
-#' #' @return an \code{\link[individual]{Bitset}}
-#' #' @export
-#' eligible_for_dose_vaccine <- function(dose, parameters, variables, t, dt) {
-#'   if (dose > 1) {
-#'     # who has gotten the previous dose? (with correction for dt < 1)
-#'     threshold <- t - as.integer(parameters$dose_period[dose]/dt)
-#'     if (threshold < 0) {
-#'       return(individual::Bitset$new(sum(parameters$population)))
-#'     }
-#'     had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
-#'     # who has not gotten the next one?
-#'     not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'     # people past the threshold and who haven't gotten the next one yet
-#'     return(not_had_next$and(had_previous_beyond_threshold))
-#'   } else {
-#'     not_had_first_dose <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'     return(not_had_first_dose)
-#'   }
-#' }
-#'
-#'
-#' #' @title Find individuals in each age group eligible for a dose (multi-dose, no types)
-#' #' @description Find those individuals who have had the dose preceding \code{dose},
-#' #' have not yet received the next one, and are beyond the \code{dose_period}.
-#' #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
-#' #' This function should only be called if simulation time is greater than the \code{dose_period}
-#' #' @param dose which dose?
-#' #' @param parameters a list
-#' #' @param variables a list
-#' #' @param t the current time step
-#' #' @param dt size of the time step
-#' #' @return a list containing a \code{\link[individual]{Bitset}} for each age bin
-#' #' @export
-#' age_group_eligible_for_dose_vaccine <- function(dose, parameters, variables, t, dt) {
-#'
-#'   out <- replicate(n = parameters$N_age,expr = NULL,simplify = FALSE)
-#'
-#'   # dose > 1
-#'   if (dose > 1) {
-#'     threshold <- t - as.integer(parameters$dose_period[dose]/dt)
-#'     # nobody is eligible
-#'     if (threshold <= 0) {
-#'       for (a in 1:parameters$N_age) {
-#'         out[[a]] <- individual::Bitset$new(sum(parameters$population))
-#'       }
-#'       return(out)
-#'     }
-#'     # who has gotten the previous dose in [0,threshold]?
-#'     had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
-#'
-#'     if (had_previous_beyond_threshold$size() > 0) {
-#'       # who has not gotten the this dose?
-#'       not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'       # people past the threshold and who haven't gotten this dose yet
-#'       not_had_next$and(had_previous_beyond_threshold)
-#'       # calculate by age
-#'       for (a in 1:parameters$N_age) {
-#'         bset_a <- variables$discrete_age$get_index_of(set = a)
-#'         bset_a$and(not_had_next)
-#'         out[[a]] <- bset_a
-#'       }
-#'     }
-#'
-#'   # dose = 1
-#'   } else {
-#'     # people who haven't gotten this dose yet and are not already scheduled for it
-#'     not_had_first_dose <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'     # calculate by age
-#'     for (a in 1:parameters$N_age) {
-#'       bset_a <- variables$discrete_age$get_index_of(set = a)
-#'       bset_a$and(not_had_first_dose)
-#'       out[[a]] <- bset_a
-#'     }
-#'   }
-#'
-#'   return(out)
-#' }
-#'
-#' #' @title Find individuals in each age group eligible for a dose (multi-dose, no types)
-#' #' @description Find those individuals who have had the dose preceding \code{dose},
-#' #' have not yet received the next one, and are beyond the \code{dose_period}.
-#' #' This is similar to the function \code{\link[nimue]{eligable_for_second}} in the nimue package.
-#' #' This function should only be called if simulation time is greater than the \code{dose_period}
-#' #' @param dose which dose?
-#' #' @param parameters a list
-#' #' @param variables a list
-#' #' @param events a list
-#' #' @param t the current time step
-#' #' @param dt size of the time step
-#' #' @return a list containing a \code{\link[individual]{Bitset}} for each age bin
-#' #' @export
-#' age_group_eligible_for_dose_vaccine_new <- function(dose, parameters, variables, events, t, dt) {
-#'
-#'   out <- replicate(n = parameters$N_age,expr = NULL,simplify = FALSE)
-#'
-#'   # dose > 1
-#'   if (dose > 1) {
-#'     threshold <- t - as.integer(parameters$dose_period[dose]/dt)
-#'     # nobody is eligible
-#'     if (threshold <= 0) {
-#'       for (a in 1:parameters$N_age) {
-#'         out[[a]] <- individual::Bitset$new(sum(parameters$population))
-#'       }
-#'       return(out)
-#'     }
-#'     # who has gotten the previous dose in [0,threshold]?
-#'     had_previous_beyond_threshold <- variables$dose_time[[dose - 1]]$get_index_of(a = 0, b = threshold)
-#'
-#'     if (had_previous_beyond_threshold$size() > 0) {
-#'       # who has not gotten the this dose?
-#'       not_had_next <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'       # people past the threshold and who haven't gotten this dose yet
-#'       not_had_next$and(had_previous_beyond_threshold)
-#'       # make sure those people are not already scheduled
-#'       not_had_next$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'       # calculate by age
-#'       for (a in 1:parameters$N_age) {
-#'         bset_a <- variables$discrete_age$get_index_of(set = a)
-#'         bset_a$and(not_had_next)
-#'         out[[a]] <- bset_a
-#'       }
-#'     }
-#'
-#'     # dose = 1
-#'   } else {
-#'     # people who haven't gotten this dose yet and are not already scheduled for it
-#'     not_had_first_dose <- variables$dose_time[[dose]]$get_index_of(set = -1)
-#'     not_had_first_dose$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'     # calculate by age
-#'     for (a in 1:parameters$N_age) {
-#'       bset_a <- variables$discrete_age$get_index_of(set = a)
-#'       bset_a$and(not_had_first_dose)
-#'       out[[a]] <- bset_a
-#'     }
-#'   }
-#'
-#'   return(out)
-#' }
-#'
-#'
-#' #' @title Get current prioritization step for a specific dose
-#' #' @param variables a list
-#' #' @param parameters Model parameters
-#' #' @param dose which dose?
-#' #' @export
-#' get_current_prioritization_step <- function(variables, parameters, dose) {
-#'   # calculate prioritisation step and which age groups are eligible right now
-#'   # pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables,age = a,dose = dose)})
-#'   pr <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = dose)
-#'
-#'   vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
-#'   for (p in 1:parameters$N_prioritisation_steps) {
-#'     vaccination_target_mat[p, ] <- as.integer(pr < parameters$vaccine_coverage_mat[p, ])
-#'   }
-#'
-#'   vaccine_target_vec <- rep(0, parameters$N_prioritisation_steps)
-#'   for (p in 1:parameters$N_prioritisation_steps) {
-#'     # an entire row summing to zero means that step has been completed
-#'     vaccine_target_vec[p] <- as.integer(sum(vaccination_target_mat[p, ]) == 0)
-#'   }
-#'   current_index <- min(sum(vaccine_target_vec) + 1, parameters$N_prioritisation_steps)
-#'
-#'   return(current_index)
-#' }
-#'
-#'
-#' #' @title Target persons in each age group to vaccinate (multi-dose, no types)
-#' #' @description For a given dose, find eligible persons in each age group to target for that vaccine dose.
-#' #' If \code{vaxx_priority} is specified, it means that we are currently vaccinating one dose ahead
-#' #' of the current vaccination phase, for those age groups prioritized to get their next dose.
-#' #' @param dose which dose?
-#' #' @param variables a list
-#' #' @param parameters Model parameters
-#' #' @param t current time step
-#' #' @param dt size of time step
-#' #' @param prioritisation row of the prioritisation matrix for the current step
-#' #' @param vaxx_priority vaxx_priority matrix for age groups that should get the next dose
-#' #' the current dose
-#' #' @return a named list with \code{n_to_cover}: number to be vaccinated in each age group,
-#' #' \code{eligible_age_bsets}: \code{\link[individual]{Bitset}} of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
-#' #' \code{eligible_age_counts}: size of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
-#' #' @export
-#' target_pop <- function(dose, variables, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
-#'
-#'   # current coverage by age in this dose (switch to cpp)
-#'   current_coverage <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = dose)
-#'
-#'   # size of each age group (just use parameters$population)
-#'   age_size <- sapply(X = 1:parameters$N_age,FUN = function(a){
-#'     variables$discrete_age$get_size_of(set = a)
-#'   })
-#'   # age_size <- parameters$population
-#'
-#'   # Remaining population left to cover with current dose number (dose) to reach target coverage in prioritisation step
-#'   n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * age_size)
-#'
-#'   out <- list(
-#'     n_to_cover = NULL,
-#'     eligible_age_bsets = NULL,
-#'     eligible_age_counts = NULL
-#'   )
-#'
-#'   # eligible group
-#'   eligible_age_bsets <- age_group_eligible_for_dose_vaccine(dose = dose,parameters = parameters, variables = variables,t = t, dt = dt)
-#'   eligible_age_counts <- sapply(eligible_age_bsets, function(x){x$size()})
-#'
-#'   out$eligible_age_bsets <- eligible_age_bsets
-#'   out$eligible_age_counts <- eligible_age_counts
-#'
-#'   if (dose > 1) {
-#'
-#'     if (!is.null(vaxx_priority)) {
-#'       # giving priority vaccine doses to dose + 1
-#'       n_to_cover <- pmin(n_to_cover, eligible_age_counts) * vaxx_priority
-#'       out$n_to_cover <- n_to_cover
-#'     } else {
-#'       # normal dose; do not check vaxx_priority
-#'       n_to_cover <- pmin(n_to_cover, eligible_age_counts)
-#'       out$n_to_cover <- n_to_cover
-#'     }
-#'
-#'   } else {
-#'     # dose 1, we can find out just from proportion with coverage the number to give
-#'     # without checking eligibility after threshold
-#'     out$n_to_cover <- n_to_cover
-#'   }
-#'
-#'   stopifnot(all(out$n_to_cover <= out$eligible_age_counts))
-#'
-#'   return(out)
-#' }
-#'
-#'
-#' #' @title Target persons in each age group to vaccinate (multi-dose, no types)
-#' #' @description For a given dose, find eligible persons in each age group to target for that vaccine dose.
-#' #' If \code{vaxx_priority} is specified, it means that we are currently vaccinating one dose ahead
-#' #' of the current vaccination phase, for those age groups prioritized to get their next dose.
-#' #' @param dose which dose?
-#' #' @param variables a list
-#' #' @param events a list
-#' #' @param parameters Model parameters
-#' #' @param t current time step
-#' #' @param dt size of time step
-#' #' @param prioritisation row of the prioritisation matrix for the current step
-#' #' @param vaxx_priority vaxx_priority matrix for age groups that should get the next dose
-#' #' the current dose
-#' #' @return a named list with \code{n_to_cover}: number to be vaccinated in each age group,
-#' #' \code{eligible_age_bsets}: \code{\link[individual]{Bitset}} of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
-#' #' \code{eligible_age_counts}: size of eligible group in each age bin (from \code{\link{age_group_eligible_for_dose_vaccine}})
-#' #' @export
-#' target_pop_new <- function(dose, variables, events, parameters, t, dt, prioritisation, vaxx_priority = NULL) {
-#'
-#'   # current coverage by age in this dose (switch to cpp)
-#'   current_coverage <- sapply(X = 1:parameters$N_age,FUN = function(a){
-#'     get_proportion_vaccinated_scheduled(variables = variables,events = events,age = a,dose = dose)
-#'   })
-#'
-#'   # size of each age group (just use parameters$population)
-#'   age_size <- sapply(X = 1:parameters$N_age,FUN = function(a){
-#'     variables$discrete_age$get_size_of(set = a)
-#'   })
-#'   # age_size <- parameters$population
-#'
-#'   # Remaining population left to cover with current dose number (dose) to reach target coverage in prioritisation step
-#'   # this takes into account who already has the vaccine and who is already scheduled for it.
-#'   # the only thing it doesn't take into accout is: are they past the minimum threshold after the previous vaxx dose
-#'   n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * age_size)
-#'
-#'   out <- list(
-#'     n_to_cover = NULL,
-#'     eligible_age_bsets = NULL,
-#'     eligible_age_counts = NULL
-#'   )
-#'
-#'   # eligible group
-#'   eligible_age_bsets <- age_group_eligible_for_dose_vaccine_new(dose = dose,parameters = parameters, variables = variables, events = events,t = t, dt = dt)
-#'   eligible_age_counts <- sapply(eligible_age_bsets, function(x){x$size()})
-#'
-#'   out$eligible_age_bsets <- eligible_age_bsets
-#'   out$eligible_age_counts <- eligible_age_counts
-#'
-#'   if (dose > 1) {
-#'
-#'     if (!is.null(vaxx_priority)) {
-#'       # giving priority vaccine doses to dose + 1
-#'       n_to_cover <- pmin(n_to_cover, eligible_age_counts) * vaxx_priority
-#'       out$n_to_cover <- n_to_cover
-#'     } else {
-#'       # normal dose; do not check vaxx_priority
-#'       n_to_cover <- pmin(n_to_cover, eligible_age_counts)
-#'       out$n_to_cover <- n_to_cover
-#'     }
-#'
-#'   } else {
-#'     # dose 1, we can find out just from proportion with coverage the number to give
-#'     # without checking eligibility after threshold
-#'     out$n_to_cover <- n_to_cover
-#'   }
-#'
-#'   stopifnot(all(out$n_to_cover <= out$eligible_age_counts))
-#'
-#'   return(out)
-#' }
-#'
-#'
-#' #' Schedule N doses to age groups based on weightings by number of people eligible to be vaccinated (multi-dose, no types)
-#' #' @description Please make sure you are subtracting these doses from some daily total outside of this function.
-#' #' It combines functionality of \code{\link[nimue]{assign_doses}} and \code{\link[nimue]{administer_first_dose}}/\code{\link[nimue]{administer_second_dose}}.
-#' #' Be aware that it is possible for fewer doses to be assigned than supplied, if not enough doses are available. In general
-#' #' \code{n_to_cover} is the ideal allocation, and it is constrained by the amount available, \code{doses}
-#' #' @param doses Total available doses
-#' #' @param n_to_cover Number of people to be vaccinated in each age group, from \code{\link{target_pop_new}}
-#' #' @param eligible_age_bset a list of \code{\link[individual]{Bitset}} from \code{\link{target_pop_new}}
-#' #' @param eligible_age_counts size of eligible group in each age bin from \code{\link{target_pop_new}}
-#' #' @param events a list
-#' #' @param dose what dose we are administering
-#' #' @param parameters a list
-#' #' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-#' #' @return the number of remaining doses
-#' #' @export
-#' assign_doses <- function(doses, n_to_cover, eligible_age_bset, eligible_age_counts, events, dose, parameters, discrete_age) {
-#'
-#'   stopifnot(all(n_to_cover <= eligible_age_counts))
-#'
-#'   leftover_doses <- doses
-#'
-#'   # check if any vaccines are scheduled at all
-#'   if (any(n_to_cover > 1 )) {
-#'
-#'     # no dose scarcity
-#'     if (sum(n_to_cover) < leftover_doses) {
-#'
-#'       # loop over ages
-#'       for (a in 1:parameters$N_age) {
-#'
-#'           if (n_to_cover[a] < 1) {
-#'             next()
-#'           }
-#'
-#'           num_to_retain <- n_to_cover[a]
-#'           to_schedule <- eligible_age_bset[[a]]$copy()
-#'           if (num_to_retain < eligible_age_counts[a]) {
-#'             to_schedule$choose(k = num_to_retain)
-#'           }
-#'
-#'           to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'           events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
-#'
-#'           leftover_doses <- leftover_doses - to_schedule$size()
-#'
-#'         # # allocated doses < eligible persons, schedule subset
-#'         # if (eligible_age_counts[a] < n_to_cover[a]) {
-#'         #
-#'         #   if (n_to_cover[a] < 1) {
-#'         #     next()
-#'         #   }
-#'         #
-#'         #   num_to_retain <- n_to_cover[a]
-#'         #   to_schedule <- eligible_age_bset[[a]]$copy()
-#'         #   if (num_to_retain < eligible_age_counts[a]) {
-#'         #     to_schedule$choose(k = num_to_retain)
-#'         #   }
-#'         #
-#'         #   to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'         #   events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
-#'         #
-#'         #   leftover_doses <- leftover_doses - to_schedule$size()
-#'         #
-#'         # # schedule everyone
-#'         # } else {
-#'         #   to_schedule <- eligible_age_bset[[a]]
-#'         #   to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'         #   events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
-#'         #
-#'         #   leftover_doses <- leftover_doses - to_schedule$size()
-#'         # }
-#'
-#'       } # end age loop
-#'
-#'     # dose scarcity; need to allocate proportional to group size
-#'     } else {
-#'
-#'       # people already getting a dose, by age
-#'       already_scheduled <- tab_bins(a = discrete_age$get_values(events$scheduled_dose[[dose]]$get_scheduled()), nbins = length(n_to_cover))
-#'       # don't want to assign vaccines to those already scheduled for one
-#'       n_to_cover <- pmax(0, n_to_cover - already_scheduled)
-#'       group_weights <- n_to_cover / sum(n_to_cover)
-#'       # make sure assigned vaccines never exceed the number of leftover doses
-#'       assigned <- floor(min(sum(n_to_cover), leftover_doses) * group_weights)
-#'       if(sum(assigned) != leftover_doses){
-#'         assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (leftover_doses %% length(group_weights)))
-#'       }
-#'
-#'       # loop over ages
-#'       for (a in 1:parameters$N_age) {
-#'
-#'         if (assigned[a] < 1) {
-#'           next()
-#'         }
-#'
-#'         num_to_retain <- assigned[a]
-#'         to_schedule <- eligible_age_bset[[a]]$copy()
-#'         if (num_to_retain < eligible_age_counts[a]) {
-#'           to_schedule$choose(k = num_to_retain)
-#'         }
-#'
-#'         to_schedule$and(events$scheduled_dose[[dose]]$get_scheduled()$not())
-#'         events$scheduled_dose[[dose]]$schedule(target = to_schedule, delay = 0)
-#'
-#'         leftover_doses <- leftover_doses - to_schedule$size()
-#'
-#'
-#'       } # end age loop
-#'
-#'     } # end dose scarcity
-#'
-#'   } # end allocation
-#'
-#'   stopifnot(leftover_doses >= 0) # assertion
-#'   return(leftover_doses)
-#' }
-#'
-#'
-#' #' @title Get prioritisation step for a specific dosing phase
-#' #' @description Return which row of the \code{\link[nimue]{strategy_matrix}} the vaccination
-#' #' program should be targeting for coverage. To complete a step, all \code{phase}
-#' #' dose coverage should be > prioritisation matrix target and all \code{phase + 1}
-#' #' dose coverage for prioritized groups should be > prioritisation matrix target.
-#' #' If these two conditions are fulfilled for the entire \code{phase}, the function returns
-#' #' -1 to indicate that vaccination dosing \code{phase} should be advanced.
-#' #' @param variables a list
-#' #' @param phase current dosing phase
-#' #' @param parameters a list
-#' #'
-#' #' @export
-#' get_vaccination_priority_stage <- function(variables, phase, parameters) {
-#'
-#'   stopifnot(is.finite(parameters$N_phase))
-#'   stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
-#'   stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
-#'
-#'   # not final phase
-#'   if (phase < parameters$N_phase) {
-#'
-#'     # pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
-#'     # pr_next_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase + 1)})
-#'
-#'     pr_this_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase)
-#'     pr_next_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase + 1)
-#'
-#'     # go through prioritisation steps
-#'     for (p in 1:parameters$N_prioritisation_steps) {
-#'       ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
-#'       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
-#'
-#'       ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
-#'       next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
-#'
-#'       if (this_dose_not_cover | next_dose_not_cover) {
-#'         return(p)
-#'       }
-#'     }
-#'
-#'     # if we did not return by now it means this step is complete, return -1
-#'     return(-1)
-#'
-#'     #  final phase: don't need to check for next dose coverage
-#'   } else {
-#'
-#'     # pr_this_dose <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated(variables = variables, age = a, dose = phase)})
-#'
-#'     pr_this_dose <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = parameters$N_age,dose = phase)
-#'
-#'     # go through prioritisation steps
-#'     for (p in 1:parameters$N_prioritisation_steps) {
-#'       ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
-#'       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
-#'
-#'       if (this_dose_not_cover) {
-#'         return(p)
-#'       }
-#'     }
-#'
-#'     # if we did not return by now it means this step is complete, return -1
-#'     return(-1)
-#'
-#'   }
-#'
-#' }
+# --------------------------------------------------
+#   functions to work with scheduling/allocating vaccines
+#   for the general vaccine model but with no types
+#   Sean L. Wu (slwood89@gmail.com)
+#   June 2021
+# --------------------------------------------------
+
+
+#' @title Get people who either have this dose or are scheduled for it
+#' @description
+#' Return a list of bitsets, one for each age group, containing.
+#' those persons who either have had this dose or are scheduled for it.
+#' The complement of each of these sets will be those
+#' people who haven't gotten this dose and aren't scheduled for it.
+#' @param variables a list of model variables
+#' @param events a list of model events
+#' @param dose what dose to check coverage for
+#' @param parameters a list of parameters
+#' @export
+get_current_coverage <- function(variables, events, dose, parameters) {
+
+  bsets <- vector("list", parameters$N_age)
+
+  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
+  vaccinated_bset <- vaccinated_bset$not() # have gotten this dose
+  vaccinated_bset$or(events$scheduled_dose[[dose]]$get_scheduled()) # have gotten this dose OR are scheduled for it
+
+  for (a in 1:parameters$N_age) {
+
+    age_bset <- variables$discrete_age$get_index_of(a)
+    vaccinated_age_bset <- vaccinated_bset$copy()
+    vaccinated_age_bset$and(age_bset) # in the right age
+
+    bsets[[a]] <- vaccinated_age_bset
+
+  }
+
+  return(bsets)
+}
+
+
+#' @title Get persons who are eligible for this dose
+#' @description Get people who are eligible for this dose, from the output of \code{\link{get_current_coverage}}.
+#' Because \code{coverage} is people (by age) who either have this dose or are scheduled for it,
+#' if we are checking eligibility for dose 1 we just want the complement of those people. For doses > 1 we need to
+#' first take the complement and then check
+#' to see who of those persons got their previous dose past the waiting threshold.
+#' This function returns a list of bitsets.
+#' @param timestep the current time step
+#' @param dt time step size
+#' @param coverage output of \code{\link{get_current_coverage}}
+#' @param variables a list of model variables
+#' @param dose what dose to get eligibility for
+#' @param parameters a list of parameters
+#' @export
+get_current_eligible_from_coverage <- function(timestep, dt, coverage, variables, dose, parameters) {
+
+  # people who did not get `dose` and are not scheduled for it
+  # bsets <- lapply(X = coverage,FUN = function(b){b$copy()$not()})
+  # this is wrong because its everyone in the complement, not the complement AND this age group.
+  # need to take variables as an arg and do that logic.
+
+  bsets <- lapply(X = 1:parameters$N_age,FUN = function(a){
+    not_cov <- coverage[[a]]$not()
+    not_cov$and(variables$discrete_age$get_index_of(a))
+  })
+
+  # for doses > 1 we need to check if they are past threshold
+  if (dose > 1) {
+
+    threshold <- timestep - as.integer(parameters$dose_period[dose]/dt)
+
+    # nobody eligible if timestep is too soon for threshold to have elapsed
+    if (threshold < 0) {
+
+      for (a in 1:parameters$N_age) {
+        bsets[[a]] <- Bitset$new(size = bsets[[a]]$max_size)
+      }
+
+    # threshold past 0
+    } else {
+
+      # who has gotten the previous dose in [0,threshold]?
+      previous_dose_in_threshold <- variables$dose_time[[dose - 1]]$get_index_of(set = 0:threshold)
+      for (a in 1:parameters$N_age) {
+        bsets[[a]]$and(previous_dose_in_threshold)
+      }
+
+    }
+
+  }
+
+  # for the 1st dose, we don't need to check previous threshold, we can just return
+
+  return(bsets)
+}
+
+
+#' @title Get prioritisation step for a specific dosing phase
+#' @description Return which row of the \code{\link[nimue]{strategy_matrix}} the vaccination
+#' program should be targeting for coverage. To complete a step, all \code{phase}
+#' dose coverage should be > prioritisation matrix target and all \code{phase + 1}
+#' dose coverage for prioritized groups should be > prioritisation matrix target.
+#' If these two conditions are fulfilled for the entire \code{phase}, the function returns
+#' -1 to indicate that vaccination dosing \code{phase} should be advanced.
+#' @param variables a list of model variables
+#' @param events a list of model events
+#' @param phase what dosing phase are we on
+#' @param parameters a list of parameters
+#' @export
+get_vaccination_priority_stage <- function(variables, events, phase, parameters) {
+
+  # age groups
+  age_size <- parameters$population
+
+  stopifnot(is.finite(parameters$N_phase))
+  stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
+  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
+
+  # calculate coverage for this dose
+  coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
+
+  pr_this_dose <- sapply(X = coverage_this_dose, function(a){a$size()})
+  pr_this_dose <- pr_this_dose / age_size
+
+  # not final phase
+  if (phase < parameters$N_phase) {
+
+    coverage_next_dose <- get_current_coverage(variables = variables, events = events, dose = phase + 1, parameters = parameters)
+
+    pr_next_dose <- sapply(X = coverage_next_dose, function(a){a$size()})
+    pr_next_dose <- pr_next_dose / age_size
+
+    # go through prioritization steps
+    for (p in 1:parameters$N_prioritisation_steps) {
+
+      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
+
+      ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
+      # in case an entire row of next_dose_priority matrix was 0
+      if (length(ages_2_check_next) < 1) {
+        next_dose_not_cover <- FALSE
+      } else {
+        next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
+      }
+
+      # if either this dose or prioritized next dose groups not covered, return this step
+      if (this_dose_not_cover | next_dose_not_cover) {
+        return(p)
+      }
+    }
+
+    # if we did not return by now it means this phase is complete, return -1
+    return(-1)
+
+  # final phase: don't need to check for next dose coverage
+  } else {
+
+    # go through prioritization steps
+    for (p in 1:parameters$N_prioritisation_steps) {
+
+      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
+
+      if (this_dose_not_cover) {
+        return(p)
+      }
+    }
+
+    # if we did not return by now it means this step is complete, return -1
+    return(-1)
+
+  }
+
+}
+
+
+#' @title Target persons in each age group to vaccinate (multi-dose, no types)
+#' @description Given the current dosing phase (\code{dose}), the current step of the strategy matrix (\code{strategy_matrix_step})
+#' and possible the age groups prioritized for the next dose \code{next_dose_priority}, figure out who should get this \code{dose}.
+#' This will return a list of bitsets giving people who are eligible to get this dose, taking into account that they
+#' have not yet had it, nor are scheduled for it, and (if dose > 1) are past the threshold for their previous dose.
+#' @param dose what dose to target (the phase we are vaccinating)
+#' @param variables a list of model variables
+#' @param events a list of model events
+#' @param parameters a list of parameters
+#' @param timestep the current time step
+#' @param dt the size of the time step
+#' @param strategy_matrix_step the current step of the strategy matrix
+#' @param next_dose_priority (optional) a row of the next dose priority matrix
+#' @export
+target_pop <- function(dose, variables, events, parameters, timestep, dt, strategy_matrix_step, next_dose_priority = NULL) {
+
+  # age groups
+  age_size <- parameters$population
+
+  # get people who have gotten this dose or are scheduled for it
+  coverage_this_dose <- get_current_coverage(
+    variables = variables, events = events, dose = dose, parameters = parameters
+  )
+
+  # current coverage proportion
+  current_coverage <- sapply(X = coverage_this_dose, function(a){a$size()})
+  current_coverage <- current_coverage / age_size
+
+  # who is eligible for this dose?
+  eligible_this_dose <- get_current_eligible_from_coverage(
+    timestep = timestep, dt = dt, coverage = coverage_this_dose, variables = variables, dose = dose, parameters = parameters
+  )
+
+  # coverage targets are the strategy matrix step; potentially multiplied by next_dose_priority
+  coverage_targets <- strategy_matrix_step
+
+  if (!is.null(next_dose_priority)) {
+    coverage_targets <- coverage_targets * next_dose_priority
+  }
+
+  # remaining population left to cover with current dose number (dose) to reach target coverage in prioritization step
+  # this does not take into account who is eligible based on threshold
+  n_to_cover <- ceiling(pmax(0, (coverage_targets - current_coverage)) * age_size)
+
+  # final number to target for vaccine is minimum of eligible[a] and n_to_cover[a]
+  eligible_num <- sapply(X = eligible_this_dose,function(b){b$size()})
+  n_to_cover <- pmin(n_to_cover, eligible_num)
+
+  # if nobody to target, set empty bitset, otherwise use choose to randomly select
+  for (a in 1:parameters$N_age) {
+    if (n_to_cover[a] < 1) {
+      eligible_this_dose[[a]] <- Bitset$new(size = eligible_this_dose[[a]]$max_size)
+    } else {
+      if (n_to_cover[a] < eligible_this_dose[[a]]$size()) {
+        eligible_this_dose[[a]]$choose(k = n_to_cover[a])
+      }
+      stopifnot(n_to_cover[a] <= eligible_this_dose[[a]]$size()) # assertion
+    }
+  }
+
+  return(eligible_this_dose)
+}
+
+
+#' @title Assign doses to eligible persons based on available supply (multi-dose, no types)
+#' @description Given a list of bitsets indicating who is eligible for this dose from \code{\link{target_pop}},
+#' and the number of doses available today \code{doses_left}, schedule individuals for doses.
+#' If fewer doses are available than eligible persons, the doses are apportioned
+#' proportional to age group size.
+#' @param doses_left the number of vaccine doses available
+#' @param events a list of model events
+#' @param dose what dose to assign for
+#' @param eligible output of \code{\link{target_pop}}
+#' @param parameters a list of model parameters
+#' @export
+assign_doses <- function(doses_left, events, dose, eligible, parameters) {
+
+  n_to_assign <- sapply(X = eligible,FUN = function(a){a$size()})
+
+  # check if can quit early
+  if (sum(n_to_assign) < 1) {
+    return(doses_left)
+  }
+
+  # no dose scarcity: everyone can get one
+  if (sum(n_to_assign) <= doses_left) {
+
+    for (a in 1:parameters$N_age) {
+
+      if (n_to_assign[a] < 1) {
+        next()
+      } else {
+        events$scheduled_dose[[dose]]$schedule(target = eligible[[a]], delay = 0)
+        doses_left <- doses_left - n_to_assign[a]
+      }
+
+    }
+
+  # dose scarcity: allocate proportional to group size
+  } else {
+
+    # assign limited doses to age groups
+    group_weights <- n_to_assign / sum(n_to_assign)
+    assigned <- floor(doses_left * group_weights)
+    if(sum(assigned) != doses_left){
+      assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (doses_left %% length(group_weights)))
+    }
+
+    for (a in 1:parameters$N_age) {
+
+      if (assigned[a] < 1) {
+        next()
+      } else {
+
+        eligible[[a]]$choose(k = assigned[a])
+        events$scheduled_dose[[dose]]$schedule(target = eligible[[a]], delay = 0)
+        doses_left <- doses_left - assigned[a]
+
+      }
+
+    }
+
+  } # end dose scarcity
+
+  return(doses_left)
+}
