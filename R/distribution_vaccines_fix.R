@@ -138,7 +138,12 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
 
       ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
-      next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
+      # in case an entire row of next_dose_priority matrix was 0
+      if (length(ages_2_check_next) < 1) {
+        next_dose_not_cover <- FALSE
+      } else {
+        next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
+      }
 
       # if either this dose or prioritized next dose groups not covered, return this step
       if (this_dose_not_cover | next_dose_not_cover) {
