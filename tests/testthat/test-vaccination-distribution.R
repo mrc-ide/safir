@@ -75,7 +75,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   )
 
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
-  eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,dose = 2,parameters = parameters)
+  eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
@@ -84,21 +84,32 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
     sapply(eligible,function(b){b$size()})
   )
 
-})
+  t <- 1
+  parameters$dose_period[2] <- 0
 
-  # t <- 1
-  # parameters$dose_period[2] <- 0
-  # expect_equal(
-  #   eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt)$to_vector(),
-  #   which(unlist(nimue:::eligable_for_second(dose_times, t, 0)))
-  # )
-  #
+  cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
+  eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
+
+  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+
+
+  sapply(cov,function(b){b$size()})
+
+  expect_equal(
+    sapply(eligible_nimue,function(x){sum(x)}),
+    sapply(eligible,function(b){b$size()})
+  )
+
   # t <- 200
   # parameters$dose_period[2] <- 14
   # expect_equal(
   #   eligible_for_dose_vaccine(dose = 2,parameters = parameters,variables = variables,t = t,dt = dt)$to_vector(),
   #   which(unlist(nimue:::eligable_for_second(dose_times, t, 14)))
   # )
+
+
+})
+
 #
 #   # sub-daily time step ------------------------------------------------------------
 #   dt <- 0.2

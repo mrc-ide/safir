@@ -4,7 +4,14 @@
 \alias{get_current_eligible_from_coverage}
 \title{Get persons who are eligible for this dose}
 \usage{
-get_current_eligible_from_coverage(timestep, dt, coverage, dose, parameters)
+get_current_eligible_from_coverage(
+  timestep,
+  dt,
+  coverage,
+  variables,
+  dose,
+  parameters
+)
 }
 \arguments{
 \item{timestep}{the current time step}
@@ -12,6 +19,8 @@ get_current_eligible_from_coverage(timestep, dt, coverage, dose, parameters)
 \item{dt}{time step size}
 
 \item{coverage}{output of \code{\link{get_current_coverage}}}
+
+\item{variables}{a list of model variables}
 
 \item{dose}{what dose to get eligibility for}
 
