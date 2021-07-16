@@ -25,7 +25,11 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
       vaccinated <- vaccinated$not()
 
       if (vaccinated$size() > 0) {
-        # calculate it....should run each day
+
+        # for each person we need to know the time since their last dose
+        time_since_last_dose <- get_time_since_last_dose(
+          timestep = timestep,dt = dt,vaccinated = vaccinated,dose_num = variables$dose_num,dose_time = variables$dose_time,N_phase = parameters$N_phase
+        )
 
         # current Ab titre
         current_ab_values <- ab_titre$get_values(index = vaccinated)
@@ -41,6 +45,26 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
     }
   )
 
+}
+
+
+#' @title Calculate the time elapsed in days since each person's last dose
+#' @export
+get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_time, N_phase) {
+
+  # which dose everybody is on
+  vaccinated_dose_num <- dose_num$get_values(vaccinated)
+
+  # output just for the vaccinated persons
+  times <- rep(NaN, vaccinated$size())
+
+  for (d in 1:N_phase) {
+    times[which(vaccinated_dose_num == d)] <- timestep - dose_time[[d]]$get_values(index = dose_num$get_index_of(set = d))
+  }
+
+  times <- times * dt
+
+  return(times)
 }
 
 
