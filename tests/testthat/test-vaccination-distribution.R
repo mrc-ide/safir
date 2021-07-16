@@ -62,7 +62,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
-  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
 
   # daily time step ------------------------------------------------------------
   dt <- 1
@@ -144,7 +144,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
-  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
 
   t <- 1 # current day
   tdt <- t/dt # current time step
@@ -218,7 +218,7 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
-  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
 
   t <- 1
   dt <- 1
@@ -290,7 +290,7 @@ test_that("target_pop is giving the same results as nimue", {
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
-  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
 
   parameters <- list(
     N_age = 3,
@@ -361,80 +361,87 @@ test_that("target_pop is giving the same results as nimue", {
 })
 
 
-# test_that("target_pop is working in general case", {
-#
-#   n <- 15
-#   dose_num <- rep(1,n)
-#
-#   variables <- list()
-#   variables$discrete_age <- IntegerVariable$new(rep(1:3,each=5))
-#   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 3)
-#   initialize_vaccine_variables(variables = variables,dose_time_init = list(rep(1:3,each=5),rep(-1,n),rep(-1,n)),dose_num_init = dose_num)
-#
-#   parameters <- list(
-#     N_age = 3,
-#     dose_period = c(NaN, 6, 4),
-#     N_phase = 3
-#   )
-#
-#   # all phase 1 targets reached
-#   p1 <- safir::target_pop(
-#     dose = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3)
-#   )
-#   expect_equal(
-#     p1$n_to_cover,
-#     rep(0, 3)
-#   )
-#
-#   # at time 8 only groups 1 and 2 are good for phase 2
-#   p2 <- safir::target_pop(
-#     dose = 2,variables = variables,parameters = parameters,t = 8,dt = 1,prioritisation = rep(1,3)
-#   )
-#   expect_equal(
-#     p2$n_to_cover,
-#     c(5,5,0)
-#   )
-#
-#   # phase 2 vaccinate group 3 at t = 9, they are prioritized for phase 3
-#   variables$dose_time[[2]] <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
-#   variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("0",10),rep("1",5)))
-#   # should be up for phase 3 if t =13
-#   p2_nt <- safir::target_pop(
-#     dose = 3,variables = variables,parameters = parameters,t = 13,dt = 1,prioritisation = rep(1,3),vaxx_priority = c(0,0,1)
-#   )
-#   expect_equal(
-#     p2_nt$n_to_cover,
-#     c(0,0,5)
-#   )
-#   # not if t=12
-#   p2_t <- safir::target_pop(
-#     dose = 3,variables = variables,parameters = parameters,t = 12,dt = 1,prioritisation = rep(1,3),vaxx_priority = c(0,0,1)
-#   )
-#   expect_equal(
-#     p2_t$n_to_cover,
-#     c(0,0,0)
-#   )
-#
-#   # phase 3, group 3 should all be ready to go regardless of priority if t = 13
-#   p3_nt <- safir::target_pop(
-#     dose = 3,variables = variables,parameters = parameters,t = 13,dt = 1,prioritisation = rep(1,3)
-#   )
-#   expect_equal(
-#     p3_nt$n_to_cover,
-#     c(0,0,5)
-#   )
-#   #  not if t = 12
-#   p3_t <- safir::target_pop(
-#     dose = 3,variables = variables,parameters = parameters,t = 12,dt = 1,prioritisation = rep(1,3)
-#   )
-#   expect_equal(
-#     p3_t$n_to_cover,
-#     c(0,0,0)
-#   )
-#
-# })
-#
-#
+test_that("target_pop is working in general case", {
+
+  n <- 15
+  dose_num <- rep(1,n)
+
+  ages <- rep(1:3,each=5)
+
+  variables <- list()
+  variables$discrete_age <- IntegerVariable$new(ages)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 3)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(rep(1:3,each=5),rep(-1,n),rep(-1,n)),dose_num_init = dose_num)
+
+  events <- list(scheduled_dose = replicate(n = 3,expr = {TargetedEvent$new(n)}))
+
+  parameters <- list(
+    N_age = 3,
+    dose_period = c(NaN, 6, 4),
+    N_phase = 3,
+    population = tab_bins(ages,3)
+  )
+
+  # all phase 1 targets reached
+  p1 <- target_pop(
+    dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3)
+  )
+  expect_equal(
+    sapply(p1,function(b){b$size()}),
+    rep(0, 3)
+  )
+
+  # at time 8 only groups 1 and 2 are good for phase 2
+  p2 <- safir::target_pop(
+    dose = 2,variables = variables,events = events,parameters = parameters,timestep = 8,dt = 1,strategy_matrix_step = rep(1,3)
+  )
+  expect_equal(
+    sapply(p2,function(b){b$size()}),
+    c(5,5,0)
+  )
+
+  # phase 2 vaccinate group 3 at t = 9, they are prioritized for phase 3
+  variables$dose_time[[2]] <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
+  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("0",10),rep("1",5)))
+  # should be up for phase 3 if t =13
+  p2_nt <- safir::target_pop(
+    dose = 3,variables = variables,events = events,parameters = parameters,timestep = 13,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = c(0,0,1)
+  )
+  expect_equal(
+    sapply(p2_nt,function(b){b$size()}),
+    c(0,0,5)
+  )
+
+  # not if t=12
+  p2_t <- safir::target_pop(
+    dose = 3,variables = variables,events = events,parameters = parameters,timestep = 12,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = c(0,0,1)
+  )
+  expect_equal(
+    sapply(p2_t,function(b){b$size()}),
+    c(0,0,0)
+  )
+
+  # phase 3, group 3 should all be ready to go regardless of priority if t = 13
+  p3_nt <- safir::target_pop(
+    dose = 3,variables = variables,events = events,parameters = parameters,timestep = 13,dt = 1,strategy_matrix_step = rep(1,3)
+  )
+  expect_equal(
+    sapply(p3_nt,function(b){b$size()}),
+    c(0,0,5)
+  )
+
+  #  not if t = 12
+  p3_t <- safir::target_pop(
+    dose = 3,variables = variables,events = events,parameters = parameters,timestep = 12,dt = 1,strategy_matrix_step = rep(1,3)
+  )
+  expect_equal(
+    sapply(p3_t,function(b){b$size()}),
+    c(0,0,0)
+  )
+
+})
+
+
 # test_that("assign doses is working for phase 1", {
 #
 #   parameters <- list(

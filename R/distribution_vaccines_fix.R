@@ -215,10 +215,11 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
   # this does not take into account who is eligible based on threshold
   n_to_cover <- ceiling(pmax(0, (coverage_targets - current_coverage)) * age_size)
 
-  # final number to set up for vaccine is minimum of eligible[a] and n_to_cover[a]
+  # final number to target for vaccine is minimum of eligible[a] and n_to_cover[a]
   eligible_num <- sapply(X = eligible_this_dose,function(b){b$size()})
   n_to_cover <- pmin(n_to_cover, eligible_num)
 
+  # if nobody to target, set empty bitset, otherwise use choose to randomly select
   for (a in 1:parameters$N_age) {
     if (n_to_cover[a] < 1) {
       eligible_this_dose[[a]] <- Bitset$new(size = eligible_this_dose[[a]]$max_size)
