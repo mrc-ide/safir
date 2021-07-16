@@ -218,6 +218,8 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+
   t <- 1
   dt <- 1
   parameters <- list(
@@ -265,85 +267,100 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
 })
 
 
-# test_that("target_pop is giving the same results as nimue", {
-#   dose_times <- list(matrix(c(1, 2, NA, NA, 3, NA), nrow = 3),
-#                      matrix(c(NA, 3, 4, NA, NA, NA), nrow = 3),
-#                      matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
-#
-#   dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
-#   dose_1[which(is.na(dose_1))] <- -1
-#
-#   dose_2 <- unlist(lapply(dose_times,function(x){x[,2]}))
-#   dose_2[which(is.na(dose_2))] <- -1
-#
-#   n <- length(dose_1)
-#   dose_num <- ifelse(dose_1 == -1, 0, 1)
-#   dose_num[which(dose_2 > -1)] <- 2
-#
-#   variables <- list()
-#   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-#   variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
-#   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
-#
-#   parameters <- list(
-#     N_age = 3,
-#     dose_period = c(NaN, 14, NaN),
-#     N_phase = 3,
-#     population = n
-#   )
-#
-#   # Dose 1
-#   d1_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = rep(1, 3),
-#                      t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
-#
-#   d1_s <- safir::target_pop(
-#     dose = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3)
-#   )
-#
-#   expect_equal(d1_n, d1_s$n_to_cover)
-#
-#   # Dose 1 as a function of prioritisation matrix
-#   d1_pri_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = c(0, 1, 0),
-#                          t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
-#
-#   d1_pri_s <- safir::target_pop(
-#     dose = 1,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = c(0,1,0)
-#   )
-#
-#   expect_equal(d1_pri_n, d1_pri_s$n_to_cover)
-#
-#   # Dose 2 - none as all d2_prioritise set to FALSE
-#   d2_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
-#                      t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
-#
-#   d2_s <- safir::target_pop(
-#     dose = 2,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(0, 3)
-#   )
-#
-#   expect_equal(d2_n, d2_s$n_to_cover)
-#
-#   # Dose 2 - none as too soon after dose 1
-#   d2_t_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
-#              t = 1, dose_period = 14, d2_prioritise = rep(TRUE, 3))
-#
-#   d2_t_s <- safir::target_pop(
-#     dose = 2,variables = variables,parameters = parameters,t = 1,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(1, 3)
-#   )
-#
-#   expect_equal(d2_t_n ,d2_t_s$n_to_cover)
-#
-#   # Dose 2
-#   d2_ok_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
-#                         t = 15, dose_period = 14, d2_prioritise = rep(TRUE, 3))
-#
-#   d2_ok_s <- safir::target_pop(
-#     dose = 2,variables = variables,parameters = parameters,t = 15,dt = 1,prioritisation = rep(1,3),vaxx_priority = rep(1, 3)
-#   )
-#
-#   expect_equal(d2_ok_n ,d2_ok_s$n_to_cover)
-# })
-#
-#
+test_that("target_pop is giving the same results as nimue", {
+
+  dose_times <- list(matrix(c(1, 2, NA, NA, 3, NA), nrow = 3),
+                     matrix(c(NA, 3, 4, NA, NA, NA), nrow = 3),
+                     matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
+
+  dose_1 <- unlist(lapply(dose_times,function(x){x[,1]}))
+  dose_1[which(is.na(dose_1))] <- -1
+
+  dose_2 <- unlist(lapply(dose_times,function(x){x[,2]}))
+  dose_2[which(is.na(dose_2))] <- -1
+
+  n <- length(dose_1)
+  dose_num <- ifelse(dose_1 == -1, 0, 1)
+  dose_num[which(dose_2 > -1)] <- 2
+
+  ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
+
+  variables <- list()
+  variables$discrete_age <- IntegerVariable$new(ages)
+  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
+
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+
+  parameters <- list(
+    N_age = 3,
+    dose_period = c(NaN, 14, NaN),
+    N_phase = 3,
+    population = tab_bins(ages,3)
+  )
+
+  # Dose 1
+  d1_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = rep(1, 3),
+                     t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  d1_s <- target_pop(
+    dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3)
+  )
+
+  d1_s_out <- sapply(d1_s,function(b){b$size()})
+
+  expect_equal(d1_n, d1_s_out)
+
+  # Dose 1 as a function of prioritisation matrix
+  d1_pri_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = c(0, 1, 0),
+                         t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  d1_pri_s <- target_pop(
+    dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = c(0,1,0)
+  )
+
+  d1_pri_s_out <- sapply(d1_pri_s,function(b){b$size()})
+
+  expect_equal(d1_pri_n, d1_pri_s_out)
+
+  # Dose 2 - none as all d2_prioritise set to FALSE
+  d2_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+                     t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
+  d2_s <- safir::target_pop(
+    dose = 2,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(0,3)
+  )
+
+  d2_s_out <- sapply(d2_s,function(b){b$size()})
+
+  expect_equal(d2_n, d2_s_out)
+
+  # Dose 2 - none as too soon after dose 1
+  d2_t_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+             t = 1, dose_period = 14, d2_prioritise = rep(TRUE, 3))
+
+  d2_t_s <- safir::target_pop(
+    dose = 2,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(1,3)
+  )
+
+  d2_t_s_out <- sapply(d2_t_s,function(b){b$size()})
+
+  expect_equal(d2_t_n ,d2_t_s_out)
+
+  # Dose 2
+  d2_ok_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+                        t = 15, dose_period = 14, d2_prioritise = rep(TRUE, 3))
+
+  d2_ok_s <- safir::target_pop(
+    dose = 2,variables = variables,events = events,parameters = parameters,timestep = 15,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(1,3)
+  )
+
+  d2_ok_s_out <- sapply(d2_ok_s,function(b){b$size()})
+
+  expect_equal(d2_ok_n, d2_ok_s_out)
+})
+
+
 # test_that("target_pop is working in general case", {
 #
 #   n <- 15
