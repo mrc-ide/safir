@@ -37,17 +37,22 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
 
   variables$dose_num$queue_update(value = dose,index = target)
   variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
+
   if (inherits(target,"Bitset")) {
-    variables$ab_titre$queue_update(
-      values = log(10^rnorm(n = target$size(),mean = log10(parameters$mu_ab[dose]),sd = parameters$std10)),
-      index = target
-    )
+    n <- target$size()
   } else {
-    variables$ab_titre$queue_update(
-      values = log(10^rnorm(n = length(target),mean = log10(parameters$mu_ab[dose]),sd = parameters$std10)),
-      index = target
-    )
+    n <- length(target)
   }
+
+  z1 <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+
+  variables$ab_titre$queue_update(values = z1, index = target)
+
+  ef_infection <- vaccine_efficacy_infection(ab_titre = z1,parameters = parameters)
+  ef_severe <- vaccine_efficacy_severe(ab_titre = z1,ef_infection = ef_infection,parameters = parameters)
+
+  variables$ef_infection$queue_update(values = ef_infection, index = target)
+  variables$ef_severe$queue_update(values = ef_severe, index = target)
 
 }
 

@@ -4,12 +4,12 @@
 \alias{vaccine_efficacy_infection}
 \title{Compute vaccine efficacy against infection from Ab titre}
 \usage{
-vaccine_efficacy_infection(ab_titre, who)
+vaccine_efficacy_infection(ab_titre, parameters)
 }
 \arguments{
-\item{ab_titre}{a \code{\link[individual]{DoubleVariable}} containing values of Ab titre}
+\item{ab_titre}{a vector of Ab titres}
 
-\item{who}{a \code{\link[individual]{Bitset}} telling who we should calculate efficacy against infection for}
+\item{parameters}{model parameters}
 }
 \description{
 Compute vaccine efficacy against infection from Ab titre

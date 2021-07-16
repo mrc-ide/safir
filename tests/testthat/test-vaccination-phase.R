@@ -14,6 +14,9 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   parameters$population <- tab_bins(a = ages,nbins = 17)
   parameters$std10 <- 0.44
   parameters$mu_ab <- c(0.14, 2.37, 1.75)
+  parameters$ab_50 <- 0.2 # titre relative to convalescent required to provide 50% protection from infection, on linear scale
+  parameters$ab_50_severe <- 0.03
+  parameters$k <- 2.94 # shape parameter of efficacy curve
 
   events <- list(
     scheduled_dose = replicate(n = parameters$N_phase,expr = {TargetedEvent$new(population_size = n)})

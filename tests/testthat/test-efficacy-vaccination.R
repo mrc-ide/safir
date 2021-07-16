@@ -47,6 +47,11 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   dr_s <- -log(2)/hl_s # Corresponding decay rate in days for half life above
   dr_l <- -log(2)/hl_l
 
+  ab_50 <- 0.2 # titre relative to convalescent required to provide 50% protection from infection, on linear scale
+  ab_50_severe <- 0.03
+  k <- 2.94 # shape parameter of efficacy curve
+
+
   dr_vec <- c(rep(dr_s, period_s),
               seq(dr_s, dr_l, length.out = time_to_decay),
               dr_l)
@@ -56,8 +61,11 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
 
   parameters <- list(
     dr_vec = dr_vec,
-    mu_ab_d1 = mu_ab_d1,
+    mu_ab = mu_ab_d1,
     std10 = std10,
+    ab_50 = ab_50,
+    ab_50_severe = ab_50_severe,
+    k = k,
     N_phase = 1
   )
 
@@ -106,5 +114,22 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
     safir_out[t, ] <-   variables$ab_titre$get_values()
   }
 
+  # test Ab time series the same
   expect_equal(rowMeans(safir_out),rowMeans(nt))
+
+  # test efficacy against infection is the same
+  nt1 <- exp(nt[,1])
+  ef_infection <- 1 / (1 + exp(-k * (log10(nt1) - log10(ab_50))))
+
+  ef_infection_safir <- vaccine_efficacy_infection(ab_titre = safir_out[,1],parameters = parameters)
+
+  expect_equal(ef_infection,ef_infection_safir)
+
+  # test efficacy against severe disease is the same
+  ef_severe_uncond <- 1 / (1 + exp(-k * (log10(nt1) - log10(ab_50_severe))))
+  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
+
+  ef_severe_safir <- vaccine_efficacy_severe(ab_titre = safir_out[,1],ef_infection = ef_infection_safir,parameters = parameters)
+
+  expect_equal(ef_severe,ef_severe_safir)
 })

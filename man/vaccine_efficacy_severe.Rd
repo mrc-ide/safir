@@ -4,13 +4,16 @@
 \alias{vaccine_efficacy_severe}
 \title{Compute vaccine efficacy against severe disease from Ab titre}
 \usage{
-vaccine_efficacy_severe(ab_titre, who)
+vaccine_efficacy_severe(ab_titre, ef_infection, parameters)
 }
 \arguments{
-\item{ab_titre}{a \code{\link[individual]{DoubleVariable}} containing values of Ab titre}
+\item{ab_titre}{a vector of Ab titres}
 
-\item{who}{a \code{\link[individual]{Bitset}} telling who we should calculate efficacy against severe infection for}
+\item{ef_infection}{a vector of efficacy against infection from \code{link{vaccine_efficacy_infection}}}
+
+\item{parameters}{model parameters}
 }
 \description{
-Compute vaccine efficacy against severe disease from Ab titre
+This needs the efficacy against infection because efficacy against severe disease,
+conditional on breakthrough infection is what safir needs, which is computed as  1 - \link{(1 - efficacy_disease)/(1 - efficacy_infection)}.
 }

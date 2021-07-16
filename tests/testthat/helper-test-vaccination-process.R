@@ -11,6 +11,9 @@ parameters$vaccine_set <- rep(80,100)
 
 parameters$std10 <- 0.44
 parameters$mu_ab <- c(0.14, 2.37, 1.75)
+parameters$ab_50 <- 0.2 # titre relative to convalescent required to provide 50% protection from infection, on linear scale
+parameters$ab_50_severe <- 0.03
+parameters$k <- 2.94 # shape parameter of efficacy curve
 
 parameters$next_dose_priority <- matrix(0, nrow = parameters$N_phase - 1, ncol = parameters$N_age)
 parameters$next_dose_priority[1, 15:17] <- 1

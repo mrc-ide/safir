@@ -34,16 +34,23 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
         # ceiling to go to next integer day and do not exceed the end of decay rate vector
         time_since_last_dose <- ceiling(time_since_last_dose)
-        time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(dr_vec)
+        time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(parameters$dr_vec)
 
         # current Ab titre
         current_ab_titre <- ab_titre$get_values(index = vaccinated)
 
         # new Ab titre
-        new_ab_titre <- current_ab_titre + dr_vec[time_since_last_dose]
+        new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose]
 
         # schedule an update
         ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
+
+        # vaccine efficacy
+        ef_infection <- vaccine_efficacy_infection(ab_titre = current_ab_titre,parameters = parameters)
+        ef_severe <- vaccine_efficacy_severe(ab_titre = current_ab_titre,ef_infection = ef_infection,parameters = parameters)
+
+        variables$ef_infection$queue_update(values = ef_infection, index = vaccinated)
+        variables$ef_severe$queue_update(values = ef_severe, index = vaccinated)
 
       }
 
@@ -74,20 +81,26 @@ get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_ti
 
 
 #' @title Compute vaccine efficacy against infection from Ab titre
-#' @param ab_titre a \code{\link[individual]{DoubleVariable}} containing values of Ab titre
-#' @param who a \code{\link[individual]{Bitset}} telling who we should calculate efficacy against infection for
+#' @param ab_titre a vector of Ab titres
+#' @param parameters model parameters
 #' @export
-vaccine_efficacy_infection <- function(ab_titre, who) {
-  ab_values <- ab_titre$get_values(index = who)
-  return(exp(-ab_values/3))
+vaccine_efficacy_infection <- function(ab_titre, parameters) {
+  nt <- exp(ab_titre)
+  ef_infection <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50))))
+  return(ef_infection)
 }
 
 
 #' @title Compute vaccine efficacy against severe disease from Ab titre
-#' @param ab_titre a \code{\link[individual]{DoubleVariable}} containing values of Ab titre
-#' @param who a \code{\link[individual]{Bitset}} telling who we should calculate efficacy against severe infection for
+#' @description This needs the efficacy against infection because efficacy against severe disease,
+#' conditional on breakthrough infection is what safir needs, which is computed as  1 - [(1 - efficacy_disease)/(1 - efficacy_infection)].
+#' @param ab_titre a vector of Ab titres
+#' @param ef_infection a vector of efficacy against infection from \code{link{vaccine_efficacy_infection}}
+#' @param parameters model parameters
 #' @export
-vaccine_efficacy_severe <- function(ab_titre, who) {
-  ab_values <- ab_titre$get_values(index = who)
-  return(exp(-ab_values/2))
+vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
+  nt <- exp(ab_titre)
+  ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
+  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
+  return(ef_severe)
 }

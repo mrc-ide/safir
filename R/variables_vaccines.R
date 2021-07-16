@@ -62,17 +62,15 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
   n <- sum(pop)
 
-  # if we need to track changepoints in the ab_titre dynamics, then add another var
-  # variables$dose_changepoint <- individual::IntegerVariable$new(initial_values = rep(0,n))
-  # when we schedule the dose `schedule_dose_vaccine` then t + some_time will be the change point
-  # that keeps the updating in `vaccine_ab_titre` as efficient as can be expected
-
-  variables$ab_titre <- individual::DoubleVariable$new(initial_values = rep(0,n))
   variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
-  # dose time stores the time step when it happened, not necessarily the same as the day (if dt != 1)
   variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
   variables$phase <- new.env(hash = FALSE)
   variables$phase$value <- 1L
+
+  # ab and efficacy dynamics
+  variables$ab_titre <- individual::DoubleVariable$new(initial_values = rep(0,n))
+  variables$ef_infection <- individual::DoubleVariable$new(initial_values = rep(1,n))
+  variables$ef_severe <- individual::DoubleVariable$new(initial_values = rep(1,n))
 
   return(variables)
 }
