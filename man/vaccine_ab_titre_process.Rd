@@ -14,5 +14,5 @@ vaccine_ab_titre_process(parameters, variables, events, dt)
 \item{dose_num}{a \code{\link[individual]{IntegerVariable}} giving the dose number of the population}
 }
 \description{
-Process that updates the antibody (Ab) titre each time step
+The values in \code{ab_titre} are calculated on the log scale.
 }

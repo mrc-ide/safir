@@ -7,6 +7,7 @@
 
 
 #' @title Process that updates the antibody (Ab) titre each time step
+#' @description The values in \code{ab_titre} are calculated on the log scale.
 #' @param ab_titre a \code{\link[individual]{DoubleVariable}} giving the antibody titre for the population
 #' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population
 #' @param dose_num a \code{\link[individual]{IntegerVariable}} giving the dose number of the population
@@ -42,7 +43,7 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
         new_ab_titre <- current_ab_titre + dr_vec[time_since_last_dose]
 
         # schedule an update
-        ab_titre$queue_update(values = new_ab_values, index = vaccinated)
+        ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
 
       }
 

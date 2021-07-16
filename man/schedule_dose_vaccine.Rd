@@ -14,6 +14,8 @@ schedule_dose_vaccine(timestep, variables, target, dose, parameters)
 \item{target}{a \code{\link[individual]{Bitset}}}
 
 \item{dose}{which dose}
+
+\item{parameters}{model parameters}
 }
 \description{
 This is called from the event listeners for each dose, and also

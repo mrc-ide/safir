@@ -39,12 +39,12 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
   variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
   if (inherits(target,"Bitset")) {
     variables$ab_titre$queue_update(
-      values = rlnorm(n = target$size(),meanlog = log10(parameters$mu_ab[dose]),sdlog = parameters$std10),
+      values = log(10^rnorm(n = target$size(),mean = log10(parameters$mu_ab[dose]),sd = parameters$std10)),
       index = target
     )
   } else {
     variables$ab_titre$queue_update(
-      values = rlnorm(n = length(target),meanlog = log10(parameters$mu_ab[dose]),sdlog = parameters$std10),
+      values = log(10^rnorm(n = length(target),mean = log10(parameters$mu_ab[dose]),sd = parameters$std10)),
       index = target
     )
   }

@@ -57,9 +57,54 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   parameters <- list(
     dr_vec = dr_vec,
     mu_ab_d1 = mu_ab_d1,
-    std10 = std10
+    std10 = std10,
+    N_phase = 1
   )
 
-  variables <- create_vaccine_variables(variables = list(),pop = 100,max_dose = 1)
+  n <- 1e2
+  tmax <- 800
 
+  # Alexandra's code
+  nt <- NULL
+  t <- 0:tmax
+  time_to_decay <- t_period_l - period_s # time in days to reach longest half-life
+
+  # vector of decay rates over time: first we have a period of fast decay, then gradually shift to period of long decay
+  dr_vec <- c(rep(dr_s, period_s),
+              seq(dr_s, dr_l, length.out = time_to_decay),
+              rep(dr_l, (length(t) - t_period_l)))
+
+  # nab titre distribution for a given vaccine product: draw from a log-normal distribution
+
+  z1 <- rnorm(n, log10(mu_ab_d1), std10)
+
+  # initiate titre vector
+  nt <- matrix(data = NaN,nrow = length(t),ncol = n)
+  nt[1, ] <- log(10^z1)
+
+  # decay antibodies over time on natural log scale
+  for (i in (2:length(t))){
+    nt[i, ] <- nt[i-1, ] + dr_vec[i]
+  }
+
+  # safir
+  variables <- create_vaccine_variables(variables = list(),pop = n,max_dose = 1)
+
+  schedule_dose_vaccine(timestep = 0,variables = variables,target = Bitset$new(n)$insert(1:n),dose = 1,parameters = parameters)
+  variables$ab_titre$queue_update(values = log(10^z1)) # make sure using the same set of RVs
+  variables$ab_titre$.update()
+  variables$dose_num$.update()
+  variables$dose_time[[1]]$.update()
+
+  ab_titre <- vaccine_ab_titre_process(parameters = parameters,variables = variables,events = list(),dt = 1)
+
+  safir_out <- matrix(data = NaN,nrow = tmax + 1,ncol = n)
+  safir_out[1, ] <- variables$ab_titre$get_values()
+  for (t in 2:(tmax+1)) {
+    ab_titre(timestep = t)
+    variables$ab_titre$.update()
+    safir_out[t, ] <-   variables$ab_titre$get_values()
+  }
+
+  expect_equal(rowMeans(safir_out),rowMeans(nt))
 })
