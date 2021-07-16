@@ -30,18 +30,24 @@ create_events_vaccination <- function(events, parameters) {
 #' @param variables a list
 #' @param target a \code{\link[individual]{Bitset}}
 #' @param dose which dose
+#' @param parameters model parameters
 #'
 #' @export
-schedule_dose_vaccine <- function(timestep, variables, target, dose) {
+schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters) {
 
   variables$dose_num$queue_update(value = dose,index = target)
   variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
   if (inherits(target,"Bitset")) {
-    variables$ab_titre$queue_update(values = rlnorm(n = target$size()), index = target) # update Ab titre somehow
+    variables$ab_titre$queue_update(
+      values = rlnorm(n = target$size(),meanlog = log10(parameters$mu_ab[dose]),sdlog = parameters$std10),
+      index = target
+    )
   } else {
-    variables$ab_titre$queue_update(values = rlnorm(n = length(target)), index = target) # update Ab titre somehow
+    variables$ab_titre$queue_update(
+      values = rlnorm(n = length(target),meanlog = log10(parameters$mu_ab[dose]),sdlog = parameters$std10),
+      index = target
+    )
   }
-
 
 }
 
@@ -53,7 +59,7 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose) {
 create_vaccination_dose_listener <- function(variables, parameters, dose) {
   stopifnot( dose > 0 )
   function (timestep, target) {
-    schedule_dose_vaccine(timestep = timestep,variables = variables,target = target,dose = dose)
+    schedule_dose_vaccine(timestep = timestep,variables = variables,target = target,dose = dose, parameters = parameters)
   }
 }
 

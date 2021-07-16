@@ -9,6 +9,9 @@ parameters$N_phase <- 3
 parameters$dose_period <- c(NaN, 14, 7)
 parameters$vaccine_set <- rep(80,100)
 
+parameters$std10 <- 0.44
+parameters$mu_ab <- c(0.14, 2.37, 1.75)
+
 parameters$next_dose_priority <- matrix(0, nrow = parameters$N_phase - 1, ncol = parameters$N_age)
 parameters$next_dose_priority[1, 15:17] <- 1
 parameters$next_dose_priority[2, 10:14] <- 1

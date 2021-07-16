@@ -4,7 +4,7 @@
 \alias{schedule_dose_vaccine}
 \title{Schedule some individuals for a vaccination dose}
 \usage{
-schedule_dose_vaccine(timestep, variables, target, dose)
+schedule_dose_vaccine(timestep, variables, target, dose, parameters)
 }
 \arguments{
 \item{timestep}{current time step}

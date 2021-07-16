@@ -62,8 +62,8 @@ renderer <- Render$new(parameters$time_period)
 
 # processes
 processes <- list(
-  vaccination_process_new(parameters = parameters,variables = variables,events = events,dt = dt),
   vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccination_process_new(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
 )

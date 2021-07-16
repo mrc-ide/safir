@@ -31,15 +31,19 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
           timestep = timestep,dt = dt,vaccinated = vaccinated,dose_num = variables$dose_num,dose_time = variables$dose_time,N_phase = parameters$N_phase
         )
 
-        # current Ab titre
-        current_ab_values <- ab_titre$get_values(index = vaccinated)
+        # ceiling to go to next integer day and do not exceed the end of decay rate vector
+        time_since_last_dose <- ceiling(time_since_last_dose)
+        time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(dr_vec)
 
-        # apply the discrete difference operator
-        # new_ab_values <- blah
-        new_ab_values <- pmax(x - (x * 0.01 * dt), 0) # fake dynamics
+        # current Ab titre
+        current_ab_titre <- ab_titre$get_values(index = vaccinated)
+
+        # new Ab titre
+        new_ab_titre <- current_ab_titre + dr_vec[time_since_last_dose]
 
         # schedule an update
         ab_titre$queue_update(values = new_ab_values, index = vaccinated)
+
       }
 
     }

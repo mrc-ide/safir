@@ -12,6 +12,8 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   parameters$N_prioritisation_steps <- nrow(parameters$vaccine_coverage_mat)
   parameters$N_phase <- 3
   parameters$population <- tab_bins(a = ages,nbins = 17)
+  parameters$std10 <- 0.44
+  parameters$mu_ab <- c(0.14, 2.37, 1.75)
 
   events <- list(
     scheduled_dose = replicate(n = parameters$N_phase,expr = {TargetedEvent$new(population_size = n)})
@@ -50,16 +52,16 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
         if (phase < 3) {
           for (p in 1:phase) {
             # groups for this dose
-            schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p)
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p, parameters = parameters)
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
-              schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p + 1)
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = p + 1, parameters = parameters)
             }
             update_vaccine_variables(variables = variables)
           }
         } else {
           # groups for this dose
-          schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 3)
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = full_bset,dose = 3, parameters = parameters)
           update_vaccine_variables(variables = variables)
         }
 
@@ -81,18 +83,18 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
           who_2_vaccinate_next <- intersect(who_2_vaccinate, which(as.logical(parameters$next_dose_priority[phase, ])))
           for (p in 1:phase) {
             # groups for this dose
-            schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = p)
+            schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = p, parameters = parameters)
 
             # groups prioritized for next dose
             if (length(who_2_vaccinate_next) > 0) {
-              schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate_next)),dose = p + 1)
+              schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate_next)),dose = p + 1, parameters = parameters)
             }
 
             update_vaccine_variables(variables = variables)
           }
         } else {
           # groups for this dose
-          schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = 3)
+          schedule_dose_vaccine(timestep = 1,variables = variables,target = filter_bitset(full_bset, which(ages %in% who_2_vaccinate)),dose = 3, parameters = parameters)
           update_vaccine_variables(variables = variables)
 
         }
