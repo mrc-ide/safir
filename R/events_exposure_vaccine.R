@@ -30,7 +30,7 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
       hosp <- target$copy()
 
       # vaccine efficacy against severe disease
-      severe_efficacy <- vaccine_efficacy_severe(ab_titre = variables$ab_titre,who = hosp)
+      severe_efficacy <- variables$ef_severe$get_values(hosp)
 
       # sample those with severe disease
       hosp$sample(prob_hosp * severe_efficacy)

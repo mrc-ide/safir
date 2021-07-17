@@ -40,3 +40,5 @@ parameters <- list(
   dr_vec = dr_vec,
   mu_ab = c(mu_ab_d1, mu_ab_d2)
 )
+
+
