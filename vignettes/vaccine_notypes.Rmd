@@ -1,0 +1,122 @@
+---
+title: "Vaccine model with multiple doses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vaccine_notypes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(safir)
+library(individual)
+library(nimue)
+```
+
+Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for multiple doses.
+
+Start by making parameters.
+
+```{r}
+iso3c <- "GBR"
+pop <- safir:::get_population(iso3c)
+pop$n <- as.integer(pop$n / 1e3)
+contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+
+tmax <- 100
+dt <- 1
+R0 <- 4
+
+# vaccine dosing
+vaccine_doses <- 2
+dose_period <- c(NaN, 28)
+vaccine_set <- c(0, seq(from = 1e2, to = 1e3, length.out = (tmax/dt)-1))
+
+# vaccine strategy
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
+next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
+storage.mode(next_dose_priority) <- "integer"
+
+# base parameters
+parameters <- safir::get_parameters(
+  population = pop$n,
+  contact_matrix_set = contact_mat,
+  iso3c = iso3c,
+  R0 = R0,
+  time_period = tmax
+)
+parameters$IAsymp_0[1:17] <- 3 # some additional infectives at t=0
+parameters$population <- parameters$population + 3
+pop$n <- parameters$population # fix this. we don't want to use this twice.
+
+# attach vaccine parameters (roll into function eventually)
+parameters$N_prioritisation_steps <- nrow(vaccine_coverage_mat)
+parameters$vaccine_coverage_mat <- vaccine_coverage_mat
+parameters$next_dose_priority <- next_dose_priority
+
+parameters$vaccine_set <- vaccine_set
+parameters$dose_period <- dose_period
+parameters$N_phase <- vaccine_doses
+
+# attach Ab dynamics parameters
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses)
+parameters <- c(parameters, ab_parameters)
+```
+
+
+```{r}
+# create variables
+timesteps <- parameters$time_period/dt
+variables <- create_variables(pop = pop, parameters = parameters)
+variables <- create_vaccine_variables(variables = variables,pop = pop$n,max_dose = vaccine_doses)
+
+# create events
+events <- create_events(parameters = parameters)
+events <- create_events_vaccination(events = events,parameters = parameters)
+attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
+attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
+
+# make renderers
+renderer <- Render$new(parameters$time_period) 
+ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(pop$n))
+
+double_count_render_process_daily <- function(renderer, variable, dt) {
+  stopifnot(inherits(variable, "DoubleVariable"))
+  function(t) {
+    if ((t * dt) %% 1 == 0) {
+      ab_renderer[as.integer(t * dt), ] <- variable$get_values()
+    }
+  }
+}
+
+
+# processes
+processes <- list(
+  vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
+  categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
+  double_count_render_process_daily(renderer = ab_renderer,variable = variables$ab_titre,dt = dt)
+)
+
+setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
+```
+
+Run the simulation.
+
+```{r}
+system.time(simulation_loop_vaccine(
+  variables = variables,
+  events = events,
+  processes = processes,
+  timesteps = timesteps
+))
+```

@@ -46,6 +46,25 @@ integer_count_render_process_daily <- function(renderer, variable, margin, dt) {
   }
 }
 
+#' #' @title Render double variables every day
+#' #' @description This only renders output on timesteps
+#' #' that correspond to a day. This saves memory and potentially time for
+#' #' simulations with small timesteps.
+#' #' @param renderer a \code{\link[individual]{Render}} object
+#' #' @param variable a \code{\link[individual]{DoubleVariable}} object
+#' #' @param dt size of time step
+#' #' @export
+#' double_count_render_process_daily <- function(renderer, variable, dt) {
+#'   stopifnot(inherits(variable, "DoubleVariable"))
+#'   stopifnot(inherits(renderer, "Render"))
+#'   function(t) {
+#'     if ((t * dt) %% 1 == 0) {
+#'       values <- variable$get_values()
+#'       renderer$render(name = as.character(1:length(values)), value = values,timestep = as.integer(t * dt))
+#'     }
+#'   }
+#' }
+
 #' @title Render categories every day
 #' @description Renders the number of individuals in each category, but only
 #' on timesteps that correspond to a day. This saves memory and potentially time
