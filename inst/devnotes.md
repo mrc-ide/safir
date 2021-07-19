@@ -1,6 +1,6 @@
 # Notes
 
-If we need to include onward infectiousness as something dependent upon ab titre
+1. If we need to include onward infectiousness as something dependent upon ab titre
 for breakthrough infections, it will need to interact with this: 
 ```
 # Group infection by age
@@ -10,3 +10,8 @@ inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
 If it can be turned into a vector of values of relative infectiousness the same
 length as `ages` then we just need to make a modified `tab_bins` that handles that
 relative multiplicative contribution of each individual.
+
+2. One thing to note is that when a large amount of doses are available from the
+start of the simulation there may be wasted doses during the lag between people
+getting their first dose, and when persons can get (become eligible for) their second dose.
+The prioritization step will only increment when both are fulfilled.

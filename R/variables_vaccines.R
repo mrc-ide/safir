@@ -82,6 +82,7 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 #' @param dose_num_init vector of initial doses (must be self-consistent with \code{dose_time_init})
 #' @export
 initialize_vaccine_variables <- function(variables, dose_time_init, dose_num_init) {
+  stop("doesn't yet account for Ab dynamics and efficacy")
   stopifnot(inherits(dose_time_init, "list"))
   stopifnot(length(dose_time_init) > 0)
   stopifnot(length(dose_time_init[[1]]) == length(dose_num_init))
@@ -107,5 +108,7 @@ update_vaccine_variables <- function(variables) {
   }
   variables$dose_num$.update()
   variables$ab_titre$.update()
+  variables$ef_infection$.update()
+  variables$ef_severe$.update()
 
 }

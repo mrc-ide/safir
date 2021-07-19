@@ -97,7 +97,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
         }
 
         # if remaining doses, give out for this dose phase according to the prioritization matrix
-        while( doses_left > 0 & step <= parameters$N_prioritisation_steps) {
+        while( doses_left > 0 & step < parameters$N_prioritisation_steps) {
 
           step <- step + 1
           p_step <- parameters$vaccine_coverage_mat[step, ]

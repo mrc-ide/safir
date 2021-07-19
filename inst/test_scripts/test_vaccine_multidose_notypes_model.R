@@ -4,6 +4,8 @@
 
 rm(list=ls());gc()
 library(individual)
+library(safir)
+library(nimue)
 
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
@@ -46,6 +48,10 @@ parameters$vaccine_set <- vaccine_set
 parameters$dose_period <- dose_period
 parameters$N_phase <- vaccine_doses
 
+# attach Ab dynamics parameters
+ab_parameters <- get_vaccine_ab_titre_parameters(max_dose = vaccine_doses)
+parameters <- c(parameters, ab_parameters)
+
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
@@ -63,7 +69,7 @@ renderer <- Render$new(parameters$time_period)
 # processes
 processes <- list(
   vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
-  vaccination_process_new(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
 )
@@ -73,7 +79,7 @@ setup_events_vaccine(parameters = parameters,events = events,variables = variabl
 # if starting with people already vaccinated, use this function
 # initialize_vaccine_variables(variables = ,dose_time_init = ,dose_num_init = )
 
-# debug all processes
+# # debug all processes
 invisible(sapply(processes,debug))
 debug(events$exposure$.listeners[[2]])
 invisible(sapply(events$scheduled_dose,function(e){debug(e$.listeners[[1]])}))
