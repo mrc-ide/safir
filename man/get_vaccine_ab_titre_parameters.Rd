@@ -4,7 +4,12 @@
 \alias{get_vaccine_ab_titre_parameters}
 \title{Get vaccine efficacy and Ab titre parameters}
 \usage{
-get_vaccine_ab_titre_parameters(max_dose = 2)
+get_vaccine_ab_titre_parameters(vaccine, max_dose = 2)
+}
+\arguments{
+\item{vaccine}{which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"}
+
+\item{max_dose}{maximum number of doses}
 }
 \description{
 Get parameters for vaccine efficacy and antibody titre decay rate.

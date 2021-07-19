@@ -13,6 +13,19 @@ get_time_since_last_dose(
   N_phase
 )
 }
+\arguments{
+\item{timestep}{current time step}
+
+\item{dt}{size of time step}
+
+\item{vaccinated}{bitset of vaccinated persons}
+
+\item{dose_num}{\code{\link[individual]{IntegerVariable}}}
+
+\item{dose_time}{a list of \code{\link[individual]{IntegerVariable}} objects}
+
+\item{N_phase}{total number of doses}
+}
 \description{
 Calculate the time elapsed in days since each person's last dose
 }

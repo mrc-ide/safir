@@ -61,6 +61,12 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
 
 #' @title Calculate the time elapsed in days since each person's last dose
+#' @param timestep current time step
+#' @param dt size of time step
+#' @param vaccinated bitset of vaccinated persons
+#' @param dose_num \code{\link[individual]{IntegerVariable}}
+#' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects
+#' @param N_phase total number of doses
 #' @export
 get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_time, N_phase) {
 
