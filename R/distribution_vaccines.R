@@ -297,7 +297,6 @@ assign_doses <- function(doses_left, events, dose, eligible, parameters) {
         eligible[[a]]$choose(k = assigned[a])
         events$scheduled_dose[[dose]]$schedule(target = eligible[[a]], delay = 0)
         doses_left <- doses_left - assigned[a]
-
       }
 
     }

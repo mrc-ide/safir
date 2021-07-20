@@ -124,40 +124,54 @@ system.time(simulation_loop_vaccine(
 ))
 ```
 
-Plot.
+Plot. This lets us check if people are getting vaccinated; it's the efficacy against infection, averaged over the population, relative to the time of the first dose. It won't look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.
 
 ```{r}
+# plot
 vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated <- vaccinated$not()
 
-ab <- ab_renderer[, vaccinated$to_vector()]
-start <- apply(ab, 2, function(x){ which(x != 0)[1] })
-ab <- exp(ab)
+ef_infection <- ef_inf_renderer[, vaccinated$to_vector()]
+start <- apply(ef_infection, 2, function(x){ which(x < 1)[1] })
 
-max_ab <- max(ab)
-
-ab <- lapply(X = 1:ncol(ab),FUN = function(x){
-  ab[start[x]:nrow(ab) ,x]
+ef_infection <- lapply(X = 1:ncol(ef_infection),FUN = function(x){
+  ef_infection[start[x]:nrow(ef_infection) , x]
 })
 
-max_len <- max(parameters$time_period - (start - 1))
+ef_infection_dt <- data.table(
+  id = rep(1:length(ef_infection), times = sapply(ef_infection,length)),
+  t = unlist(lapply(ef_infection,function(x){1:length(x)})),
+  ef_inf = unlist(ef_infection)
+)
+ef_infection_dt[, ef_inf := 1 - ef_inf]
 
-plot(x = seq_along(ab[[1]]),y = ab[[1]],type="l",xlim = c(1,max_len),ylim = c(0,max_ab))
-for (i in 2:length(ab)) {
-  lines(x = 1:length(ab[[i]]),y = ab[[i]])
-}
+eff_sum_dt <- ef_infection_dt[, .(mean = mean(ef_inf), lo = quantile(ef_inf,probs =0.025) , hi = quantile(ef_inf,probs = 0.975)) , by = .(t)]
 
+ggplot(data = eff_sum_dt) +
+  geom_line(aes(x=t,y=mean)) +
+  geom_ribbon(aes(x=t,ymin=lo,ymax=hi),alpha=0.5) +
+  theme_bw()
+```
 
+We also want to plot the number of people with each dose over time to check it's working.
 
+```{r}
+dose_out <- dose_renderer$to_dataframe()
+matplot(dose_out[,-1],type="l",lty=1)
+```
 
+And the states.
 
-as.data.table(ab)
+```{r}
+saf_dt <- as.data.table(renderer$to_dataframe())
+saf_dt[, IMild_count := IMild_count + IAsymp_count]
+saf_dt[, IAsymp_count := NULL]
+saf_dt <- melt(saf_dt,id.vars = c("timestep"),variable.name = "name")
+saf_dt[, name := gsub("(^)(\\w*)(_count)", "\\2", name)]
+setnames(x = saf_dt,old = c("timestep","name","value"),new = c("t","compartment","y"))
 
-rownames(ab_renderer) <- as.character(1:nrow(ab_renderer))
-colnames(ab_renderer) <- as.character(vaccinated$to_vector())
-ab_renderer <- as.data.table(ab_renderer)
-
-ab_renderer <- melt(ab_renderer)
-
-# matplot(exp(ab_renderer), type="l")
+ggplot(data = saf_dt, aes(t,y,color = compartment)) +
+  geom_line() +
+  geom_line() +
+  facet_wrap(~compartment, scales = "free")
 ```
