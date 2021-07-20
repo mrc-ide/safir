@@ -28,7 +28,7 @@ setup_events <- function(
             parameters = parameters,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_E)
+        init_fn(timestep = 1, target = bset_E)
     }
 
     # IMild
@@ -41,7 +41,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IMild)
+        init_fn(timestep = 1, target = bset_IMild)
     }
 
     # IAsymp
@@ -54,7 +54,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IAsymp)
+        init_fn(timestep = 1, target = bset_IAsymp)
     }
 
     # ICase
@@ -67,7 +67,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_ICase)
+        init_fn(timestep = 1, target = bset_ICase)
     }
 
     # IMVGetLive
@@ -80,7 +80,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IMVGetLive)
+        init_fn(timestep = 1, target = bset_IMVGetLive)
     }
 
     # IMVGetDie
@@ -93,7 +93,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IMVGetDie)
+        init_fn(timestep = 1, target = bset_IMVGetDie)
     }
 
     # IMVNotGetLive
@@ -106,7 +106,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IMVNotGetLive)
+        init_fn(timestep = 1, target = bset_IMVNotGetLive)
     }
 
     # IMVNotGetDie
@@ -119,7 +119,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IMVNotGetDie)
+        init_fn(timestep = 1, target = bset_IMVNotGetDie)
     }
 
     # IOxGetLive
@@ -132,7 +132,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IOxGetLive)
+        init_fn(timestep = 1, target = bset_IOxGetLive)
     }
 
     # IOxGetDie
@@ -145,7 +145,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IOxGetDie)
+        init_fn(timestep = 1, target = bset_IOxGetDie)
     }
 
     # IOxNotGetLive
@@ -158,7 +158,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IOxNotGetLive)
+        init_fn(timestep = 1, target = bset_IOxNotGetLive)
     }
 
     # IOxNotGetDie
@@ -171,7 +171,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IOxNotGetDie)
+        init_fn(timestep = 1, target = bset_IOxNotGetDie)
     }
 
     # R
@@ -185,7 +185,7 @@ setup_events <- function(
                 shift = 1L,
                 dt = dt
             )
-            init_fn(timestep = 1, to_move = bset_R)
+            init_fn(timestep = 1, target = bset_R)
         }
     }
 
@@ -199,7 +199,7 @@ setup_events <- function(
             shift = 1L,
             dt = dt
         )
-        init_fn(timestep = 1, to_move = bset_IRec)
+        init_fn(timestep = 1, target = bset_IRec)
     }
 
 }

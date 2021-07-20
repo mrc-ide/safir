@@ -148,6 +148,7 @@ schedule_outcome <- function(
 #' @param need_treatment a vector of individuals who need treatment
 #' @param treated_state a list states for individuals receiving treatment
 #' @param limit the number of individuals who can receive treatment
+#' @importFrom individual Bitset
 allocate_treatment <- function(
   variables,
   need_treatment,
@@ -163,6 +164,15 @@ allocate_treatment <- function(
     return(need_treatment)
   }
 
-  get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
-  return(get_treatment)
+  # get_treatment <- individual::filter_bitset(need_treatment, sample.int(need_treatment$size(), max(0, available)))
+  # return(get_treatment)
+
+  k <- max(0, available)
+  if (k > 0) {
+    get_treatment <- need_treatment$copy()
+    get_treatment$choose(k = k)
+    return(get_treatment)
+  } else {
+    return(Bitset$new(size = need_treatment$max_size))
+  }
 }

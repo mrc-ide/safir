@@ -19,6 +19,7 @@ hospitilisation_flow_process <- function(
     mv_success <- bernoulli_multi_p(prob_severe)
     need_mv <- individual::filter_bitset(hospitalised, which(mv_success))
     if(need_mv$size() > 0) {
+      browser()
        mv_get <- allocate_treatment(
          variables,
          need_treatment = need_mv,

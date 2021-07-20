@@ -121,6 +121,7 @@ call_nimue_pars <- function(
   dur_rec = nimue:::durs$dur_rec,
   # vaccine
   dur_R = nimue:::vaccine_pars$dur_R,
+  tt_dur_R = nimue:::vaccine_pars$tt_dur_R,
   dur_V = nimue:::vaccine_pars$dur_V,
   vaccine_efficacy_infection = nimue:::vaccine_pars$vaccine_efficacy_infection,
   tt_vaccine_efficacy_infection = nimue:::vaccine_pars$tt_vaccine_efficacy_infection,
@@ -174,6 +175,7 @@ call_nimue_pars <- function(
     dur_rec = dur_rec,
     # vaccine
     dur_R = dur_R,
+    tt_dur_R = tt_dur_R,
     dur_V = dur_V,
     vaccine_efficacy_infection = vaccine_efficacy_infection,
     tt_vaccine_efficacy_infection = tt_vaccine_efficacy_infection,
@@ -225,66 +227,3 @@ interp_nimue_array <- function(x, y, by = 1, end = max(x) + 1) {
 
   return(yout)
 }
-
-
-#' #' @title Append vaccine parameters from nimue model
-#' #' @description This calls \code{\link[nimue]{parameters}} from \href{https://mrc-ide.github.io/nimue/index.html}{nimue}
-#' #' and appends the following parameters to the list:
-#' #'
-#' #'  * gamma_vaccine_delay: mean duration of period from vaccination to vaccine protection.
-#' #'  * gamma_V: mean duration of vaccine-derived immunity (days)
-#' #'  * rel_infectiousness_vaccinated: Relative infectiousness per age category of vaccinated individuals relative to unvaccinated individuals. Default = rep(1, 17), which is no impact of vaccination on onwards transmissions
-#' #'  * rel_infectiousness: Relative infectiousness per age category relative to maximum infectiousness category. Default = rep(1, 17)
-#' #'  * vaccine_efficacy_infection: Efficacy of vaccine against infection. This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce FOI by 100 percent, an efficacy of 0.2 will reduce FOI by 20 percent etc.
-#' #'  * prob_hosp: Efficacy of vaccine against severe (requiring hospitilisation) disease (by age). This parameter must either be length 1 numeric (a single efficacy for all age groups) or length 17 numeric vector (an efficacy for each age group). An efficacy of 1 will reduce the probability of hospitalisation by 100 percent, an efficacy of 0.2 will reduce the probability of hospitalisation by 20 percent etc.
-#' #'  * vaccine_coverage_mat: Vaccine coverage targets by age (columns) and priority (row)
-#' #'  * N_prioritisation_steps: number of vaccine prioritization levels
-#' #'  * current_prioritisation_step: current prioritization step we are on
-#' #'  * vaccine_set: vaccines available each day of simulation
-#' #'
-#' #' @param parameters list from [get_parameters]
-#' #' @param population a population data frame
-#' #' @param contact_mat a contact matrix
-#' #' @param ... Other parameters for \code{nimue:::}\code{\link[nimue]{parameters}}
-#' #' @export
-#' append_vaccine_nimue <- function(parameters, population, contact_mat, ...) {
-#'
-#'   nimue_pars <- call_nimue_pars(
-#'     population = population,
-#'     contact_matrix_set = contact_mat,
-#'     ...
-#'   )
-#'
-#'   parameters$dur_vaccine_delay <- 1 / (nimue_pars$gamma_vaccine[2] / 2)
-#'   parameters$dur_V <- 1 / (nimue_pars$gamma_vaccine[4] / 2)
-#'   parameters$rel_infectiousness_vaccinated <- nimue_pars$rel_infectiousness_vaccinated[,-c(3,5)]
-#'   parameters$rel_infectiousness <- nimue_pars$rel_infectiousness
-#'   parameters$vaccine_coverage_mat <- nimue_pars$vaccine_coverage_mat
-#'   parameters$N_prioritisation_steps <- nimue_pars$N_prioritisation_steps
-#'   parameters$current_prioritisation_step <- 1L
-#'
-#'   parameters$vaccine_set <- interp_input_par(
-#'     x = c(nimue_pars$tt_vaccine, parameters$time_period),
-#'     y = c(nimue_pars$max_vaccine, tail(nimue_pars$max_vaccine, 1))
-#'   )
-#'
-#'   parameters$prob_hosp <- interp_nimue_array(
-#'     x = c(nimue_pars$tt_vaccine_efficacy_disease, parameters$time_period),
-#'     y = nimue_pars$prob_hosp
-#'   )
-#'
-#'   parameters$vaccine_efficacy_infection <- interp_nimue_array(
-#'     x = c(nimue_pars$tt_vaccine_efficacy_infection, parameters$time_period),
-#'     y = nimue_pars$vaccine_efficacy_infection
-#'   )
-#'
-#'   parameters$prob_severe_death_no_treatment <- nimue_pars$prob_severe_death_no_treatment
-#'   parameters$prob_severe_death_treatment <- nimue_pars$prob_severe_death_treatment
-#'   parameters$prob_non_severe_death_no_treatment <- nimue_pars$prob_non_severe_death_no_treatment
-#'   parameters$prob_non_severe_death_treatment <- nimue_pars$prob_non_severe_death_treatment
-#'
-#'   parameters$hosp_beds <- nimue_pars$hosp_beds
-#'   parameters$ICU_beds <- nimue_pars$ICU_beds
-#'
-#'   return(parameters)
-#' }

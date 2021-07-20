@@ -71,7 +71,7 @@ Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(
         // an entire row summing to zero means that step has been completed
         for (auto p = 0u; p < N_prioritisation_steps; ++p) {
           int rowsum{0};
-          for (auto i = 0; i < N_age; ++i) {
+          for (auto i = 0u; i < N_age; ++i) {
             rowsum += vaccination_target_mat(p, i);
           }
           vaccine_target_vec[p] = (rowsum == 0)? 1 : 0;

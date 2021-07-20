@@ -22,14 +22,14 @@ create_exposure_scheduler_listener <- function(events, variables, parameters, dt
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
   return(
-    function(timestep, to_move) {
+    function(timestep, target) {
 
-      disc_ages <- variables$discrete_age$get_values(to_move)
+      disc_ages <- variables$discrete_age$get_values(target)
       prob_hosp <- parameters$prob_hosp[disc_ages]
-      hosp <- to_move$copy()
+      hosp <- target$copy()
 
       hosp$sample(prob_hosp)
-      not_hosp <- to_move$set_difference(hosp)
+      not_hosp <- target$set_difference(hosp)
 
       if (hosp$size() > 0) {
         events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))

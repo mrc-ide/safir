@@ -35,6 +35,156 @@ Most of the simulation updates state by TargetedEvents. When a targeted event fi
 
 There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.
 
+## Vaccination (multiple dosing model)
+
+Now that **nimue** has an approximation of multiple dosing strategies based on weighting the time varying efficacy let's see how to do this in **safir**.
+
+There's some functions in weighted_efficacy.R we should be familiar with:
+
+* `assign_doses`: this function is simple, given an integer number of doses and a vector of eligible populations (by age), distributes the doses. If num doses > sum(target_pop), everyone gets one. If not, assign doses weighted proportionally to population size.
+
+* `coverage`: this function takes a data structure (`dose_times`) that is a list of length `N_age` and in each element is a matrix of dims (`N_pop_age` (size of age group) X `N_doses`). So if age group 1 had 5 people and this vaccine had 2 doses, it would be a 5x2 matrix. If a person hasn't recieved that dose yet, the element of the matrix is `NA`. If they have, the time it was given is the integer day. `coverage` then computes the coverage % for each age for the user input `dose_number`. So the output is a vector of length equal to the list length `N_age`. The **safir** equivalent is `get_proportion_vaccinated` and `get_proportion_vaccinated_type`.
+
+* `eligable_for_second`: this function takes the same data structure (`dose_times`) as `coverage`. It returns a list of length `N_age` of vectors of length equal to `N_pop_age`. Each element says if this person is eligible for 2nd dose. It checks for each person if `t - first_dose_time >= dose_period` (where `dose_period` is days between dose 1 and dose 2), and that person has not already had their second dose.
+
+* `administer_first_dose`: this simple function takes in a vector of doses by age group, and the `dose_times` data structure. It updates `dose_times` (`NA` values become current `t`)
+
+* `administer_second_dose`: same as `administer_first_dose` but uses `eligable_for_second` to check if those people are eligible before administration.
+
+* `target_pop`: this function finds the number of individuals in each age group to vaccinate for a given dose `dose_number`.
+  ```{r}
+  suppressPackageStartupMessages(library(nimue))
+  dose_times <- list(matrix(c(1, 2, NA, NA, 3, NA), nrow = 3),
+               matrix(c(NA, NA, NA, NA, 3, 4), nrow = 3),
+               matrix(c(1, 2, 2, NA, NA, NA), nrow = 3))
+  prioritisation = rep(1, 3)
+  dose_number = 1
+  t = 15
+  dose_period = 14
+  d2_prioritise = rep(FALSE, 3)
+  nimue:::target_pop(dose_number = dose_number,dose_times = dose_times,prioritisation = prioritisation,t = t,dose_period = dose_period,d2_prioritise =     d2_prioritise)
+  ```
+The way it works is like this:
+  
+1. the code computes `current_coverage <- coverage(dose_times, dose_number)`
+2. `n_to_cover <- ceiling(pmax(0, (prioritisation - current_coverage)) * sapply(dose_times, nrow))` this first computes the fraction remaining to vaccinate `pmax(0, (prioritisation - current_coverage))`, which may be zero if that age group is not in the current row of the prioritization matrix. Then multiplying by the number of people in each age group and taking ceiling gives the number who are eligible for vaccination by age group.
+3.  if this is for second dose, there's some more logic. `eligable <- sapply(eligable_for_second(dose_times, t, dose_period), sum)` gives the number of people in each age group who are eligible for 2nd dose (past the `dose_period`). Then `n_to_cover <- pmin(n_to_cover, eligable) * d2_prioritise` gets the final number who may be vaccinated, which is the minimum of this value, and `n_to_cover`, which was computed without regard to time. Finally multiply by the `d2_prioritise` for age groups being prioritized (or not).
+
+So those are the individual functions. They all get wrapped up in the big one, `weighted_efficacy` which actually runs the vaccine distribution "simulation". This one has four steps:
+
+  1 . Give doses to any age groups where dose1 coverage < current prioritisation coverage (https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L208-L214)
+  
+  2. Give any remaining doses as 2nd doses where dose2 coverage < current prioritisation coverage AND age group is prioritised for dose 2 (https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L216-L225)
+  
+  3. For efficient dose use, step through prioritisation matrix an give any remaing doses out as dose 1 (https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L228-L242)
+  
+  4. When all of dose1 coverages are >= the final step of the prioritisation matrix AND all of dose 2 coverages for age groups prioritised for 2nd dose >= the final step of the prioritisation matrix, we "reset" the prioritisation matrix to the first row and step through ensuring all remaining dose2 coverage > current prioritisation coverage (https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L260-L268)
+
+We just need to replicate this at each step in **safir**. The big remaining question is just how `infection_efficacy` and `disease_efficacy` work in **safir**.
+
+### **safir** implementation
+
+#### *nimue*
+In **nimue**, phase 2 is reached when dose 1 coverage >= final step of prioritization matrix and dose 2 coverage for groups prioritized for dose 2 >= final step of prioritization matrix.
+
+#### **safir**
+In **safir** we will have arbitrarily many doses. How do we do this same thing when `N_dose = 2` but also generalize to the general case? We track what dose we are giving out by the variable `phase`.
+
+Within each value of `phase` (for now, arbitrarily assume `phase = 1`), we need to give out doses according to the prioritization matrix. On a step:
+  
+  1. find out what step of `vaccine_coverage_mat` we are on using existing code, distribute `phase` doses to age groups in that step whose coverage < that step's prioritization coverage
+  2. give out remaining doses as `phase + 1` doses to age groups in this step who are eligible *and* are prioritized based on `vaxx_priority[phase, ]`.
+  3. if doses still remain, assign `phase` doses to individuals based on going through the rest of the `vaccine_coverage_mat`
+  4. if we are at the final stage of prioritization and all `phase` dose coverage is fulfilled, and `phase + 1` coverage fulfilled for `vaxx_priority[phase, ]` age groups, set `phase = phase + 1` and advance.
+  
+The only slight modification is what goes on during the final phase. In this case the algorithm is much simpler. It just gives out final doses for everyone until the coverage targets are hit. If for whatever reason the maximum phase is 1, then treat the initial phase as the maximum phase.
+
+  1. find out what step of `vaccine_coverage_mat` we are on using existing code, distribute `phase` doses to age groups in that step whose coverage < that step's prioritization coverage.
+  2. if doses still remain, assign `phase` doses to individuals based on going through the rest of the `vaccine_coverage_mat`
+  
+#### target and assign/distribute
+
+Given the current `phase` (what dose we are distributing), `prioritization` (the step of prioritization strategy), and `vaxx_priority` (an optional priority )
+
+Squares are input parameters, circles are functions. `target_pop` gives us how we'd like to assign vaccines, and the external input `doses` constrains it.
+
+```{r,echo=FALSE}
+nodefontsize <- 6
+edgefontsize <- 5
+
+graph <-
+  create_graph() %>%
+  add_node(label = "phase",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "prioritization",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "vaxx_priority",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "target_pop",node_aes=node_aes(fontsize = nodefontsize)) %>%
+  add_node(label = "eligible_ages_bset",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "eligible_ages_counts",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "n_to_cover",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "doses",node_aes = node_aes(shape = "plaintext", fontsize = nodefontsize)) %>%
+  add_node(label = "assign_doses",node_aes=node_aes(fontsize = nodefontsize))
+
+graph <-
+  graph %>%
+  set_node_position( # phase
+    node = 1,
+    x = 0, y = 3) %>%
+  set_node_position( # priority
+    node = 2,
+    x = 1, y = 3) %>%
+  set_node_position( #vaxx_priority
+    node = 3,
+    x = 2, y = 3) %>%
+  set_node_position( # target_pop
+    node = 4,
+    x = 1, y = 2) %>%
+  set_node_position( # eligible_ages_bset
+    node = 5,
+    x = 0, y = 1) %>%
+  set_node_position( # eligible_ages_counts
+    node = 6,
+    x = 1, y = 1) %>%
+  set_node_position( # n_to_cover
+    node = 7,
+    x = 2, y = 1) %>%
+  set_node_position( # doses
+    node = 8,
+    x = 3, y = 1) %>%
+  set_node_position( # assign_doses
+    node = 9,
+    x = 1, y = 0) 
+
+graph <- 
+  graph %>%
+  add_edge(from = 1, to = 4) %>%
+  add_edge(from = 2, to = 4) %>%
+  add_edge(from = 3, to = 4) %>%
+  add_edge(from = 4, to = 5) %>%
+  add_edge(from = 4, to = 6) %>%
+  add_edge(from = 4, to = 7) %>%
+  add_edge(from = 5, to = 9) %>%
+  add_edge(from = 6, to = 9) %>%
+  add_edge(from = 7, to = 9) %>%
+  add_edge(from = 8, to = 9)
+
+render_graph(graph, layout = "neato",width = 600,height = 500)
+```
+
+### Parameters needed
+
+We need new parameters in the list of named parameters.
+
+  * `N_dose`: number of doses. Can be a scalar or a vector (by num types).
+  * `N_type`: number of types of vaccines
+  * `N_phase`: number of phases (max of doses?)
+  * `vaxx_types`: character vector of type names
+  * `vaxx_priority`: a matrix, `N_dose - 1` by `N_age` (so if `N_dose` is 1, this is set to `NULL`). This matrix goes from 1,...,`N_dose - 1` and tells us, on this phase, what age group should get prioritized for the next dose.
+  * `dose_period`: a vector of length `1:N_dose`. `dose_period[i]` gives how long one must wait after `i-1`-th dose to get the `i`-th dose. The first element is unused, but must be present.
+  
+We need a new variable to be in the list `variables`
+
+  * `phase`: an integer in `1:N_dose`, telling us what phase we are on. The phase advances to `phase + 1` when for the current phase, all current dose coverage >= final step of prioritization matrix *and* next dose coverage for prioritized groups >= final step of prioritization matrix.
+
 ## Vaccination
 
 ### State representation
@@ -43,6 +193,8 @@ A straightforward way to track vaccines is this. Let `max_vaxx` be the maximum n
 
   1. `IntegerVariable[max_vaxx]`: stores the time each dose is given.
   2. `CategoricalVariable[max_vaxx]`: store the type of vaccine for each dose.
+  
+One thing is that, if all we care about is people getting 1st v. 2nd doses of **anything**, we can just do the checks for coverage for any dose, and then give people doses based on what's available at that time. Or if someone gets a certain 1st dose, they are guaranteed to get subsequent doses of that type. Something like that.
   
 ### Transitions & scheduling
 

@@ -11,7 +11,7 @@ contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 # use as many as you want normally.
 options("mc.cores" = 20)
 
-nrep <- 40
+nrep <- 20
 # Scale it for speed
 pop$n <- as.integer(pop$n / 100)
 
@@ -51,7 +51,7 @@ system.time(
     safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
     renderer <- individual::Render$new(timesteps)
     processes <- list(
-      safir::infection_process(parameters = parameters,variables = variables,events = events,dt = dt),
+      safir::infection_process_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
       individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
     )
     safir::setup_events(parameters = parameters,events = events,variables = variables,dt = dt)

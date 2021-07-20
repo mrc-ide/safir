@@ -14,7 +14,7 @@
 #' @param parameters model parameters from \code{\link{get_parameters_nimue}}
 #' @param dt the time step
 #' @param shift passed to \code{\link{make_rerlang}}
-#' @noRd
+#' @export
 create_exposure_scheduler_listener_nimue <- function(events, variables, parameters, dt, shift = 0) {
 
   stopifnot(length(dim(parameters$prob_hosp)) == 3)
@@ -27,25 +27,21 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
   return(
-    function(timestep, to_move) {
+    function(timestep, target) {
 
-      # if (timestep * dt > 20) {
-      #   browser()
-      # }
+      ages <- variables$discrete_age$get_values(target)
+      vaxx <- variables$vaccine_states$get_values(target)
 
-      ages <- variables$discrete_age$get_values(to_move)
-      vaxx <- variables$vaccine_states$get_values(to_move)
-
-      submat <- matrix(data = NA,nrow = to_move$size(),ncol = 3)
+      submat <- matrix(data = NA,nrow = target$size(),ncol = 3)
       submat[, 1] <- ceiling(timestep * dt)
       submat[, 2] <- ages
       submat[, 3] <- vaxx
 
       prob_hosp <- parameters$prob_hosp[submat]
-      hosp <- to_move$copy()
+      hosp <- target$copy()
 
       hosp$sample(prob_hosp)
-      not_hosp <- to_move$set_difference(hosp)
+      not_hosp <- target$set_difference(hosp)
 
       if (hosp$size() > 0) {
         events$severe_infection$schedule(target = hosp, delay = ICase_delay(n = hosp$size()))
@@ -54,9 +50,6 @@ create_exposure_scheduler_listener_nimue <- function(events, variables, paramete
       if (not_hosp$size() > 0) {
 
         ages <- variables$discrete_age$get_values(not_hosp)
-        # vaxx <- variables$vaccine_states$get_values(not_hosp)
-        # submat[, 2] <- ages
-        # submat[, 3] <- vaxx
 
         prob_asymp <- parameters$prob_asymp[ages]
 

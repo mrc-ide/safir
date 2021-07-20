@@ -42,7 +42,6 @@ infection_process_nimue <- function(parameters, variables, events, dt) {
 
         # calculate FoI for each age group
         m <- get_contact_matrix(parameters)
-        # lambda <- parameters$beta_set[day] * rowSums(m %*% diag(inf_ages) %*% diag(parameters$rel_infectiousness))
         lambda <- parameters$beta_set[day] * as.vector(m %*% (inf_ages * parameters$rel_infectiousness))
 
         # FoI for each susceptible person
