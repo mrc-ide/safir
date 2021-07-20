@@ -109,7 +109,8 @@ vaccine_efficacy_infection <- function(ab_titre, parameters) {
 vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
   nt <- exp(ab_titre)
   ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
-  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
+  # ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
+  ef_severe <-  1 - ((1 - ef_severe_uncond)/ef_infection) # denominator should be % efficacy
   ef_severe <- 1 - ef_severe
   return(ef_severe)
 }
