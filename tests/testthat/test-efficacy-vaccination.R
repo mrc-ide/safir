@@ -131,6 +131,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
 
   ef_severe_safir <- vaccine_efficacy_severe(ab_titre = safir_out[,1],ef_infection = ef_infection_safir,parameters = parameters)
+  ef_severe_safir <- 1 - ef_severe_safir
 
   expect_equal(ef_severe,ef_severe_safir)
 })
