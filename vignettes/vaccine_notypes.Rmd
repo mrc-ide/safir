@@ -90,13 +90,14 @@ attach_event_listeners_vaccination(variables = variables,events = events,paramet
 
 # make renderers
 renderer <- Render$new(parameters$time_period)
-ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(pop$n))
+ef_inf_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(pop$n))
+dose_renderer <- Render$new(parameters$time_period)
 
 double_count_render_process_daily <- function(variable, dt) {
   stopifnot(inherits(variable, "DoubleVariable"))
   function(t) {
     if ((t * dt) %% 1 == 0) {
-      ab_renderer[as.integer(t * dt), ] <<- variable$get_values()
+      ef_inf_renderer[as.integer(t * dt), ] <<- variable$get_values()
     }
   }
 }

@@ -52,6 +52,7 @@ get_current_coverage <- function(variables, events, dose, parameters) {
 #' @param variables a list of model variables
 #' @param dose what dose to get eligibility for
 #' @param parameters a list of parameters
+#' @importFrom individual Bitset
 #' @export
 get_current_eligible_from_coverage <- function(timestep, dt, coverage, variables, dose, parameters) {
 

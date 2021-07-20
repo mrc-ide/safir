@@ -148,6 +148,7 @@ schedule_outcome <- function(
 #' @param need_treatment a vector of individuals who need treatment
 #' @param treated_state a list states for individuals receiving treatment
 #' @param limit the number of individuals who can receive treatment
+#' @importFrom individual Bitset
 allocate_treatment <- function(
   variables,
   need_treatment,
