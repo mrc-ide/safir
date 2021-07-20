@@ -39,6 +39,14 @@ test_that("get_time_since_last_dose works", {
 
 test_that("vaccine_ab_titre_process works for everyone on dose 1", {
 
+  # safir parameters
+  parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  parameters$N_phase <- 1
+
+  n <- 1e2
+  tmax <- 800
+
+  # Alexandra's code
   hl_s <- 108 # Half life of antibody decay - short
   hl_l <- 3650 # Half life of antibody decay - long
   period_s <- 250
@@ -59,20 +67,6 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   mu_ab_d1 <- 0.14 # mean titre dose 1
   std10 <- 0.44 # Pooled standard deviation of antibody level on log10 data
 
-  parameters <- list(
-    dr_vec = dr_vec,
-    mu_ab = mu_ab_d1,
-    std10 = std10,
-    ab_50 = ab_50,
-    ab_50_severe = ab_50_severe,
-    k = k,
-    N_phase = 1
-  )
-
-  n <- 1e2
-  tmax <- 800
-
-  # Alexandra's code
   nt <- NULL
   t <- 0:tmax
   time_to_decay <- t_period_l - period_s # time in days to reach longest half-life
