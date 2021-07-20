@@ -121,7 +121,7 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
   # calculate coverage for this dose
   coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
 
-  pr_this_dose <- sapply(X = coverage_this_dose, function(a){a$size()})
+  pr_this_dose <- vapply(X = coverage_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
   pr_this_dose <- pr_this_dose / age_size
 
   # not final phase
@@ -129,7 +129,7 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
 
     coverage_next_dose <- get_current_coverage(variables = variables, events = events, dose = phase + 1, parameters = parameters)
 
-    pr_next_dose <- sapply(X = coverage_next_dose, function(a){a$size()})
+    pr_next_dose <- vapply(X = coverage_next_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
     pr_next_dose <- pr_next_dose / age_size
 
     # go through prioritization steps
@@ -202,7 +202,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
   )
 
   # current coverage proportion
-  current_coverage <- sapply(X = coverage_this_dose, function(a){a$size()})
+  current_coverage <- vapply(X = coverage_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
   current_coverage <- current_coverage / age_size
 
   # who is eligible for this dose?
@@ -222,7 +222,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
   n_to_cover <- ceiling(pmax(0, (coverage_targets - current_coverage)) * age_size)
 
   # final number to target for vaccine is minimum of eligible[a] and n_to_cover[a]
-  eligible_num <- sapply(X = eligible_this_dose,function(b){b$size()})
+  eligible_num <- vapply(X = eligible_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
   n_to_cover <- pmin(n_to_cover, eligible_num)
 
   # if nobody to target, set empty bitset, otherwise use choose to randomly select
@@ -254,7 +254,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
 #' @export
 assign_doses <- function(doses_left, events, dose, eligible, parameters) {
 
-  n_to_assign <- sapply(X = eligible,FUN = function(a){a$size()})
+  n_to_assign <- vapply(X = eligible,FUN = function(a){a$size()},FUN.VALUE = numeric(1))
 
   # check if can quit early
   if (sum(n_to_assign) < 1) {
