@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/params.html">Parameters</a>
     </li>
+    <li>
+      <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -78,8 +81,8 @@
 
       
 
-      </header><script src="code_design_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="code_design_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="code_design_files/viz-1.8.2/viz.js"></script><link href="code_design_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="code_design_files/grViz-binding-1.0.6.1/grViz.js"></script><div class="row">
+      </header><script src="code_design_files/header-attrs-2.6/header-attrs.js"></script><script src="code_design_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="code_design_files/viz-1.8.2/viz.js"></script><link href="code_design_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="code_design_files/grViz-binding-1.0.6.9000/grViz.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Code Design</h1>
@@ -106,6 +109,112 @@ end</code></pre>
 <li>state updates - these are functions like <code>create_state_update_listener</code> which update state when the event fires (<code>create_infection_update_listener</code> in original code).</li>
 </ol>
 <p>There could be others, to update tracking variables for example, but only these two types are necessary for the model dynamics.</p>
+<div id="vaccination-multiple-dosing-model" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vaccination-multiple-dosing-model" class="anchor"></a>Vaccination (multiple dosing model)</h2>
+<p>Now that <strong>nimue</strong> has an approximation of multiple dosing strategies based on weighting the time varying efficacy let’s see how to do this in <strong>safir</strong>.</p>
+<p>There’s some functions in weighted_efficacy.R we should be familiar with:</p>
+<ul>
+<li><p><code>assign_doses</code>: this function is simple, given an integer number of doses and a vector of eligible populations (by age), distributes the doses. If num doses &gt; sum(target_pop), everyone gets one. If not, assign doses weighted proportionally to population size.</p></li>
+<li><p><code>coverage</code>: this function takes a data structure (<code>dose_times</code>) that is a list of length <code>N_age</code> and in each element is a matrix of dims (<code>N_pop_age</code> (size of age group) X <code>N_doses</code>). So if age group 1 had 5 people and this vaccine had 2 doses, it would be a 5x2 matrix. If a person hasn’t recieved that dose yet, the element of the matrix is <code>NA</code>. If they have, the time it was given is the integer day. <code>coverage</code> then computes the coverage % for each age for the user input <code>dose_number</code>. So the output is a vector of length equal to the list length <code>N_age</code>. The <strong>safir</strong> equivalent is <code>get_proportion_vaccinated</code> and <code>get_proportion_vaccinated_type</code>.</p></li>
+<li><p><code>eligable_for_second</code>: this function takes the same data structure (<code>dose_times</code>) as <code>coverage</code>. It returns a list of length <code>N_age</code> of vectors of length equal to <code>N_pop_age</code>. Each element says if this person is eligible for 2nd dose. It checks for each person if <code>t - first_dose_time &gt;= dose_period</code> (where <code>dose_period</code> is days between dose 1 and dose 2), and that person has not already had their second dose.</p></li>
+<li><p><code>administer_first_dose</code>: this simple function takes in a vector of doses by age group, and the <code>dose_times</code> data structure. It updates <code>dose_times</code> (<code>NA</code> values become current <code>t</code>)</p></li>
+<li><p><code>administer_second_dose</code>: same as <code>administer_first_dose</code> but uses <code>eligable_for_second</code> to check if those people are eligible before administration.</p></li>
+<li>
+<p><code>target_pop</code>: this function finds the number of individuals in each age group to vaccinate for a given dose <code>dose_number</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">nimue</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dose_times</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">3</span>, <span class="cn">NA</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,
+             <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,
+             <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
+<span class="va">prioritisation</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>
+<span class="va">dose_number</span> <span class="op">=</span> <span class="fl">1</span>
+<span class="va">t</span> <span class="op">=</span> <span class="fl">15</span>
+<span class="va">dose_period</span> <span class="op">=</span> <span class="fl">14</span>
+<span class="va">d2_prioritise</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fl">3</span><span class="op">)</span>
+<span class="fu">nimue</span><span class="fu">:::</span><span class="fu"><a href="https://rdrr.io/pkg/nimue/man/target_pop.html">target_pop</a></span><span class="op">(</span>dose_number <span class="op">=</span> <span class="va">dose_number</span>,dose_times <span class="op">=</span> <span class="va">dose_times</span>,prioritisation <span class="op">=</span> <span class="va">prioritisation</span>,t <span class="op">=</span> <span class="va">t</span>,dose_period <span class="op">=</span> <span class="va">dose_period</span>,d2_prioritise <span class="op">=</span>     <span class="va">d2_prioritise</span><span class="op">)</span>
+<span class="co">#&gt; [1] 1 3 0</span></code></pre></div>
+<p>The way it works is like this:</p>
+</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>the code computes <code>current_coverage &lt;- coverage(dose_times, dose_number)</code>
+</li>
+<li>
+<code>n_to_cover &lt;- ceiling(pmax(0, (prioritisation - current_coverage)) * sapply(dose_times, nrow))</code> this first computes the fraction remaining to vaccinate <code><a href="https://rdrr.io/r/base/Extremes.html">pmax(0, (prioritisation - current_coverage))</a></code>, which may be zero if that age group is not in the current row of the prioritization matrix. Then multiplying by the number of people in each age group and taking ceiling gives the number who are eligible for vaccination by age group.</li>
+<li>if this is for second dose, there’s some more logic. <code>eligable &lt;- sapply(eligable_for_second(dose_times, t, dose_period), sum)</code> gives the number of people in each age group who are eligible for 2nd dose (past the <code>dose_period</code>). Then <code>n_to_cover &lt;- pmin(n_to_cover, eligable) * d2_prioritise</code> gets the final number who may be vaccinated, which is the minimum of this value, and <code>n_to_cover</code>, which was computed without regard to time. Finally multiply by the <code>d2_prioritise</code> for age groups being prioritized (or not).</li>
+</ol>
+<p>So those are the individual functions. They all get wrapped up in the big one, <code>weighted_efficacy</code> which actually runs the vaccine distribution “simulation”. This one has four steps:</p>
+<p>1 . Give doses to any age groups where dose1 coverage &lt; current prioritisation coverage (<a href="https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L208-L214" class="uri">https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L208-L214</a>)</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Give any remaining doses as 2nd doses where dose2 coverage &lt; current prioritisation coverage AND age group is prioritised for dose 2 (<a href="https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L216-L225" class="uri">https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L216-L225</a>)</p></li>
+<li><p>For efficient dose use, step through prioritisation matrix an give any remaing doses out as dose 1 (<a href="https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L228-L242" class="uri">https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L228-L242</a>)</p></li>
+<li><p>When all of dose1 coverages are &gt;= the final step of the prioritisation matrix AND all of dose 2 coverages for age groups prioritised for 2nd dose &gt;= the final step of the prioritisation matrix, we “reset” the prioritisation matrix to the first row and step through ensuring all remaining dose2 coverage &gt; current prioritisation coverage (<a href="https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L260-L268" class="uri">https://github.com/mrc-ide/nimue/blob/5c812a1cf539676ccd994a75a2f7e76499642984/R/weighted_efficacy.R#L260-L268</a>)</p></li>
+</ol>
+<p>We just need to replicate this at each step in <strong>safir</strong>. The big remaining question is just how <code>infection_efficacy</code> and <code>disease_efficacy</code> work in <strong>safir</strong>.</p>
+<div id="safir-implementation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#safir-implementation" class="anchor"></a><strong>safir</strong> implementation</h3>
+<div id="nimue" class="section level4">
+<h4 class="hasAnchor">
+<a href="#nimue" class="anchor"></a><em>nimue</em>
+</h4>
+<p>In <strong>nimue</strong>, phase 2 is reached when dose 1 coverage &gt;= final step of prioritization matrix and dose 2 coverage for groups prioritized for dose 2 &gt;= final step of prioritization matrix.</p>
+</div>
+<div id="safir" class="section level4">
+<h4 class="hasAnchor">
+<a href="#safir" class="anchor"></a><strong>safir</strong>
+</h4>
+<p>In <strong>safir</strong> we will have arbitrarily many doses. How do we do this same thing when <code>N_dose = 2</code> but also generalize to the general case? We track what dose we are giving out by the variable <code>phase</code>.</p>
+<p>Within each value of <code>phase</code> (for now, arbitrarily assume <code>phase = 1</code>), we need to give out doses according to the prioritization matrix. On a step:</p>
+<ol style="list-style-type: decimal">
+<li>find out what step of <code>vaccine_coverage_mat</code> we are on using existing code, distribute <code>phase</code> doses to age groups in that step whose coverage &lt; that step’s prioritization coverage</li>
+<li>give out remaining doses as <code>phase + 1</code> doses to age groups in this step who are eligible <em>and</em> are prioritized based on <code>vaxx_priority[phase, ]</code>.</li>
+<li>if doses still remain, assign <code>phase</code> doses to individuals based on going through the rest of the <code>vaccine_coverage_mat</code>
+</li>
+<li>if we are at the final stage of prioritization and all <code>phase</code> dose coverage is fulfilled, and <code>phase + 1</code> coverage fulfilled for <code>vaxx_priority[phase, ]</code> age groups, set <code>phase = phase + 1</code> and advance.</li>
+</ol>
+<p>The only slight modification is what goes on during the final phase. In this case the algorithm is much simpler. It just gives out final doses for everyone until the coverage targets are hit. If for whatever reason the maximum phase is 1, then treat the initial phase as the maximum phase.</p>
+<ol style="list-style-type: decimal">
+<li>find out what step of <code>vaccine_coverage_mat</code> we are on using existing code, distribute <code>phase</code> doses to age groups in that step whose coverage &lt; that step’s prioritization coverage.</li>
+<li>if doses still remain, assign <code>phase</code> doses to individuals based on going through the rest of the <code>vaccine_coverage_mat</code>
+</li>
+</ol>
+</div>
+<div id="target-and-assigndistribute" class="section level4">
+<h4 class="hasAnchor">
+<a href="#target-and-assigndistribute" class="anchor"></a>target and assign/distribute</h4>
+<p>Given the current <code>phase</code> (what dose we are distributing), <code>prioritization</code> (the step of prioritization strategy), and <code>vaxx_priority</code> (an optional priority )</p>
+<p>Squares are input parameters, circles are functions. <code>target_pop</code> gives us how we’d like to assign vaccines, and the external input <code>doses</code> constrains it.</p>
+<div id="htmlwidget-d39d8aa983f3f90b3664" style="width:600px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d39d8aa983f3f90b3664">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"phase\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,3!\"] \n  \"2\" [label = \"prioritization\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,3!\"] \n  \"3\" [label = \"vaxx_priority\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,3!\"] \n  \"4\" [label = \"target_pop\", shape = \"circle\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,2!\"] \n  \"5\" [label = \"eligible_ages_bset\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,1!\"] \n  \"6\" [label = \"eligible_ages_counts\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,1!\"] \n  \"7\" [label = \"n_to_cover\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"8\" [label = \"doses\", shape = \"plaintext\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"3,1!\"] \n  \"9\" [label = \"assign_doses\", shape = \"circle\", fontsize = \"6\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,0!\"] \n  \"1\"->\"4\" \n  \"2\"->\"4\" \n  \"3\"->\"4\" \n  \"4\"->\"5\" \n  \"4\"->\"6\" \n  \"4\"->\"7\" \n  \"5\"->\"9\" \n  \"6\"->\"9\" \n  \"7\"->\"9\" \n  \"8\"->\"9\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="parameters-needed" class="section level3">
+<h3 class="hasAnchor">
+<a href="#parameters-needed" class="anchor"></a>Parameters needed</h3>
+<p>We need new parameters in the list of named parameters.</p>
+<ul>
+<li>
+<code>N_dose</code>: number of doses. Can be a scalar or a vector (by num types).</li>
+<li>
+<code>N_type</code>: number of types of vaccines</li>
+<li>
+<code>N_phase</code>: number of phases (max of doses?)</li>
+<li>
+<code>vaxx_types</code>: character vector of type names</li>
+<li>
+<code>vaxx_priority</code>: a matrix, <code>N_dose - 1</code> by <code>N_age</code> (so if <code>N_dose</code> is 1, this is set to <code>NULL</code>). This matrix goes from 1,…,<code>N_dose - 1</code> and tells us, on this phase, what age group should get prioritized for the next dose.</li>
+<li>
+<code>dose_period</code>: a vector of length <code>1:N_dose</code>. <code>dose_period[i]</code> gives how long one must wait after <code>i-1</code>-th dose to get the <code>i</code>-th dose. The first element is unused, but must be present.</li>
+</ul>
+<p>We need a new variable to be in the list <code>variables</code></p>
+<ul>
+<li>
+<code>phase</code>: an integer in <code>1:N_dose</code>, telling us what phase we are on. The phase advances to <code>phase + 1</code> when for the current phase, all current dose coverage &gt;= final step of prioritization matrix <em>and</em> next dose coverage for prioritized groups &gt;= final step of prioritization matrix.</li>
+</ul>
+</div>
+</div>
 <div id="vaccination" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vaccination" class="anchor"></a>Vaccination</h2>
@@ -119,13 +228,14 @@ end</code></pre>
 <li>
 <code>CategoricalVariable[max_vaxx]</code>: store the type of vaccine for each dose.</li>
 </ol>
+<p>One thing is that, if all we care about is people getting 1st v. 2nd doses of <strong>anything</strong>, we can just do the checks for coverage for any dose, and then give people doses based on what’s available at that time. Or if someone gets a certain 1st dose, they are guaranteed to get subsequent doses of that type. Something like that.</p>
 </div>
 <div id="transitions-scheduling" class="section level3">
 <h3 class="hasAnchor">
 <a href="#transitions-scheduling" class="anchor"></a>Transitions &amp; scheduling</h3>
-<p>The <code>vaccination_process()</code> function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is “at risk” of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only “at risk” of vaccination?) we do the normal binomial draw.</p>
+<p>The <code><a href="../reference/vaccination_process.html">vaccination_process()</a></code> function should be the first one run in the daily simulation loop. It gets the number of vaccines available at this time step, and based on the prioritization scheme, figure out who is “at risk” of getting vaccinated; e.g. has a non-zero hazard of that event firing. Perhaps that can be returned as a bitset? Then for those people who are at risk of both, we do the multinomial sample for state updates, for those who are only at risk of infection (probably nobody only “at risk” of vaccination?) we do the normal binomial draw.</p>
 <p>In <a href="https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L404">nimue</a> the code that handles how vaccines are allocated works like below:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">vr_temp</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">S</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">N_age</span>
 <span class="co"># Catch so vaccination rate does not exceed 1 if the number of people available for vaccination &lt; number of vaccines</span>
@@ -144,13 +254,13 @@ end</code></pre>
 <ol style="list-style-type: decimal">
 <li>
 <p>which age groups should be targeted for vaccination by using the targeting matrix; could be more or less the same as <a href="https://github.com/mrc-ide/nimue/blob/79d94720196420486a5995662fba5ff2f676e777/inst/odin/vaccine.R#L393">nimue</a>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Isolate age groups below current target coverage which must be targeted</span>
 <span class="va">vaccination_target_mat</span><span class="op">[</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">pr</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">vaccine_coverage_mat</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span></code></pre></div>
 </li>
 <li>
 <p>for each age group that should be targeted get the number that haven’t been vaccinated yet, in nimue it’s simple</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">vr_temp</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">S</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">E2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R1</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">+</span> <span class="va">R2</span><span class="op">[</span><span class="va">i</span>,<span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="va">vaccination_target</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">vr_temp</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">N_age</span></code></pre></div>
 <p>In our case we’d want to do something likewise but with the state variables in eligible age groups. Lots of bitset and operations, return the sum.</p>
@@ -195,16 +305,16 @@ end</code></pre>
 <a href="#infection-process-infection_process_nimue" class="anchor"></a>Infection process <code>infection_process_nimue</code>
 </h3>
 <p>We’ll go with a function that uses a calculated <code>vr</code> akin to the original <strong>nimue</strong> model but allows vaccination and infection to occur in a single time step. Normally, this would make a model that’s pretty inconsistent with the stochastic interpretation of the deterministic model but I think in this case we got lucky. Here’s why.</p>
-<div id="htmlwidget-3fe104c83314d4f60521" style="width:600px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3fe104c83314d4f60521">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = <S<FONT POINT-SIZE=\"8\"><SUB>0<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,1!\"] \n  \"2\" [label = <S<FONT POINT-SIZE=\"8\"><SUB>1<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"3\" [label = <E1<FONT POINT-SIZE=\"8\"><SUB>0<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,0!\"] \n  \"4\" [label = <E1<FONT POINT-SIZE=\"8\"><SUB>1<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,0!\"] \n\"1\"->\"2\" [fontsize = \"5\", label = \"vaccination\", label = \"vaccination\"] \n\"3\"->\"4\" [fontsize = \"5\", label = \"vaccination\", label = \"vaccination\"] \n\"1\"->\"3\" [fontsize = \"5\", label = \"infection (v0)\", label = \"infection (v0)\"] \n\"2\"->\"4\" [fontsize = \"5\", label = \"infection (v1)\", label = \"infection (v1)\"] \n\"1\"->\"4\" [fontsize = \"5\", label = \"infection+vaccinated\", style = \"dashed\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>Here’s why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let’s consider <strong>safir</strong> to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination’s protective effect doesn’t kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn’t matter. It’s still not going to make sense as <span class="math inline">\(\Delta t \to 0\)</span> but it will be a pretty good approximation.</p>
+<div id="htmlwidget-d697ca50abc1304ebf3a" style="width:600px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d697ca50abc1304ebf3a">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = <S<FONT POINT-SIZE=\"8\"><SUB>0<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,1!\"] \n  \"2\" [label = <S<FONT POINT-SIZE=\"8\"><SUB>1<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,1!\"] \n  \"3\" [label = <E1<FONT POINT-SIZE=\"8\"><SUB>0<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0.5,0!\"] \n  \"4\" [label = <E1<FONT POINT-SIZE=\"8\"><SUB>1<\/SUB><\/FONT>>, fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"2,0!\"] \n\"1\"->\"2\" [fontsize = \"5\", label = \"vaccination\", label = \"vaccination\"] \n\"3\"->\"4\" [fontsize = \"5\", label = \"vaccination\", label = \"vaccination\"] \n\"1\"->\"3\" [fontsize = \"5\", label = \"infection (v0)\", label = \"infection (v0)\"] \n\"2\"->\"4\" [fontsize = \"5\", label = \"infection (v1)\", label = \"infection (v1)\"] \n\"1\"->\"4\" [fontsize = \"5\", label = \"infection+vaccinated\", style = \"dashed\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>Here’s why this wont be a problem in this case. In the determinsitic model over an infintesimal time interval, only the solid line transitions are allowed. If we were interpreting the ODE model as the skeletion of a CTMC model, those would (still) be the only allowed transitions that could occur, were a single event to occur. Let’s consider <strong>safir</strong> to be a discretization of the CTMC we wish we could run. Then, if the rates at which infection or vaccination occured differed depending on the state one was in, allowing two events to happen in one jump would be bad. Why? Because then the probability of the vaccination first, followed by infection in a time step != the probability of infection first, followed by vaccination in a time step. But because we assume vaccination’s protective effect doesn’t kick in until states V3,V4, the infection and the vaccination lines occur at the same rate. So order doesn’t matter. It’s still not going to make sense as <span class="math inline">\(\Delta t \to 0\)</span> but it will be a pretty good approximation.</p>
 <p>Need to set up event progression for vaccines.</p>
 <p>It looks like this right now</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R">  <span class="va">events</span><span class="op">$</span><span class="va">v0_to_v1v2</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when vaccination occurs</span>
   <span class="va">events</span><span class="op">$</span><span class="va">v1v2_to_v3v4</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when entering v1v2</span>
   <span class="va">events</span><span class="op">$</span><span class="va">v3v4_to_v5</span> <span class="op">=</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/TargetedEvent.html">TargetedEvent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">N</span><span class="op">)</span> <span class="co"># scheduled when entering v3v4</span></code></pre></div>
-<div id="htmlwidget-deb2026e2fe396e86739" style="width:600px;height:500px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-deb2026e2fe396e86739">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"V0\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,4!\"] \n  \"2\" [label = \"V1,V2\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,3!\"] \n  \"3\" [label = \"V3,V4\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,2!\"] \n  \"4\" [label = \"V5\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,1!\"] \n\"1\"->\"2\" [label = \"occurs at (S,E,R) vaccination\"] \n\"2\"->\"3\" [label = \"event scheduled (gamma_vaccine_delay)\"] \n\"3\"->\"4\" [label = \"event scheduled (gamma_V)\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-46debd7543fdbbef38f0" style="width:600px;height:500px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-46debd7543fdbbef38f0">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"V0\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,4!\"] \n  \"2\" [label = \"V1,V2\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,3!\"] \n  \"3\" [label = \"V3,V4\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,2!\"] \n  \"4\" [label = \"V5\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"1,1!\"] \n\"1\"->\"2\" [label = \"occurs at (S,E,R) vaccination\"] \n\"2\"->\"3\" [label = \"event scheduled (gamma_vaccine_delay)\"] \n\"3\"->\"4\" [label = \"event scheduled (gamma_V)\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data-structures" class="section level3">
 <h3 class="hasAnchor">

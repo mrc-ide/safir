@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/params.html">Parameters</a>
     </li>
+    <li>
+      <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -78,7 +81,7 @@
 
       
 
-      </header><script src="compare_squire_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="compare_squire_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Squire Validation Run</h1>
@@ -97,6 +100,12 @@
 <p>Let’s compare <strong>safir</strong> to <strong>squire</strong>. Set up our parameters for running. We use a time step of 0.1 days. We use <code>get_parameters</code> to grab parameters directly from the <strong>squire</strong> package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">safir</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">squire</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'squire'</span>
+<span class="co">#&gt; The following object is masked from 'package:safir':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     get_population</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span>
@@ -172,7 +181,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  17.689   0.613  19.760</span></code></pre></div>
+<span class="co">#&gt;   7.951   0.472   8.583</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
