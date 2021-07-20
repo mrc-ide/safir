@@ -73,7 +73,7 @@ create_vaccination_dose_listener <- function(variables, parameters, dose) {
 #' @param variables a named list of variables
 #' @param events a named list of events
 #' @param parameters the parameters
-#' @param type character type of vaccine
+#' @param dt size of time step
 #' @export
 attach_event_listeners_vaccination <- function(variables, events, parameters, dt) {
 
