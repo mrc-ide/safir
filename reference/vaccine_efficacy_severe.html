@@ -41,7 +41,7 @@
 
 <meta property="og:title" content="Compute vaccine efficacy against severe disease from Ab titre — vaccine_efficacy_severe" />
 <meta property="og:description" content="This needs the efficacy against infection because efficacy against severe disease,
-conditional on breakthrough infection is what safir needs, which is computed as  1 - (1 - efficacy_disease)/(1 - efficacy_infection)." />
+conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection))." />
 
 
 
@@ -135,7 +135,7 @@ conditional on breakthrough infection is what safir needs, which is computed as 
 
     <div class="ref-description">
     <p>This needs the efficacy against infection because efficacy against severe disease,
-conditional on breakthrough infection is what safir needs, which is computed as  1 - (1 - efficacy_disease)/(1 - efficacy_infection).</p>
+conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).</p>
     </div>
 
     <pre class="usage"><span class='fu'>vaccine_efficacy_severe</span><span class='op'>(</span><span class='va'>ab_titre</span>, <span class='va'>ef_infection</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
@@ -149,7 +149,7 @@ conditional on breakthrough infection is what safir needs, which is computed as 
     </tr>
     <tr>
       <th>ef_infection</th>
-      <td><p>a vector of efficacy against infection from <code>link{vaccine_efficacy_infection}</code></p></td>
+      <td><p>a vector of efficacy against infection from <code><a href='vaccine_efficacy_infection.html'>vaccine_efficacy_infection</a></code></p></td>
     </tr>
     <tr>
       <th>parameters</th>
