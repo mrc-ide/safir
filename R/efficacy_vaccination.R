@@ -15,15 +15,11 @@
 #' @export
 vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
-  dose_num <- variables$dose_num
-  dose_time <- variables$dose_time
-  ab_titre <- variables$ab_titre
-
   return(
     function(timestep) {
 
       # only those with at least 1 dose will need to have titre calculated
-      vaccinated <- dose_num$get_index_of(set = 0)
+      vaccinated <- variables$dose_num$get_index_of(set = 0)
       vaccinated <- vaccinated$not()
 
       if (vaccinated$size() > 0) {
@@ -38,13 +34,13 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
         time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(parameters$dr_vec)
 
         # current Ab titre
-        current_ab_titre <- ab_titre$get_values(index = vaccinated)
+        current_ab_titre <- variables$ab_titre$get_values(index = vaccinated)
 
         # new Ab titre
         new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose]
 
         # schedule an update
-        ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
+        variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
 
         # vaccine efficacy
         ef_infection <- vaccine_efficacy_infection(ab_titre = current_ab_titre,parameters = parameters)
@@ -109,8 +105,7 @@ vaccine_efficacy_infection <- function(ab_titre, parameters) {
 vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
   nt <- exp(ab_titre)
   ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
-  # ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
-  ef_severe <-  1 - ((1 - ef_severe_uncond)/ef_infection) # denominator should be % efficacy
+  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
   ef_severe <- 1 - ef_severe
   return(ef_severe)
 }

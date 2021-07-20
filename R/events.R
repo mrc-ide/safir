@@ -11,6 +11,7 @@
 #' @title Create events
 #'
 #' @param parameters write me!
+#' @importFrom individual TargetedEvent
 #' @export
 create_events <- function(parameters) {
 
@@ -19,23 +20,23 @@ create_events <- function(parameters) {
 
     list(
         # Human infection events
-        exposure = individual::TargetedEvent$new(N), # S->E, scheduled by infection_process_zzz
-        mild_infection = individual::TargetedEvent$new(N), # E->IMild, scheduled by create_exposure_update_listener
-        asymp_infection = individual::TargetedEvent$new(N),
-        severe_infection = individual::TargetedEvent$new(N),
-        hospitilisation = individual::TargetedEvent$new(N),
-        imv_get_live = individual::TargetedEvent$new(N),
-        imv_get_die = individual::TargetedEvent$new(N),
-        iox_get_live = individual::TargetedEvent$new(N),
-        iox_get_die = individual::TargetedEvent$new(N),
-        imv_not_get_live = individual::TargetedEvent$new(N),
-        imv_not_get_die = individual::TargetedEvent$new(N),
-        iox_not_get_live = individual::TargetedEvent$new(N),
-        iox_not_get_die = individual::TargetedEvent$new(N),
-        stepdown = individual::TargetedEvent$new(N),
-        recovery = individual::TargetedEvent$new(N),
-        immunity_loss = individual::TargetedEvent$new(N),
-        death = individual::TargetedEvent$new(N)
+        exposure = TargetedEvent$new(N), # S->E, scheduled by infection_process_zzz
+        mild_infection = TargetedEvent$new(N), # E->IMild, scheduled by create_exposure_update_listener
+        asymp_infection = TargetedEvent$new(N),
+        severe_infection = TargetedEvent$new(N),
+        hospitilisation = TargetedEvent$new(N),
+        imv_get_live = TargetedEvent$new(N),
+        imv_get_die = TargetedEvent$new(N),
+        iox_get_live = TargetedEvent$new(N),
+        iox_get_die = TargetedEvent$new(N),
+        imv_not_get_live = TargetedEvent$new(N),
+        imv_not_get_die = TargetedEvent$new(N),
+        iox_not_get_live = TargetedEvent$new(N),
+        iox_not_get_die = TargetedEvent$new(N),
+        stepdown = TargetedEvent$new(N),
+        recovery = TargetedEvent$new(N),
+        immunity_loss = TargetedEvent$new(N),
+        death = TargetedEvent$new(N)
     )
 }
 

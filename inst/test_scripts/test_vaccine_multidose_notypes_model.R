@@ -57,7 +57,7 @@ parameters <- c(parameters, ab_parameters)
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
-variables <- create_vaccine_variables(variables = variables,pop = pop$n,max_dose = vaccine_doses)
+variables <- create_vaccine_variables(variables = variables,pop = parameters$population,max_dose = vaccine_doses)
 
 # create events
 events <- create_events(parameters = parameters)
@@ -67,7 +67,7 @@ attach_event_listeners_vaccination(variables = variables,events = events,paramet
 
 # make renderers
 renderer <- Render$new(parameters$time_period)
-ef_inf_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(pop$n))
+ef_inf_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
 dose_renderer <- Render$new(parameters$time_period)
 
 double_count_render_process_daily <- function(variable, dt) {

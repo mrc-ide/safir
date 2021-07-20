@@ -56,11 +56,7 @@ get_current_coverage <- function(variables, events, dose, parameters) {
 #' @export
 get_current_eligible_from_coverage <- function(timestep, dt, coverage, variables, dose, parameters) {
 
-  # people who did not get `dose` and are not scheduled for it
-  # bsets <- lapply(X = coverage,FUN = function(b){b$copy()$not()})
-  # this is wrong because its everyone in the complement, not the complement AND this age group.
-  # need to take variables as an arg and do that logic.
-
+  # eligible persons are those not covered and in this age group
   bsets <- lapply(X = 1:parameters$N_age,FUN = function(a){
     not_cov <- coverage[[a]]$not()
     not_cov$and(variables$discrete_age$get_index_of(a))

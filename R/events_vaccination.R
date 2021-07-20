@@ -10,6 +10,7 @@
 #'
 #' @param events a named list of individual::Event
 #' @param parameters write me!
+#' @importFrom individual TargetedEvent
 #' @export
 create_events_vaccination <- function(events, parameters) {
 
@@ -17,7 +18,7 @@ create_events_vaccination <- function(events, parameters) {
   N <- sum(parameters$population)
 
   # scheduled future doses
-  events$scheduled_dose <- replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(N),simplify = FALSE)
+  events$scheduled_dose <- replicate(n = parameters$N_phase,expr = TargetedEvent$new(N),simplify = FALSE)
 
   return(events)
 }
@@ -55,6 +56,7 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
   variables$ef_severe$queue_update(values = ef_severe, index = target)
 
 }
+
 
 #' @title Create listener for vaccination dose (multi-dose, no types)
 #' @description Updates state when a vaccine dose is given. It does not schedule future events.

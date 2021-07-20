@@ -34,7 +34,7 @@ create_variables <- function(pop, parameters) {
 #' @param pop population list
 #' @param parameters model parameters
 #' @param continuous return both age by year and bin?
-#'
+#' @importFrom individual IntegerVariable
 #' @return named list of individual::Variable
 create_age_variables <- function(pop, parameters, continuous = FALSE) {
 
@@ -51,13 +51,13 @@ create_age_variables <- function(pop, parameters, continuous = FALSE) {
   if (continuous) {
     return(
       list(
-        age = individual::IntegerVariable$new(cont_age),
-        discrete_age = individual::IntegerVariable$new(discrete_age)
+        age = IntegerVariable$new(cont_age),
+        discrete_age = IntegerVariable$new(discrete_age)
       )
     )
   } else {
     list(
-      discrete_age = individual::IntegerVariable$new(discrete_age)
+      discrete_age = IntegerVariable$new(discrete_age)
     )
   }
 }

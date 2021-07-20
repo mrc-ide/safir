@@ -12,7 +12,7 @@
 #' @title Create and initialise states
 #'
 #' @param psq the model parameters
-#'
+#' @importFrom individual CategoricalVariable
 #' @return list of states
 #' @export
 create_state_variables <- function(psq) {
@@ -38,7 +38,7 @@ create_state_variables <- function(psq) {
   )
 
   # Define state variables
-  states <- individual::CategoricalVariable$new(
+  states <- CategoricalVariable$new(
     names(initial_counts),
     rep(names(initial_counts), times = as.integer(initial_counts))
   )

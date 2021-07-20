@@ -19,3 +19,5 @@ The prioritization step will only increment when both are fulfilled.
 3. To test if 100% effective vaccines are having an effect, just set `ab_50 = 2e-12`
 or some small value, which ensures that for almost any positive Ab titre the efficacy
 will be nearly 1.
+
+4. get `variables_vaccines.R/initialize_vaccine_variables` working with ab titre.
