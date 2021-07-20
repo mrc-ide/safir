@@ -39,7 +39,7 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- c(0, seq(from = 1e2, to = 1e3, length.out = (tmax/dt)-1))
+vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = (tmax/dt)-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
@@ -108,7 +108,8 @@ processes <- list(
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
-  double_count_render_process_daily(variable = variables$ab_titre,dt = dt)
+  double_count_render_process_daily(variable = variables$ef_infection,dt = dt),
+  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:2,dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
