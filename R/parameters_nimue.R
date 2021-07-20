@@ -121,6 +121,7 @@ call_nimue_pars <- function(
   dur_rec = nimue:::durs$dur_rec,
   # vaccine
   dur_R = nimue:::vaccine_pars$dur_R,
+  tt_dur_R = nimue:::vaccine_pars$tt_dur_R,
   dur_V = nimue:::vaccine_pars$dur_V,
   vaccine_efficacy_infection = nimue:::vaccine_pars$vaccine_efficacy_infection,
   tt_vaccine_efficacy_infection = nimue:::vaccine_pars$tt_vaccine_efficacy_infection,
@@ -174,6 +175,7 @@ call_nimue_pars <- function(
     dur_rec = dur_rec,
     # vaccine
     dur_R = dur_R,
+    tt_dur_R = tt_dur_R,
     dur_V = dur_V,
     vaccine_efficacy_infection = vaccine_efficacy_infection,
     tt_vaccine_efficacy_infection = tt_vaccine_efficacy_infection,
