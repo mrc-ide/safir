@@ -513,11 +513,16 @@ test_that("assign doses is working for phase 1", {
     events = events,dose = 1,eligible = targeted,parameters = parameters
   )
   sched <- var_local$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  assigned_groups <- as.vector(table(sched))
   expect_equal(
-    c(5,5,6),
-    as.vector(table(sched))
+    16, sum(assigned_groups)
   )
-
+  expect_true(
+    all(assigned_groups >= 5)
+  )
+  expect_true(
+    all(assigned_groups <= 6)
+  )
 })
 
 

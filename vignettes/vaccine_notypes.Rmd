@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 library(safir)
 library(individual)
 library(nimue)
+library(data.table)
+library(ggplot2)
 ```
 
 Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for multiple doses.
@@ -38,6 +40,7 @@ R0 <- 4
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
 vaccine_set <- c(0, seq(from = 1e2, to = 1e3, length.out = (tmax/dt)-1))
+vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
 vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
@@ -71,6 +74,7 @@ ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = 
 parameters <- c(parameters, ab_parameters)
 ```
 
+Now we make the variables, events, and processes used in the model.
 
 ```{r}
 # create variables
@@ -85,18 +89,17 @@ attach_event_listeners(variables = variables,events = events,parameters = parame
 attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
 
 # make renderers
-renderer <- Render$new(parameters$time_period) 
+renderer <- Render$new(parameters$time_period)
 ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(pop$n))
 
-double_count_render_process_daily <- function(renderer, variable, dt) {
+double_count_render_process_daily <- function(variable, dt) {
   stopifnot(inherits(variable, "DoubleVariable"))
   function(t) {
     if ((t * dt) %% 1 == 0) {
-      ab_renderer[as.integer(t * dt), ] <- variable$get_values()
+      ab_renderer[as.integer(t * dt), ] <<- variable$get_values()
     }
   }
 }
-
 
 # processes
 processes <- list(
@@ -104,7 +107,7 @@ processes <- list(
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
-  double_count_render_process_daily(renderer = ab_renderer,variable = variables$ab_titre,dt = dt)
+  double_count_render_process_daily(variable = variables$ab_titre,dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
@@ -119,4 +122,42 @@ system.time(simulation_loop_vaccine(
   processes = processes,
   timesteps = timesteps
 ))
+```
+
+Plot.
+
+```{r}
+vaccinated <- variables$dose_num$get_index_of(set = 0)
+vaccinated <- vaccinated$not()
+
+ab <- ab_renderer[, vaccinated$to_vector()]
+start <- apply(ab, 2, function(x){ which(x != 0)[1] })
+ab <- exp(ab)
+
+max_ab <- max(ab)
+
+ab <- lapply(X = 1:ncol(ab),FUN = function(x){
+  ab[start[x]:nrow(ab) ,x]
+})
+
+max_len <- max(parameters$time_period - (start - 1))
+
+plot(x = seq_along(ab[[1]]),y = ab[[1]],type="l",xlim = c(1,max_len),ylim = c(0,max_ab))
+for (i in 2:length(ab)) {
+  lines(x = 1:length(ab[[i]]),y = ab[[i]])
+}
+
+
+
+
+
+as.data.table(ab)
+
+rownames(ab_renderer) <- as.character(1:nrow(ab_renderer))
+colnames(ab_renderer) <- as.character(vaccinated$to_vector())
+ab_renderer <- as.data.table(ab_renderer)
+
+ab_renderer <- melt(ab_renderer)
+
+# matplot(exp(ab_renderer), type="l")
 ```

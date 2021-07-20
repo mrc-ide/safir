@@ -280,14 +280,14 @@ assign_doses <- function(doses_left, events, dose, eligible, parameters) {
     # assign limited doses to age groups
     group_weights <- n_to_assign / sum(n_to_assign)
     assigned <- floor(doses_left * group_weights)
+
     if(sum(assigned) != doses_left){
-      groups_to_assign <- which(n_to_assign > 0 & n_to_assign < assigned)
-      doses_to_assign <- as.vector(rmultinom(n = 1,size = length(groups_to_assign),prob = rep(1,length(groups_to_assign))))
-      assigned[groups_to_assign] <- assigned[groups_to_assign] + doses_to_assign
+      extra_to_assign <- n_to_assign - assigned
+      extra_weights <- extra_to_assign / sum(extra_to_assign)
+      assigned <- assigned + as.vector(rmultinom(n = 1,size = doses_left - sum(assigned),prob = extra_weights))
     }
-    # if(sum(assigned) != doses_left){
-    #   assigned <- assigned + (rank(-group_weights, ties.method = "last") <= (doses_left %% length(group_weights)))
-    # }
+
+    stopifnot(sum(assigned) <= doses_left)
 
     for (a in 1:parameters$N_age) {
 
