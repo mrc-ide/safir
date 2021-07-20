@@ -13,7 +13,7 @@ attach_event_listeners_vaccination(variables, events, parameters, dt)
 
 \item{parameters}{the parameters}
 
-\item{type}{character type of vaccine}
+\item{dt}{size of time step}
 }
 \description{
 Attach event listeners for vaccination events (multi-dose, no types)

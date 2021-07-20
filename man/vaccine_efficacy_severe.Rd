@@ -9,11 +9,11 @@ vaccine_efficacy_severe(ab_titre, ef_infection, parameters)
 \arguments{
 \item{ab_titre}{a vector of Ab titres}
 
-\item{ef_infection}{a vector of efficacy against infection from \code{link{vaccine_efficacy_infection}}}
+\item{ef_infection}{a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}}
 
 \item{parameters}{model parameters}
 }
 \description{
 This needs the efficacy against infection because efficacy against severe disease,
-conditional on breakthrough infection is what safir needs, which is computed as  1 - \link{(1 - efficacy_disease)/(1 - efficacy_infection)}.
+conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).
 }
