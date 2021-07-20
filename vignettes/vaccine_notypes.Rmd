@@ -2,7 +2,7 @@
 title: "Vaccine model with multiple doses"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{vaccine_notypes}
+  %\VignetteIndexEntry{Vaccine model with multiple doses}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
