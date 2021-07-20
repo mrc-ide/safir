@@ -8,9 +8,10 @@
 
 #' @title Process that updates the antibody (Ab) titre each time step
 #' @description The values in \code{ab_titre} are calculated on the log scale.
-#' @param ab_titre a \code{\link[individual]{DoubleVariable}} giving the antibody titre for the population
-#' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population
-#' @param dose_num a \code{\link[individual]{IntegerVariable}} giving the dose number of the population
+#' @param parameters a list of model parameters
+#' @param variables a list of model variables
+#' @param events a list of model events
+#' @param dt time step size
 #' @export
 vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 

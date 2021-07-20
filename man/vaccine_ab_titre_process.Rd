@@ -7,11 +7,13 @@
 vaccine_ab_titre_process(parameters, variables, events, dt)
 }
 \arguments{
-\item{ab_titre}{a \code{\link[individual]{DoubleVariable}} giving the antibody titre for the population}
+\item{parameters}{a list of model parameters}
 
-\item{dose_time}{a list of \code{\link[individual]{IntegerVariable}} objects giving the time of doses for the population}
+\item{variables}{a list of model variables}
 
-\item{dose_num}{a \code{\link[individual]{IntegerVariable}} giving the dose number of the population}
+\item{events}{a list of model events}
+
+\item{dt}{time step size}
 }
 \description{
 The values in \code{ab_titre} are calculated on the log scale.

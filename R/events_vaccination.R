@@ -31,7 +31,7 @@ create_events_vaccination <- function(events, parameters) {
 #' @param target a \code{\link[individual]{Bitset}}
 #' @param dose which dose
 #' @param parameters model parameters
-#'
+#' @importFrom stats rnorm
 #' @export
 schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters) {
 

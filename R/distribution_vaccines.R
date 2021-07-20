@@ -251,6 +251,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
 #' @param dose what dose to assign for
 #' @param eligible output of \code{\link{target_pop}}
 #' @param parameters a list of model parameters
+#' @importFrom stats rmultinom
 #' @export
 assign_doses <- function(doses_left, events, dose, eligible, parameters) {
 
