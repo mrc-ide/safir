@@ -13,7 +13,7 @@ pop$n <- as.integer(pop$n / 1e3)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
 tmax <- 100
-dt <- 1
+dt <- 0.5
 R0 <- 4
 
 # vaccine dosing
@@ -67,14 +67,15 @@ attach_event_listeners_vaccination(variables = variables,events = events,paramet
 
 # make renderers
 renderer <- Render$new(parameters$time_period)
-ef_inf_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
+# ef_inf_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
+ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
 dose_renderer <- Render$new(parameters$time_period)
 
 double_count_render_process_daily <- function(variable, dt) {
   stopifnot(inherits(variable, "DoubleVariable"))
   function(t) {
     if ((t * dt) %% 1 == 0) {
-      ef_inf_renderer[as.integer(t * dt), ] <<- variable$get_values()
+      ab_renderer[as.integer(t * dt), ] <<- variable$get_values()
     }
   }
 }
@@ -85,7 +86,7 @@ processes <- list(
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
-  double_count_render_process_daily(variable = variables$ef_infection,dt = dt),
+  double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
   integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:2,dt = dt)
 )
 
@@ -102,37 +103,41 @@ system.time(simulation_loop_vaccine(
 
 
 
-# plot
+# plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated <- vaccinated$not()
 
-ef_infection <- ef_inf_renderer[, vaccinated$to_vector()]
-start <- apply(ef_infection, 2, function(x){ which(x < 1)[1] })
+ab_titre <- ab_renderer[, vaccinated$to_vector()]
+start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
-ef_infection <- lapply(X = 1:ncol(ef_infection),FUN = function(x){
-  ef_infection[start[x]:nrow(ef_infection) , x]
+ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){
+  ab_titre[start[x]:nrow(ab_titre) , x]
 })
 
-ef_infection_dt <- data.table(
-  id = rep(1:length(ef_infection), times = sapply(ef_infection,length)),
-  t = unlist(lapply(ef_infection,function(x){1:length(x)})),
-  ef_inf = unlist(ef_infection)
+ab_titre_dt <- data.table(
+  ab = unlist(ab_titre),
+  t = unlist(lapply(ab_titre, function(ab_titre){1:length(ab_titre)})),
+  id = rep(1:length(ab_titre), times = vapply(ab_titre,length,integer(1)))
 )
-ef_infection_dt[, ef_inf := 1 - ef_inf]
 
-eff_sum_dt <- ef_infection_dt[, .(mean = mean(ef_inf), lo = quantile(ef_inf,probs =0.025) , hi = quantile(ef_inf,probs = 0.975)) , by = .(t)]
+ab_titre_quant_dt <- ab_titre_dt[, .(mean = mean(ab), lo = quantile(ab,probs =0.025) , hi = quantile(ab,probs = 0.975)) , by = .(t)]
 
-ggplot(data = eff_sum_dt) +
+ggplot(data = ab_titre_quant_dt) +
   geom_line(aes(x=t,y=mean)) +
   geom_ribbon(aes(x=t,ymin=lo,ymax=hi),alpha=0.5) +
   theme_bw()
 
-
-
+# plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
-matplot(dose_out[,-1],type="l",lty=1)
+colnames(dose_out)[2:4] <- as.character(0:2)
+dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
+setnames(dose_out, "variable", "dose")
 
+ggplot(data = dose_out) +
+  geom_line(aes(x=timestep,y=value,color=dose)) +
+  theme_bw()
 
+# states
 saf_dt <- as.data.table(renderer$to_dataframe())
 saf_dt[, IMild_count := IMild_count + IAsymp_count]
 saf_dt[, IAsymp_count := NULL]
