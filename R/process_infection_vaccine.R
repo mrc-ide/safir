@@ -57,3 +57,31 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
   )
 }
+
+
+#' @title C++ infection process for vaccine model (multi-dose, no types)
+#'
+#' @description This samples infection events in the susceptible population.
+#' Calls \code{\link{infection_process_vaccine_cpp_internal}} to return an external pointer object.
+#'
+#' @param parameters Model parameters
+#' @param variables Model variable
+#' @param events Model events
+#' @param dt the time step
+#' @export
+infection_process_vaccine_cpp <- function(parameters, variables, events, dt) {
+
+  stopifnot(all(c("states","discrete_age") %in% names(variables)))
+  stopifnot("exposure" %in% names(events))
+
+  return(
+    infection_process_vaccine_cpp_internal(
+      parameters = parameters,
+      states = variables$states$.variable,
+      discrete_age = variables$discrete_age$.variable,
+      ef_infection = variables$ef_infection$.variable,
+      exposure = events$exposure$.event,
+      dt = dt
+    )
+  )
+}

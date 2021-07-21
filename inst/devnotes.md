@@ -15,3 +15,12 @@ relative multiplicative contribution of each individual.
 start of the simulation there may be wasted doses during the lag between people
 getting their first dose, and when persons can get (become eligible for) their second dose.
 The prioritization step will only increment when both are fulfilled.
+
+3. To test if 100% effective vaccines are having an effect, just set `ab_50 = 2e-12`
+or some small value, which ensures that for almost any positive Ab titre the efficacy
+will be nearly 1.
+
+4. get `variables_vaccines.R/initialize_vaccine_variables` working with ab titre.
+
+5. to setup correlated Ab titres for 2nd dose, need to ask Alexandra to set up
+the code s.t. 2nd dose depends on 1st (right now is the opposite).

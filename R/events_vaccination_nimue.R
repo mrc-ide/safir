@@ -16,15 +16,16 @@ nimue_states_names <- c("vaccine_states", "eligible", "vaccinated", "empty")
 #'
 #' @param events a named list of individual::Event
 #' @param parameters write me!
+#' @importFrom individual TargetedEvent
 #' @export
 create_events_nimue <- function(events, parameters) {
 
   # pop size
   N <- sum(parameters$population)
 
-  events$v0_to_v1v2 = individual::TargetedEvent$new(N) # scheduled when vaccination occurs
-  events$v1v2_to_v3v4 = individual::TargetedEvent$new(N) # scheduled when entering v1v2
-  events$v3v4_to_v5 = individual::TargetedEvent$new(N) # scheduled when entering v3v4
+  events$v0_to_v1v2 = TargetedEvent$new(N) # scheduled when vaccination occurs
+  events$v1v2_to_v3v4 = TargetedEvent$new(N) # scheduled when entering v1v2
+  events$v3v4_to_v5 = TargetedEvent$new(N) # scheduled when entering v3v4
 
   return(events)
 }

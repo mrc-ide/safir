@@ -15,15 +15,11 @@
 #' @export
 vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
-  dose_num <- variables$dose_num
-  dose_time <- variables$dose_time
-  ab_titre <- variables$ab_titre
-
   return(
     function(timestep) {
 
       # only those with at least 1 dose will need to have titre calculated
-      vaccinated <- dose_num$get_index_of(set = 0)
+      vaccinated <- variables$dose_num$get_index_of(set = 0)
       vaccinated <- vaccinated$not()
 
       if (vaccinated$size() > 0) {
@@ -38,13 +34,13 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
         time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(parameters$dr_vec)
 
         # current Ab titre
-        current_ab_titre <- ab_titre$get_values(index = vaccinated)
+        current_ab_titre <- variables$ab_titre$get_values(index = vaccinated)
 
         # new Ab titre
         new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose]
 
         # schedule an update
-        ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
+        variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
 
         # vaccine efficacy
         ef_infection <- vaccine_efficacy_infection(ab_titre = current_ab_titre,parameters = parameters)

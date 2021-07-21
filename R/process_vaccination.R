@@ -45,7 +45,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
         phase <- variables$phase$value
 
         # how many doses we have today
-        doses_left <- parameters$vaccine_set[ceiling(day)]
+        doses_left <- parameters$vaccine_set[day]
 
         # if vaccination done or no doses available, return early
         if (phase > parameters$N_phase || doses_left <= 0) {

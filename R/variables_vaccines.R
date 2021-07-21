@@ -14,20 +14,22 @@
 #'
 #' @param variables a list
 #' @param pop population list
-#'
+#' @importFrom individual Bitset
+#' @importFrom individual IntegerVariable
 #' @return named list of individual::Variable
 #' @export
 create_vaccine_variables_nimue <- function(variables, pop) {
 
   n <- sum(pop$n)
 
-  variables$vaccine_states <- individual::IntegerVariable$new(initial_values = rep(1,n))
-  variables$eligible <- individual::Bitset$new(size = n)
-  variables$vaccinated <- individual::Bitset$new(size = n)
-  variables$empty <- individual::Bitset$new(size = n)
+  variables$vaccine_states <- IntegerVariable$new(initial_values = rep(1,n))
+  variables$eligible <- Bitset$new(size = n)
+  variables$vaccinated <- Bitset$new(size = n)
+  variables$empty <- Bitset$new(size = n)
 
   return(variables)
 }
+
 
 #' @title Get proportion of an age group that is vaccinated (nimue vaccine model)
 #' @description Get proportion of an age group that has received a particular vaccine dose
@@ -55,25 +57,27 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 #' @param variables a list
 #' @param pop population list
 #' @param max_dose maximum number of possible doses
-#'
+#' @importFrom individual IntegerVariable
+#' @importFrom individual DoubleVariable
 #' @return named list of individual::Variable
 #' @export
 create_vaccine_variables <- function(variables, pop, max_dose = 2) {
 
   n <- sum(pop)
 
-  variables$dose_num <- individual::IntegerVariable$new(initial_values = rep(0,n))
-  variables$dose_time <- replicate(n = max_dose,expr = individual::IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
+  variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
+  variables$dose_time <- replicate(n = max_dose,expr = IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
   variables$phase <- new.env(hash = FALSE)
   variables$phase$value <- 1L
 
   # ab and efficacy dynamics
-  variables$ab_titre <- individual::DoubleVariable$new(initial_values = rep(0,n))
-  variables$ef_infection <- individual::DoubleVariable$new(initial_values = rep(1,n))
-  variables$ef_severe <- individual::DoubleVariable$new(initial_values = rep(1,n))
+  variables$ab_titre <- DoubleVariable$new(initial_values = rep(0,n))
+  variables$ef_infection <- DoubleVariable$new(initial_values = rep(1,n))
+  variables$ef_severe <- DoubleVariable$new(initial_values = rep(1,n))
 
   return(variables)
 }
+
 
 #' @title Initialize vaccination variables (multi-dose, no types)
 #' @param variables a list from \code{\link{create_vaccine_variables}}
@@ -95,6 +99,7 @@ initialize_vaccine_variables <- function(variables, dose_time_init, dose_num_ini
   variables$dose_num$queue_update(value = dose_num_init)
   variables$dose_num$.update()
 }
+
 
 #' @title Update vaccine variables
 #' @description This should be called from the simulation loop. It does not
