@@ -183,7 +183,7 @@
   <span class="fu"><a href="../reference/vaccination_process.html">vaccination_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/infection_process_vaccine_cpp.html">infection_process_vaccine_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/categorical_count_renderer_process_daily.html">categorical_count_renderer_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span>,categories <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
-  <span class="fu">double_count_render_process_daily</span><span class="op">(</span>variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">ef_infection</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
+  <span class="fu">double_count_render_process_daily</span><span class="op">(</span>variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">ab_titre</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/integer_count_render_process_daily.html">integer_count_render_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">dose_renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">dose_num</span>,margin <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="va">vaccine_doses</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 <span class="op">)</span>
 
@@ -197,7 +197,7 @@
   timesteps <span class="op">=</span> <span class="va">timesteps</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  10.331   0.293  10.631</span></code></pre></div>
+<span class="co">#&gt;  10.625   0.337  10.996</span></code></pre></div>
 <p>Plot. This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won’t look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot: ab titre</span>
