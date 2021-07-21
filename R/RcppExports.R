@@ -41,6 +41,19 @@ infection_process_nimue_cpp_internal <- function(parameters, states, vaccine_sta
     .Call('_safir_infection_process_nimue_cpp_internal', PACKAGE = 'safir', parameters, states, vaccine_states, discrete_age, exposure, dt)
 }
 
+#' @title C++ infection process for vaccine model (multi-dose, no types)
+#' @description this is an internal function, you should use the R interface
+#' for type checking, \code{\link{infection_process_cpp}}
+#' @param parameters a list of parameters from \code{\link{get_parameters}}
+#' @param states a \code{\link[individual]{CategoricalVariable}}
+#' @param discrete_age a \code{\link[individual]{IntegerVariable}}
+#' @param ef_infection a \code{\link[individual]{DoubleVariable}}
+#' @param exposure a \code{\link[individual]{TargetedEvent}}
+#' @param dt size of time step
+infection_process_vaccine_cpp_internal <- function(parameters, states, discrete_age, ef_infection, exposure, dt) {
+    .Call('_safir_infection_process_vaccine_cpp_internal', PACKAGE = 'safir', parameters, states, discrete_age, ef_infection, exposure, dt)
+}
+
 #' @title Cross tabulate two vectors with given margins
 #' @description this is a replacement for \code{\link[base]{table}} that allows empty
 #' cells because the margins have been specified. The input vectors \code{a} and \code{b}

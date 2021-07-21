@@ -21,3 +21,6 @@ or some small value, which ensures that for almost any positive Ab titre the eff
 will be nearly 1.
 
 4. get `variables_vaccines.R/initialize_vaccine_variables` working with ab titre.
+
+5. to setup correlated Ab titres for 2nd dose, need to ask Alexandra to set up
+the code s.t. 2nd dose depends on 1st (right now is the opposite).
