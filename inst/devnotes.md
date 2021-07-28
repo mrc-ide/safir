@@ -24,3 +24,12 @@ will be nearly 1.
 
 5. to setup correlated Ab titres for 2nd dose, need to ask Alexandra to set up
 the code s.t. 2nd dose depends on 1st (right now is the opposite).
+
+6. one way to include additional variation in inter-dose times is to 
+include variance in `dose_period` used to calculate thresholds in 
+`threshold <- timestep - as.integer(parameters$dose_period[dose]/dt)` from
+function `distribution_vaccines.R/get_current_eligible_from_coverage`.
+
+7. including multiple vaccine types could be as simple as just finding out what
+proportion of doses belong to each type per time step and draw the ab titre
+from the appropriate parameter.
