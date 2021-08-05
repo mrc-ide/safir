@@ -4,6 +4,8 @@
 
 rm(list=ls());gc()
 library(individual)
+library(data.table)
+library(ggplot2)
 library(safir)
 library(nimue)
 

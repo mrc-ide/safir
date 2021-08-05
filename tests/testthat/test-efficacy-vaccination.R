@@ -59,7 +59,6 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   ab_50_severe <- 0.03
   k <- 2.94 # shape parameter of efficacy curve
 
-
   dr_vec <- c(rep(dr_s, period_s),
               seq(dr_s, dr_l, length.out = time_to_decay),
               dr_l)
