@@ -53,7 +53,7 @@ parameters$dose_period <- dose_period
 parameters$N_phase <- vaccine_doses
 
 # attach Ab dynamics parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
 parameters <- c(parameters, ab_parameters)
 
 # create variables
