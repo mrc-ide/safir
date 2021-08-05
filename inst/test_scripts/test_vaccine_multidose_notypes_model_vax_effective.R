@@ -57,7 +57,7 @@ parameters <- c(parameters, ab_parameters)
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
-variables <- create_vaccine_variables(variables = variables,pop = parameters$population,max_dose = vaccine_doses)
+variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
 # create events
 events <- create_events(parameters = parameters)

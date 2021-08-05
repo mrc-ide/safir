@@ -7,6 +7,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
   ages <- rep(1:17, each = 100)
 
   parameters <- list()
+  parameters$population <- n
   parameters$vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
   parameters$N_age <- ncol(parameters$vaccine_coverage_mat)
   parameters$N_prioritisation_steps <- nrow(parameters$vaccine_coverage_mat)
@@ -40,7 +41,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # 0th "stage", should give stage = 1
       if (stage == 0) {
 
-        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+        variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
         calc_stage <- get_vaccination_priority_stage(variables = variables,events = events,phase = phase,parameters = parameters)
         # cat(" calc stage: ",calc_stage," --- \n")
@@ -51,7 +52,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # final stage, should give stage = -1 (move to next)
       } else if(stage == 17) {
 
-        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+        variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
         if (phase < 3) {
           for (p in 1:phase) {
@@ -78,7 +79,7 @@ test_that("testing get_vaccination_priority_stage for proper prioritization matr
       # intermediate stages, should give stage + 1
       } else {
 
-        variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+        variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
         stage_pr_vec <- parameters$vaccine_coverage_mat[stage, ]
         who_2_vaccinate <- which(stage_pr_vec > 0)

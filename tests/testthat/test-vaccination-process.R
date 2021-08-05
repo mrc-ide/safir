@@ -1,6 +1,6 @@
 test_that("vaccination_process phase 1 step 1 working", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
@@ -26,7 +26,7 @@ test_that("vaccination_process phase 1 step 1 working", {
 
 test_that("vaccination_process phase 1 step 1; assigns for next step if nobody eligible", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17),dose = 1,parameters = parameters)
@@ -54,7 +54,7 @@ test_that("vaccination_process phase 1 step 1; assigns for next step if nobody e
 
 test_that("vaccination_process phase 1 step 1; assigns priority doses to next step", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17),dose = 1,parameters = parameters)
@@ -81,7 +81,7 @@ test_that("vaccination_process phase 1 step 1; assigns priority doses to next st
 
 test_that("vaccination_process phase 1 step 17; move to next phase (2) and vaccinate persons there (step 4)", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   # give everyone 1st dose
@@ -117,7 +117,7 @@ test_that("vaccination_process phase 1 step 17; move to next phase (2) and vacci
 
 test_that("vaccination_process does not do anything if done with all phases", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   # give everyone all doses
@@ -147,7 +147,7 @@ test_that("vaccination_process does not do anything if done with all phases", {
 
 test_that("vaccination_process on phase 1 step 1 advances correctly if we have an excess of doses", {
 
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = parameters$N_phase)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
   parameters$vaccine_set[10] <- 80*3

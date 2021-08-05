@@ -46,6 +46,8 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   n <- 1e2
   tmax <- 800
 
+  parameters$population <- n
+
   # Alexandra's code
   hl_s <- 108 # Half life of antibody decay - short
   hl_l <- 3650 # Half life of antibody decay - long
@@ -89,7 +91,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   }
 
   # safir
-  variables <- create_vaccine_variables(variables = list(),pop = n,max_dose = 1)
+  variables <- create_vaccine_variables(variables = list(),parameters = parameters)
 
   schedule_dose_vaccine(timestep = 0,variables = variables,target = Bitset$new(n)$insert(1:n),dose = 1,parameters = parameters)
   variables$ab_titre$queue_update(values = log(10^z1)) # make sure using the same set of RVs

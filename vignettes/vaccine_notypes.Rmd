@@ -77,7 +77,7 @@ Now we make the variables, events, and processes used in the model.
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
-variables <- create_vaccine_variables(variables = variables,pop = pop$n,max_dose = vaccine_doses)
+variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
 # create events
 events <- create_events(parameters = parameters)

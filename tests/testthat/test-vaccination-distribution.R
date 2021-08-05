@@ -14,9 +14,11 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
+  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
@@ -57,9 +59,11 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
   ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
 
+  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
@@ -139,9 +143,11 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
   ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
 
+  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
@@ -213,9 +219,11 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
 
   ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
 
+  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
@@ -285,9 +293,11 @@ test_that("target_pop is giving the same results as nimue", {
 
   ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
 
+  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 2)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(n)}))
@@ -368,19 +378,20 @@ test_that("target_pop is working in general case", {
 
   ages <- rep(1:3,each=5)
 
-  variables <- list()
-  variables$discrete_age <- IntegerVariable$new(ages)
-  variables <- create_vaccine_variables(variables = variables,pop = n,max_dose = 3)
-  initialize_vaccine_variables(variables = variables,dose_time_init = list(rep(1:3,each=5),rep(-1,n),rep(-1,n)),dose_num_init = dose_num)
-
-  events <- list(scheduled_dose = replicate(n = 3,expr = {TargetedEvent$new(n)}))
-
   parameters <- list(
     N_age = 3,
     dose_period = c(NaN, 6, 4),
     N_phase = 3,
-    population = tab_bins(ages,3)
+    population = tab_bins(ages,3),
+    correlated = FALSE
   )
+
+  variables <- list()
+  variables$discrete_age <- IntegerVariable$new(ages)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
+  initialize_vaccine_variables(variables = variables,dose_time_init = list(rep(1:3,each=5),rep(-1,n),rep(-1,n)),dose_num_init = dose_num)
+
+  events <- list(scheduled_dose = replicate(n = 3,expr = {TargetedEvent$new(n)}))
 
   # all phase 1 targets reached
   p1 <- target_pop(
@@ -448,15 +459,17 @@ test_that("assign doses is working for phase 1", {
     population = rep(10,3),
     N_age = 3,
     dose_period = c(NaN, 6, 4),
-    N_phase = 3
+    N_phase = 3,
+    correlated = FALSE
   )
 
   pop_ages <- rep(1:3,times=parameters$population)
 
   n <- sum(parameters$population)
+
   var_local <- list()
   var_local$discrete_age <- IntegerVariable$new(pop_ages)
-  var_local <- create_vaccine_variables(variables = var_local,pop = n,max_dose = 3)
+  var_local <- create_vaccine_variables(variables = var_local,parameters = parameters)
   initialize_vaccine_variables(variables = var_local,dose_time_init = list(rep(-1,n),rep(-1,n),rep(-1,n)),dose_num_init = rep(0,n))
 
   # won't assign no doses
@@ -532,15 +545,17 @@ test_that("assign doses is working for phase 2", {
     population = rep(10,3),
     N_age = 3,
     dose_period = c(NaN, 6, 4),
-    N_phase = 3
+    N_phase = 3,
+    correlated = FALSE
   )
 
   pop_ages <- rep(1:3,times=parameters$population)
 
   n <- sum(parameters$population)
+
   var_local <- list()
   var_local$discrete_age <- IntegerVariable$new(pop_ages)
-  var_local <- create_vaccine_variables(variables = var_local,pop = n,max_dose = 3)
+  var_local <- create_vaccine_variables(variables = var_local,parameters = parameters)
   initialize_vaccine_variables(variables = var_local,dose_time_init = list(c(rep(5,n-5),rep(-1,5)),rep(-1,n),rep(-1,n)),dose_num_init = c(rep(1,n-5),rep(0,5)))
 
   # won't assign doses if not past threshold
