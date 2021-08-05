@@ -55,15 +55,16 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 #' @description Create all individual variables for humans
 #'
 #' @param variables a list
-#' @param pop population list
-#' @param max_dose maximum number of possible doses
+#' @param parameters list of model parameters
 #' @importFrom individual IntegerVariable
 #' @importFrom individual DoubleVariable
 #' @return named list of individual::Variable
 #' @export
-create_vaccine_variables <- function(variables, pop, max_dose = 2) {
+create_vaccine_variables <- function(variables, parameters) {
 
-  n <- sum(pop)
+  n <- sum(parameters$population)
+  max_dose <- parameters$N_phase
+  correlated <- parameters$correlated
 
   variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
   variables$dose_time <- replicate(n = max_dose,expr = IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
@@ -74,6 +75,10 @@ create_vaccine_variables <- function(variables, pop, max_dose = 2) {
   variables$ab_titre <- DoubleVariable$new(initial_values = rep(0,n))
   variables$ef_infection <- DoubleVariable$new(initial_values = rep(1,n))
   variables$ef_severe <- DoubleVariable$new(initial_values = rep(1,n))
+
+  if (correlated) {
+    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN,n))
+  }
 
   return(variables)
 }
@@ -115,5 +120,9 @@ update_vaccine_variables <- function(variables) {
   variables$ab_titre$.update()
   variables$ef_infection$.update()
   variables$ef_severe$.update()
+
+  if (!is.null(variables$zdose)) {
+    variables$zdose$.update()
+  }
 
 }

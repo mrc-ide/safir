@@ -4,14 +4,12 @@
 \alias{create_vaccine_variables}
 \title{Create vaccination variables (multi-dose, no types)}
 \usage{
-create_vaccine_variables(variables, pop, max_dose = 2)
+create_vaccine_variables(variables, parameters)
 }
 \arguments{
 \item{variables}{a list}
 
-\item{pop}{population list}
-
-\item{max_dose}{maximum number of possible doses}
+\item{parameters}{list of model parameters}
 }
 \value{
 named list of individual::Variable

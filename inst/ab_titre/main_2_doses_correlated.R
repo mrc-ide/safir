@@ -25,26 +25,29 @@ dr_l <- -log(2)/hl_l
 
 # function to create titre and efficacy profiles
 draw <- function(mu_ab_d1 = mu_ab_d1, mu_ab_d2 = mu_ab_d2, std10 = std10, ab_50 = ab_50, ab_50_severe, dr_s = dr_s, dr_l = dr_l, t = t, t_d2 = t_d2, k = k, time_to_decay = time_to_decay){
-  
+
   # decay rates over time
   dr_vec_sub <- c(rep(dr_s, period_s),
                   seq(dr_s, dr_l, length.out = time_to_decay),
                   rep(dr_l, (length(t) - t_period_l)))
-  
+
   dr_vec <- rep(0, length(t))
   dr_vec[1:(t_d2-1)] <- dr_vec_sub[1:(t_d2-1)]
   dr_vec[t_d2:length(t)] <- dr_vec_sub[1:(length(t) - t_d2 + 1) ]
 
   # nab titre distribution for a given vaccine product: draw from a log-normal distribution
   # here the first titre is dependent on the second but I suppose could do it the other way around
-  z2 <- rnorm(1, log10(mu_ab_d2), std10)
-  z1 <- log10(10^z2 * (mu_ab_d1/mu_ab_d2))
+  # z2 <- rnorm(1, log10(mu_ab_d2), std10)
+  # z1 <- log10(10^z2 * (mu_ab_d1/mu_ab_d2))
+
+  z1 <- rnorm(1, log10(mu_ab_d1), std10)
+  z2 <- log10(10^z1 * (mu_ab_d2/mu_ab_d1))
 
   # initiate titre vector
   nt <- rep(0, length(t))
   nt[1] <- log(10^z1)
   nt[t_d2] <- log(10^z2)
-  
+
   # decay antibodies over time on natural log scale
   for (i in (2:(t_d2-1))){
     nt[i] <- nt[i-1] + dr_vec[i]
@@ -53,7 +56,7 @@ draw <- function(mu_ab_d1 = mu_ab_d1, mu_ab_d2 = mu_ab_d2, std10 = std10, ab_50 
     nt[i] <- nt[i-1] + dr_vec[i]
   }
   nt <- exp(nt) # return to linear scale
-  
+
   # relate titre to efficacy over time - using log-10 parameters
   ef_infection <- 1 / (1 + exp(-k * (log10(nt) - log10(ab_50))))
   ef_severe <- 1 / (1 + exp(-k * (log10(nt) - log10(ab_50_severe))))
@@ -68,7 +71,7 @@ plotlist <- list()
 for (j in 1:4){
   mu_ab_d1 <- mu_ab_list$mu_ab_d1[j]
   mu_ab_d2 <- mu_ab_list$mu_ab_d2[j]
-  
+
 r1 <- NULL
 for (i in 1:100){
   out <- draw(mu_ab_d1 = mu_ab_d1, mu_ab_d2 = mu_ab_d2, std10 = std10, ab_50 = ab_50, ab_50_severe, dr_s = dr_s, dr_l = dr_l, t = t, t_d2 = t_d2, k = k, time_to_decay = time_to_decay)

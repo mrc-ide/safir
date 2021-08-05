@@ -45,12 +45,29 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
     n <- length(target)
   }
 
-  z1 <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+  if (parameters$correlated) {
 
-  variables$ab_titre$queue_update(values = z1, index = target)
+    if (dose > 1) {
+      # correlated doses > 1; use ratio of mean titre
+      zdose_prev <- variables$zdose$get_values(index = target)
+      zdose_prev <- log10(exp(zdose_prev)) # transform back to log scale
+      zdose <- log(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
+      variables$zdose$queue_update(values = zdose, index = target)
+    } else {
+      # initial dose
+      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+      variables$zdose$queue_update(values = zdose, index = target)
+    }
 
-  ef_infection <- vaccine_efficacy_infection(ab_titre = z1,parameters = parameters)
-  ef_severe <- vaccine_efficacy_severe(ab_titre = z1,ef_infection = ef_infection,parameters = parameters)
+  } else {
+    # uncorrelated doses (also use for dose 1 of correlated dose titre)
+    zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+  }
+
+  variables$ab_titre$queue_update(values = zdose, index = target)
+
+  ef_infection <- vaccine_efficacy_infection(ab_titre = zdose,parameters = parameters)
+  ef_severe <- vaccine_efficacy_severe(ab_titre = zdose,ef_infection = ef_infection,parameters = parameters)
 
   variables$ef_infection$queue_update(values = ef_infection, index = target)
   variables$ef_severe$queue_update(values = ef_severe, index = target)

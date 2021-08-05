@@ -4,6 +4,8 @@
 
 rm(list=ls());gc()
 library(individual)
+library(data.table)
+library(ggplot2)
 library(safir)
 library(nimue)
 
@@ -51,13 +53,13 @@ parameters$dose_period <- dose_period
 parameters$N_phase <- vaccine_doses
 
 # attach Ab dynamics parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
 parameters <- c(parameters, ab_parameters)
 
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
-variables <- create_vaccine_variables(variables = variables,pop = parameters$population,max_dose = vaccine_doses)
+variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 
 # create events
 events <- create_events(parameters = parameters)
