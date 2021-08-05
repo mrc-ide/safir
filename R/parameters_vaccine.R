@@ -8,10 +8,12 @@
 #' @title Get vaccine efficacy and Ab titre parameters
 #' @param vaccine which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"
 #' @param max_dose maximum number of doses
+#' @param correlated are doses correlated?
 #' @description Get parameters for vaccine efficacy and antibody titre decay rate.
 #' @export
-get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2) {
+get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = FALSE) {
   stopifnot(max_dose == 2)
+  stopifnot(is.logical(correlated))
   stopifnot(vaccine %in% c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"))
 
   mu_ab_list <- data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
@@ -45,7 +47,8 @@ get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2) {
     std10 = std10,
     ab_50 = ab_50,
     ab_50_severe = ab_50_severe,
-    k = k
+    k = k,
+    correlated = correlated
   )
   return(parameters)
 }

@@ -32,10 +32,9 @@ create_events_vaccination <- function(events, parameters) {
 #' @param target a \code{\link[individual]{Bitset}}
 #' @param dose which dose
 #' @param parameters model parameters
-#' @param correlated are doses correlated?
 #' @importFrom stats rnorm
 #' @export
-schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters, correlated = FALSE) {
+schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters) {
 
   variables$dose_num$queue_update(value = dose,index = target)
   variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
@@ -46,34 +45,15 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters,
     n <- length(target)
   }
 
-  # if (dose > 1 & correlated) {
-  #
-  #   # for each person getting dose n we need to find out when they got dose n-1
-  #   time_since_last_dose <- get_time_since_last_dose(
-  #     timestep = timestep,dt = dt,vaccinated = target,dose_num = variables$dose_num,dose_time = variables$dose_time,N_phase = parameters$N_phase
-  #   )
-  #
-  #   # ceiling to go to next integer day and do not exceed the end of decay rate vector
-  #   time_since_last_dose <- ceiling(time_since_last_dose)
-  #   time_since_last_dose[time_since_last_dose > length(parameters$dr_vec)] <- length(parameters$dr_vec)
-  #
-  # } else {
-  #   zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
-  #
-  #   variables$ab_titre$queue_update(values = zdose, index = target)
-  #
-  #   ef_infection <- vaccine_efficacy_infection(ab_titre = zdose,parameters = parameters)
-  #   ef_severe <- vaccine_efficacy_severe(ab_titre = zdose,ef_infection = ef_infection,parameters = parameters)
-  #
-  #   variables$ef_infection$queue_update(values = ef_infection, index = target)
-  #   variables$ef_severe$queue_update(values = ef_severe, index = target)
-  # }
-
-  # if (timestep > 50) {
-  #   browser()
-  # }
-
-  zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+  if (parameters$correlated & dose > 1) {
+    # correlated doses > 1; use ratio of mean titre
+    zdose_prev <- variables$zdose$get_values(index = target)
+    zdose <- log10(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
+    variables$zdose$queue_update(values = zdose, index = target)
+  } else {
+    # uncorrelated doses (also use for dose 1 of correlated dose titre)
+    zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+  }
 
   variables$ab_titre$queue_update(values = zdose, index = target)
 

@@ -4,7 +4,7 @@
 \alias{create_vaccine_variables}
 \title{Create vaccination variables (multi-dose, no types)}
 \usage{
-create_vaccine_variables(variables, pop, max_dose = 2)
+create_vaccine_variables(variables, pop, max_dose = 2, correlated = FALSE)
 }
 \arguments{
 \item{variables}{a list}
@@ -12,6 +12,8 @@ create_vaccine_variables(variables, pop, max_dose = 2)
 \item{pop}{population list}
 
 \item{max_dose}{maximum number of possible doses}
+
+\item{correlated}{if \code{TRUE}, store an additional}
 }
 \value{
 named list of individual::Variable
