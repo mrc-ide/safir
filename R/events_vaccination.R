@@ -45,11 +45,19 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
     n <- length(target)
   }
 
-  if (parameters$correlated & dose > 1) {
-    # correlated doses > 1; use ratio of mean titre
-    zdose_prev <- variables$zdose$get_values(index = target)
-    zdose <- log10(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
-    variables$zdose$queue_update(values = zdose, index = target)
+  if (parameters$correlated) {
+
+    if (dose > 1) {
+      # correlated doses > 1; use ratio of mean titre
+      zdose_prev <- variables$zdose$get_values(index = target)
+      zdose <- log10(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
+      variables$zdose$queue_update(values = zdose, index = target)
+    } else {
+      # uncorrelated doses (also use for dose 1 of correlated dose titre)
+      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+      variables$zdose$queue_update(values = zdose, index = target)
+    }
+
   } else {
     # uncorrelated doses (also use for dose 1 of correlated dose titre)
     zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
