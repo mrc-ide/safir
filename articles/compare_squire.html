@@ -162,14 +162,14 @@
     <span class="va">variables</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_variables.html">create_variables</a></span><span class="op">(</span>pop <span class="op">=</span> <span class="va">pop</span>, parameters <span class="op">=</span> <span class="va">parameters</span><span class="op">)</span>
     <span class="va">events</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span><span class="op">)</span>
     <span class="fu"><a href="../reference/attach_event_listeners.html">attach_event_listeners</a></span><span class="op">(</span>variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,parameters <span class="op">=</span> <span class="va">parameters</span>, dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
-    <span class="va">renderer</span> <span class="op">&lt;-</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/individual/man/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
+    <span class="va">renderer</span> <span class="op">&lt;-</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
     <span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
       <span class="fu"><a href="../reference/infection_process_cpp.html">infection_process_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
       <span class="fu"><a href="../reference/categorical_count_renderer_process_daily.html">categorical_count_renderer_process_daily</a></span><span class="op">(</span><span class="va">renderer</span>, <span class="va">variables</span><span class="op">$</span><span class="va">state</span>, categories <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
     <span class="op">)</span>
     <span class="fu"><a href="../reference/setup_events.html">setup_events</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 
-    <span class="fu">individual</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/individual/man/simulation_loop.html">simulation_loop</a></span><span class="op">(</span>
+    <span class="fu">individual</span><span class="fu">::</span><span class="fu"><a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html">simulation_loop</a></span><span class="op">(</span>
       variables <span class="op">=</span> <span class="va">variables</span>,
       events <span class="op">=</span> <span class="va">events</span>,
       processes <span class="op">=</span> <span class="va">processes</span>,
@@ -181,7 +181,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  19.031   0.617  22.363</span></code></pre></div>
+<span class="co">#&gt;  19.460   0.636  22.418</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
