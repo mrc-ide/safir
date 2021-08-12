@@ -40,7 +40,7 @@ get_parameters <- function(iso3c = NULL,
         population = population,
         country = country,
         contact_matrix_set = contact_matrix_set,
-        dt = 1, # dt should always be 1 as individual is always a discrete time
+        # dt = 1, # dt should always be 1 as individual is always a discrete time
         time_period = time_period,
         ...)
 

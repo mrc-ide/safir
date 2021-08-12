@@ -54,4 +54,45 @@ get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = 
 }
 
 
+#' @title Combine and verify vaccine parameters
+#' @param safir_parameters a list from \code{\link{get_parameters}}
+#' @param vaccine_ab_parameters a list from \code{\link{get_vaccine_ab_titre_parameters}}
+#' @param vaccine_set a vector
+#' @param dose_period a vector giving the minimum delay between doses
+#' @param strategy_matrix a vaccine strategy matrix from \code{\link[nimue]{strategy_matrix}}
+#' @param next_dose_priority_matrix a binary matrix giving age groups prioritized for next dose;
+#' it should have one fewer row than the number of doses being given, because on the
+#' final allocation phase there will be no future dose to prioritize
+#' @description Combine parameters for simulation and verify for correctness.
+#' @export
+make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vaccine_set, dose_period, strategy_matrix, next_dose_priority_matrix) {
 
+  parameters <- safir_parameters
+
+  vaccine_doses <- length(dose_period)
+  stopifnot(vaccine_doses >= 1)
+  if (vaccine_doses > 1) {
+    stopifnot(all(is.finite(dose_period[2:vaccine_doses])))
+    stopifnot(all(dose_period[2:vaccine_doses] >= 0))
+  }
+
+  parameters$N_phase <- vaccine_doses
+  parameters$dose_period <- dose_period
+
+  stopifnot(all(is.finite(vaccine_set)))
+  stopifnot(all(vaccine_set >= 0))
+
+  parameters$vaccine_set <- vaccine_set
+
+  storage.mode(next_dose_priority_matrix) <- "integer"
+  stopifnot(nrow(next_dose_priority_matrix) == vaccine_doses - 1)
+  stopifnot(ncol(next_dose_priority_matrix) == ncol(strategy_matrix))
+
+  parameters$N_prioritisation_steps <- nrow(strategy_matrix)
+  parameters$vaccine_coverage_mat <- strategy_matrix
+  parameters$next_dose_priority <- next_dose_priority_matrix
+
+  parameters <- c(parameters, vaccine_ab_parameters)
+
+  return(parameters)
+}

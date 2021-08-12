@@ -37,7 +37,8 @@ parameters <- safir::get_parameters(
   contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
-  time_period = tmax
+  time_period = tmax,
+  dt = dt
 )
 # parameters$IAsymp_0[1:17] <- 3 # some additional infectives at t=0
 # parameters$population <- parameters$population + 3
