@@ -20,14 +20,13 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- c(0, rep(1e4, times = (tmax/dt)-1))
+vaccine_set <- c(0, rep(1e4, times = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
 vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
-storage.mode(next_dose_priority) <- "integer"
 
 # base parameters
 parameters <- safir::get_parameters(
@@ -35,24 +34,26 @@ parameters <- safir::get_parameters(
   contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
-  time_period = tmax
+  time_period = tmax,
+  dt = dt
 )
 
-# attach vaccine parameters (roll into function eventually)
-parameters$N_prioritisation_steps <- nrow(vaccine_coverage_mat)
-parameters$vaccine_coverage_mat <- vaccine_coverage_mat
-parameters$next_dose_priority <- next_dose_priority
+# vaccine parameters
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
 
-parameters$vaccine_set <- vaccine_set
-parameters$dose_period <- dose_period
-parameters$N_phase <- vaccine_doses
+# combine parameters and verify
+parameters <- make_vaccine_parameters(
+  safir_parameters = parameters,
+  vaccine_ab_parameters = ab_parameters,
+  vaccine_set = vaccine_set,
+  dose_period = dose_period,
+  strategy_matrix = vaccine_coverage_mat,
+  next_dose_priority_matrix = next_dose_priority
+)
 
-# attach Ab dynamics parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses)
 # super effective
-ab_parameters$ab_50 <- 2e-12
-ab_parameters$ab_50_severe <- 2e-12
-parameters <- c(parameters, ab_parameters)
+parameters$ab_50 <- 2e-12
+parameters$ab_50_severe <- 2e-12
 
 # create variables
 timesteps <- parameters$time_period/dt
