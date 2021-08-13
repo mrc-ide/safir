@@ -19,6 +19,7 @@
 //' @param discrete_age a \code{\link[individual]{IntegerVariable}}
 //' @param v0_to_v1v2 a \code{\link[individual]{TargetedEvent}}
 //' @param dt size of time step
+//' @export
 // [[Rcpp::export]]
 Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(
     Rcpp::List parameters,

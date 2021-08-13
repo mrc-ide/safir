@@ -39,7 +39,7 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = (tmax/dt)-1))
+vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy

@@ -17,6 +17,7 @@
 //' @param discrete_age a \code{\link[individual]{IntegerVariable}}
 //' @param exposure a \code{\link[individual]{TargetedEvent}}
 //' @param dt size of time step
+//' @export
 // [[Rcpp::export]]
 Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
     Rcpp::List parameters,
