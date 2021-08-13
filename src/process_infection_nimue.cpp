@@ -35,8 +35,13 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
   std::vector<double> beta(17, 0.);
   std::vector<double> lambda(17, 0.);
 
+  // parameters that remain constant over simulation
+  Rcpp::NumericMatrix rel_inf = Rcpp::as<Rcpp::NumericMatrix>(parameters["rel_infectiousness_vaccinated"]);
+  std::vector<double> rel_inf_age = Rcpp::as<std::vector<double>>(parameters["rel_infectiousness"]);
+
+  // the process lambda
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
+    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age](size_t t) mutable {
 
       individual_index_t infectious = states->get_index_of(inf_states);
 
@@ -53,13 +58,12 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
 
         // compute cross tab for relative infectiousness, multiply by that matrix, and sum it out
         Rcpp::NumericMatrix inf_age_vax = cross_tab_margins_internal(ages, inf_vaxx, 17, 4);
-        Rcpp::NumericMatrix rel_inf = Rcpp::as<Rcpp::NumericMatrix>(parameters["rel_infectiousness_vaccinated"]);
         std::vector<double> inf_ages = mult_2matrix_rowsum(inf_age_vax, rel_inf);
 
         // calculate FoI for each age group
         Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
         std::fill(beta.begin(), beta.end(), get_vector_cpp(parameters["beta_set"], tnow));
-        std::vector<double> m_inf_ages_rel = matrix_2vec_mult_cpp(m, inf_ages, Rcpp::as<std::vector<double>>(parameters["rel_infectiousness"]));
+        std::vector<double> m_inf_ages_rel = matrix_2vec_mult_cpp(m, inf_ages, rel_inf_age);
         std::transform(beta.begin(), beta.end(), m_inf_ages_rel.begin(), lambda.begin(), std::multiplies<double>());
 
         // FoI for each susceptible person

@@ -1,6 +1,3 @@
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # **safir**
 
 <!-- badges: start -->
@@ -34,14 +31,14 @@ This includes the following vignettes:
 
 -   **`Squire Validation Run`**: comparison of
     [`{safir}`](https://github.com/mrc-ide/safir) to
-    [`{squire}`](https://github.com/mrc-ide/squire)
+    [`{squire}`](https://github.com/mrc-ide/squire).
 -   **`Nimue Validation Run`**: comparison of
     [`{safir}`](https://github.com/mrc-ide/safir) to
-    [`{nimue}`](https://github.com/mrc-ide/nimue)
+    [`{nimue}`](https://github.com/mrc-ide/nimue).
+-   **`Vaccine model with multiple doses`**: runs the model for
+    explicit tracking of antibody titre for a 2 dose vaccine.
 -   **`Code Design`**: a diary of ideas, notes, etc. as
     [`{safir}`](https://github.com/mrc-ide/safir) is developed.
--   **`Parameters`**: how parameters from the compartmental models are
-    translated to the individual based model. Not written yet.
 
 ## License
 
