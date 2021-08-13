@@ -18,7 +18,7 @@ make_vaccine_parameters(
 
 \item{vaccine_ab_parameters}{a list from \code{\link{get_vaccine_ab_titre_parameters}}}
 
-\item{vaccine_set}{a vector}
+\item{vaccine_set}{a vector giving the number of doses available each day (not each timestep)}
 
 \item{dose_period}{a vector giving the minimum delay between doses}
 

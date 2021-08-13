@@ -90,6 +90,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cross_tab_margins_internal
+Rcpp::NumericMatrix cross_tab_margins_internal(const std::vector<int>& a, const std::vector<int>& b, const int a_margin, const int b_margin);
+RcppExport SEXP _safir_cross_tab_margins_internal(SEXP aSEXP, SEXP bSEXP, SEXP a_marginSEXP, SEXP b_marginSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const int >::type a_margin(a_marginSEXP);
+    Rcpp::traits::input_parameter< const int >::type b_margin(b_marginSEXP);
+    rcpp_result_gen = Rcpp::wrap(cross_tab_margins_internal(a, b, a_margin, b_margin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tab_bins
 std::vector<int> tab_bins(const std::vector<int>& a, const int nbins);
 RcppExport SEXP _safir_tab_bins(SEXP aSEXP, SEXP nbinsSEXP) {
@@ -196,6 +210,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
     {"_safir_infection_process_vaccine_cpp_internal", (DL_FUNC) &_safir_infection_process_vaccine_cpp_internal, 6},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
+    {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {"_safir_get_vector_cpp", (DL_FUNC) &_safir_get_vector_cpp, 2},

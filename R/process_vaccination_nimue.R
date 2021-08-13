@@ -96,7 +96,7 @@ vaccination_process_nimue_cpp <- function(parameters, variables, events, dt) {
   stopifnot("v0_to_v1v2" %in% names(events))
 
   return(
-    vaccination_process_nimue_cpp_internal(
+    safir:::vaccination_process_nimue_cpp_internal(
       parameters = parameters,
       states = variables$states$.variable,
       eligible = variables$eligible$.bitset,

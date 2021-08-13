@@ -72,6 +72,10 @@ cross_tab_margins <- function(a, b, a_margin, b_margin) {
     .Call('_safir_cross_tab_margins', PACKAGE = 'safir', a, b, a_margin, b_margin)
 }
 
+cross_tab_margins_internal <- function(a, b, a_margin, b_margin) {
+    .Call('_safir_cross_tab_margins_internal', PACKAGE = 'safir', a, b, a_margin, b_margin)
+}
+
 #' @title Tabulate a vector of observations
 #' @description Tabulate a vector \code{a} whose values fall into a set of integers
 #' of maximum value \code{nbins}. This function does no argument checking so please

@@ -52,7 +52,8 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
 
         // compute cross tab for relative infectiousness, multiply by that matrix, and sum it out
         Rcpp::NumericMatrix inf_age_vax = cross_tab_margins_internal(ages, inf_vaxx, 17, 4);
-        std::vector<double> inf_ages = mult_2matrix_rowsum(inf_age_vax, Rcpp::as<Rcpp::NumericMatrix>(parameters["rel_infectiousness_vaccinated"]));
+        Rcpp::NumericMatrix rel_inf = Rcpp::as<Rcpp::NumericMatrix>(parameters["rel_infectiousness_vaccinated"]);
+        std::vector<double> inf_ages = mult_2matrix_rowsum(inf_age_vax, rel_inf);
 
         // calculate FoI for each age group
         Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);

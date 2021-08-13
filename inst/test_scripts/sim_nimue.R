@@ -39,7 +39,8 @@ parameters <- get_parameters_nimue(
   R0 = R0,
   max_vaccine = max_vaccine,
   tt_vaccine = tt_vaccine,
-  vaccine_coverage_mat = vaccine_coverage_mat
+  vaccine_coverage_mat = vaccine_coverage_mat,
+  dt = dt
 )
 
 timesteps <- parameters$time_period/dt
@@ -53,19 +54,9 @@ events <- create_events_nimue(events = events,parameters = parameters)
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_nimue(variables = variables,events = events,parameters = parameters,dt = dt)
 
-# # this is bad and i should feel bad
-# events$exposure$.listeners[[2]] <- NULL
-# events$exposure$add_listener(
-#   safir:::create_exposure_scheduler_listener_nimue(
-#     events = events,
-#     variables = variables,
-#     parameters = parameters,
-#     dt = dt
-#   )
-# )
-
 renderer <- Render$new(parameters$time_period)
 vaxx_renderer <- Render$new(parameters$time_period)
+
 processes <- list(
   vaccination_process_nimue_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_nimue_cpp(parameters = parameters,variables = variables,events = events,dt = dt),

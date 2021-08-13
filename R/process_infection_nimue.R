@@ -84,7 +84,7 @@ infection_process_nimue_cpp <- function(parameters, variables, events, dt) {
   stopifnot("exposure" %in% names(events))
 
   return(
-    infection_process_nimue_cpp_internal(
+    safir:::infection_process_nimue_cpp_internal(
       parameters = parameters,
       states = variables$states$.variable,
       vaccine_states = variables$vaccine_states$.variable,

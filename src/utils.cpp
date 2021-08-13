@@ -37,6 +37,7 @@ Rcpp::IntegerMatrix cross_tab_margins(
   return out;
 };
 
+// [[Rcpp::export]]
 Rcpp::NumericMatrix cross_tab_margins_internal(
     const std::vector<int>& a,
     const std::vector<int>& b,
@@ -47,7 +48,7 @@ Rcpp::NumericMatrix cross_tab_margins_internal(
   Rcpp::NumericMatrix out(a_margin, b_margin);
 
   for (auto i = 0u; i < a.size(); ++i) {
-    out(a[i]-1, b[i]-1)++;
+    out(a[i]-1, b[i]-1) += 1.0;
   }
 
   return out;

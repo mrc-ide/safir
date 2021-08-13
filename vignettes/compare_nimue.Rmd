@@ -70,7 +70,8 @@ parameters <- get_parameters_nimue(
   max_vaccine = c(0, seq(10, 1e4, length.out = 40)),
   tt_vaccine = c(0, seq(10, 50, length.out = 40)),
   vaccine_efficacy_disease = rep(0, 17),
-  vaccine_efficacy_infection = rep(0.9, 17)
+  vaccine_efficacy_infection = rep(0.9, 17),
+  dt = dt
 )
 
 timesteps <- parameters$time_period/dt

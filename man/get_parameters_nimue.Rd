@@ -4,7 +4,14 @@
 \alias{get_parameters_nimue}
 \title{Get parameters for safir (nimue vaccine model)}
 \usage{
-get_parameters_nimue(population, contact_mat, time_period, max_age = 100, ...)
+get_parameters_nimue(
+  population,
+  contact_mat,
+  time_period,
+  max_age = 100,
+  dt = 1,
+  ...
+)
 }
 \arguments{
 \item{population}{integer vector of population by age group}
@@ -14,6 +21,8 @@ get_parameters_nimue(population, contact_mat, time_period, max_age = 100, ...)
 \item{time_period}{maximum time of simulation}
 
 \item{max_age}{max age for humans}
+
+\item{dt}{time step size}
 
 \item{...}{Other parameters for \code{\link[nimue]{parameters}}}
 }
