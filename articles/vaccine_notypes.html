@@ -120,14 +120,13 @@
 <span class="co"># vaccine dosing</span>
 <span class="va">vaccine_doses</span> <span class="op">&lt;-</span> <span class="fl">2</span>
 <span class="va">dose_period</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">NaN</span>, <span class="fl">28</span><span class="op">)</span>
-<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">1e3</span>, to <span class="op">=</span> <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="op">(</span><span class="va">tmax</span><span class="op">/</span><span class="va">dt</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">1e3</span>, to <span class="op">=</span> <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="va">tmax</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">floor</a></span><span class="op">(</span><span class="va">vaccine_set</span><span class="op">)</span>
 
 <span class="co"># vaccine strategy</span>
 <span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html">strategy_matrix</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"Elderly"</span>,max_coverage <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
 <span class="va">next_dose_priority</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fl">0</span>, nrow <span class="op">=</span> <span class="va">vaccine_doses</span> <span class="op">-</span> <span class="fl">1</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">vaccine_coverage_mat</span><span class="op">)</span><span class="op">)</span>
 <span class="va">next_dose_priority</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">15</span><span class="op">:</span><span class="fl">17</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># prioritize 3 oldest age groups for next dose</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mode.html">storage.mode</a></span><span class="op">(</span><span class="va">next_dose_priority</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"integer"</span>
 
 <span class="co"># base parameters</span>
 <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span>
@@ -135,21 +134,22 @@
   contact_matrix_set <span class="op">=</span> <span class="va">contact_mat</span>,
   iso3c <span class="op">=</span> <span class="va">iso3c</span>,
   R0 <span class="op">=</span> <span class="va">R0</span>,
-  time_period <span class="op">=</span> <span class="va">tmax</span>
+  time_period <span class="op">=</span> <span class="va">tmax</span>,
+  dt <span class="op">=</span> <span class="va">dt</span>
 <span class="op">)</span>
 
-<span class="co"># attach vaccine parameters (roll into function eventually)</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">N_prioritisation_steps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">vaccine_coverage_mat</span><span class="op">)</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="va">vaccine_coverage_mat</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">next_dose_priority</span> <span class="op">&lt;-</span> <span class="va">next_dose_priority</span>
+<span class="co"># vaccine parameters</span>
+<span class="va">ab_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_vaccine_ab_titre_parameters.html">get_vaccine_ab_titre_parameters</a></span><span class="op">(</span>vaccine <span class="op">=</span> <span class="st">"Pfizer"</span>, max_dose <span class="op">=</span> <span class="va">vaccine_doses</span>,correlated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="va">parameters</span><span class="op">$</span><span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="va">vaccine_set</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">dose_period</span> <span class="op">&lt;-</span> <span class="va">dose_period</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">N_phase</span> <span class="op">&lt;-</span> <span class="va">vaccine_doses</span>
-
-<span class="co"># attach Ab dynamics parameters</span>
-<span class="va">ab_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_vaccine_ab_titre_parameters.html">get_vaccine_ab_titre_parameters</a></span><span class="op">(</span>vaccine <span class="op">=</span> <span class="st">"Pfizer"</span>, max_dose <span class="op">=</span> <span class="va">vaccine_doses</span><span class="op">)</span>
-<span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">parameters</span>, <span class="va">ab_parameters</span><span class="op">)</span></code></pre></div>
+<span class="co"># combine parameters and verify</span>
+<span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_vaccine_parameters.html">make_vaccine_parameters</a></span><span class="op">(</span>
+  safir_parameters <span class="op">=</span> <span class="va">parameters</span>,
+  vaccine_ab_parameters <span class="op">=</span> <span class="va">ab_parameters</span>,
+  vaccine_set <span class="op">=</span> <span class="va">vaccine_set</span>,
+  dose_period <span class="op">=</span> <span class="va">dose_period</span>,
+  strategy_matrix <span class="op">=</span> <span class="va">vaccine_coverage_mat</span>,
+  next_dose_priority_matrix <span class="op">=</span> <span class="va">next_dose_priority</span>
+<span class="op">)</span></code></pre></div>
 <p>Now we make the variables, events, and processes used in the model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create variables</span>
@@ -197,7 +197,7 @@
   timesteps <span class="op">=</span> <span class="va">timesteps</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  10.632   0.381  11.045</span></code></pre></div>
+<span class="co">#&gt;  10.834   0.360  11.780</span></code></pre></div>
 <p>Plot. This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won’t look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot: ab titre</span>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get parameters for safir (nimue vaccine model) — get_parameters_nimue • safir</title>
+<title>Combine and verify vaccine parameters — make_vaccine_parameters • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Get parameters for safir (nimue vaccine model) — get_parameters_nimue" />
-<meta property="og:description" content="This calls parameters from nimue." />
+<meta property="og:title" content="Combine and verify vaccine parameters — make_vaccine_parameters" />
+<meta property="og:description" content="Combine parameters for simulation and verify for correctness." />
 
 
 
@@ -127,50 +127,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get parameters for safir (nimue vaccine model)</h1>
+    <h1>Combine and verify vaccine parameters</h1>
     
-    <div class="hidden name"><code>get_parameters_nimue.Rd</code></div>
+    <div class="hidden name"><code>make_vaccine_parameters.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This calls <code><a href='https://rdrr.io/pkg/nimue/man/parameters.html'>parameters</a></code> from <a href='https://mrc-ide.github.io/nimue/index.html'>nimue</a>.</p>
+    <p>Combine parameters for simulation and verify for correctness.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_parameters_nimue</span><span class='op'>(</span>
-  <span class='va'>population</span>,
-  <span class='va'>contact_mat</span>,
-  <span class='va'>time_period</span>,
-  max_age <span class='op'>=</span> <span class='fl'>100</span>,
-  dt <span class='op'>=</span> <span class='fl'>1</span>,
-  <span class='va'>...</span>
+    <pre class="usage"><span class='fu'>make_vaccine_parameters</span><span class='op'>(</span>
+  <span class='va'>safir_parameters</span>,
+  <span class='va'>vaccine_ab_parameters</span>,
+  <span class='va'>vaccine_set</span>,
+  <span class='va'>dose_period</span>,
+  <span class='va'>strategy_matrix</span>,
+  <span class='va'>next_dose_priority_matrix</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>population</th>
-      <td><p>integer vector of population by age group</p></td>
+      <th>safir_parameters</th>
+      <td><p>a list from <code><a href='get_parameters.html'>get_parameters</a></code></p></td>
     </tr>
     <tr>
-      <th>contact_mat</th>
-      <td><p>a contact matrix from <code><a href='https://rdrr.io/pkg/squire/man/get_mixing_matrix.html'>get_mixing_matrix</a></code></p></td>
+      <th>vaccine_ab_parameters</th>
+      <td><p>a list from <code><a href='get_vaccine_ab_titre_parameters.html'>get_vaccine_ab_titre_parameters</a></code></p></td>
     </tr>
     <tr>
-      <th>time_period</th>
-      <td><p>maximum time of simulation</p></td>
+      <th>vaccine_set</th>
+      <td><p>a vector giving the number of doses available each day (not each timestep)</p></td>
     </tr>
     <tr>
-      <th>max_age</th>
-      <td><p>max age for humans</p></td>
+      <th>dose_period</th>
+      <td><p>a vector giving the minimum delay between doses</p></td>
     </tr>
     <tr>
-      <th>dt</th>
-      <td><p>time step size</p></td>
+      <th>strategy_matrix</th>
+      <td><p>a vaccine strategy matrix from <code><a href='https://rdrr.io/pkg/nimue/man/strategy_matrix.html'>strategy_matrix</a></code></p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Other parameters for <code><a href='https://rdrr.io/pkg/nimue/man/parameters.html'>parameters</a></code></p></td>
+      <th>next_dose_priority_matrix</th>
+      <td><p>a binary matrix giving age groups prioritized for next dose;
+it should have one fewer row than the number of doses being given, because on the
+final allocation phase there will be no future dose to prioritize</p></td>
     </tr>
     </table>
 

@@ -149,7 +149,8 @@
   max_vaccine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span>,
   tt_vaccine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, length.out <span class="op">=</span> <span class="fl">40</span><span class="op">)</span><span class="op">)</span>,
   vaccine_efficacy_disease <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">17</span><span class="op">)</span>,
-  vaccine_efficacy_infection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">17</span><span class="op">)</span>
+  vaccine_efficacy_infection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">17</span><span class="op">)</span>,
+  dt <span class="op">=</span> <span class="va">dt</span>
 <span class="op">)</span>
 
 <span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">/</span><span class="va">dt</span>
@@ -184,7 +185,7 @@
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  48.230   2.440  52.626</span></code></pre></div>
+<span class="co">#&gt;  48.220   2.485  51.390</span></code></pre></div>
 </div>
 <div id="plot-vaccinations" class="section level2">
 <h2 class="hasAnchor">

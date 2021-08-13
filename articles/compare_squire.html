@@ -143,7 +143,7 @@
   time_period <span class="op">=</span> <span class="fl">200</span>,
   replicates <span class="op">=</span> <span class="va">nrep</span>,
   day_return <span class="op">=</span> <span class="cn">TRUE</span>,
-  R0 <span class="op">=</span> <span class="fl">2</span>,
+  R0 <span class="op">=</span> <span class="va">R0</span>,
   dt <span class="op">=</span> <span class="va">dt</span>
 <span class="op">)</span></code></pre></div>
 </div>
@@ -181,7 +181,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  19.580   0.644  23.966</span></code></pre></div>
+<span class="co">#&gt;  20.270   0.610  21.387</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
