@@ -12,6 +12,7 @@
 #' @param discrete_age a \code{\link[individual]{IntegerVariable}}
 #' @param v0_to_v1v2 a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
+#' @export
 vaccination_process_nimue_cpp_internal <- function(parameters, states, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt) {
     .Call('_safir_vaccination_process_nimue_cpp_internal', PACKAGE = 'safir', parameters, states, eligible, vaccinated, empty, discrete_age, v0_to_v1v2, dt)
 }
@@ -37,6 +38,7 @@ infection_process_cpp_internal <- function(parameters, states, discrete_age, exp
 #' @param discrete_age a \code{\link[individual]{IntegerVariable}}
 #' @param exposure a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
+#' @export
 infection_process_nimue_cpp_internal <- function(parameters, states, vaccine_states, discrete_age, exposure, dt) {
     .Call('_safir_infection_process_nimue_cpp_internal', PACKAGE = 'safir', parameters, states, vaccine_states, discrete_age, exposure, dt)
 }
@@ -70,6 +72,10 @@ infection_process_vaccine_cpp_internal <- function(parameters, states, discrete_
 #' @export
 cross_tab_margins <- function(a, b, a_margin, b_margin) {
     .Call('_safir_cross_tab_margins', PACKAGE = 'safir', a, b, a_margin, b_margin)
+}
+
+cross_tab_margins_internal <- function(a, b, a_margin, b_margin) {
+    .Call('_safir_cross_tab_margins_internal', PACKAGE = 'safir', a, b, a_margin, b_margin)
 }
 
 #' @title Tabulate a vector of observations

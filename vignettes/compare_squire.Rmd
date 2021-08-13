@@ -63,7 +63,7 @@ out <- squire::run_explicit_SEEIR_model(
   time_period = 200,
   replicates = nrep,
   day_return = TRUE,
-  R0 = 2,
+  R0 = R0,
   dt = dt
 )
 ```

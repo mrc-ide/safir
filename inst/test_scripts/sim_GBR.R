@@ -18,16 +18,16 @@ pop$n <- as.integer(pop$n / 100)
 # Create our simulation parameters
 R0 <- 2
 time_period <- 200
+dt <- 0.1
 
 parameters <- safir::get_parameters(
   population = pop$n,
   contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
-  time_period = time_period
+  time_period = time_period,
+  dt = dt
 )
-
-dt <- 0.1
 
 
 out <- squire::run_explicit_SEEIR_model(
@@ -37,7 +37,7 @@ out <- squire::run_explicit_SEEIR_model(
   time_period = 200,
   replicates = nrep,
   day_return = TRUE,
-  R0 = 2,
+  R0 = R0,
   dt = dt
 )
 

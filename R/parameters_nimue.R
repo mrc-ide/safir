@@ -11,9 +11,10 @@
 #' @param contact_mat a contact matrix from \code{\link[squire]{get_mixing_matrix}}
 #' @param time_period maximum time of simulation
 #' @param max_age max age for humans
+#' @param dt time step size
 #' @param ... Other parameters for \code{\link[nimue]{parameters}}
 #' @export
-get_parameters_nimue <- function(population, contact_mat, time_period, max_age = 100, ...) {
+get_parameters_nimue <- function(population, contact_mat, time_period, max_age = 100, dt = 1, ...) {
   stopifnot(length(population)==17)
   stopifnot(is.finite(population))
 
@@ -24,6 +25,7 @@ get_parameters_nimue <- function(population, contact_mat, time_period, max_age =
     ...
   )
 
+  pars$dt <- dt
   pars$max_age <- max_age
   pars$time_period <- time_period
 

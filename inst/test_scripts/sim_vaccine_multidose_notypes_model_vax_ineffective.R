@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------------
 #   test vaxx model, multi dose, no types
+#   completely ineffective vaccine
 # --------------------------------------------------------------------------------
 
 rm(list=ls());gc()
@@ -21,15 +22,13 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = (tmax/dt)-1))
+vaccine_set <- c(0, rep(1e4, times = tmax-1))
 vaccine_set <- floor(vaccine_set)
-# vaccine_set <- 0*vaccine_set
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
-storage.mode(next_dose_priority) <- "integer"
 
 # base parameters
 parameters <- safir::get_parameters(
@@ -37,24 +36,26 @@ parameters <- safir::get_parameters(
   contact_matrix_set = contact_mat,
   iso3c = iso3c,
   R0 = R0,
-  time_period = tmax
+  time_period = tmax,
+  dt = dt
 )
-# parameters$IAsymp_0[1:17] <- 3 # some additional infectives at t=0
-# parameters$population <- parameters$population + 3
-# pop$n <- parameters$population # fix this. we don't want to use this twice.
 
-# attach vaccine parameters (roll into function eventually)
-parameters$N_prioritisation_steps <- nrow(vaccine_coverage_mat)
-parameters$vaccine_coverage_mat <- vaccine_coverage_mat
-parameters$next_dose_priority <- next_dose_priority
+# vaccine parameters
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
 
-parameters$vaccine_set <- vaccine_set
-parameters$dose_period <- dose_period
-parameters$N_phase <- vaccine_doses
+# combine parameters and verify
+parameters <- make_vaccine_parameters(
+  safir_parameters = parameters,
+  vaccine_ab_parameters = ab_parameters,
+  vaccine_set = vaccine_set,
+  dose_period = dose_period,
+  strategy_matrix = vaccine_coverage_mat,
+  next_dose_priority_matrix = next_dose_priority
+)
 
-# attach Ab dynamics parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
-parameters <- c(parameters, ab_parameters)
+# super effective
+parameters$ab_50 <- 2e-12
+parameters$ab_50_severe <- 2e-12
 
 # create variables
 timesteps <- parameters$time_period/dt
@@ -88,7 +89,7 @@ processes <- list(
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
   double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
-  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:2,dt = dt)
+  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
@@ -100,9 +101,6 @@ system.time(simulation_loop_vaccine(
   timesteps = timesteps,
   TRUE
 ))
-
-
-
 
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
