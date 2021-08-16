@@ -1,6 +1,6 @@
 # --------------------------------------------------------------------------------
 #   test vaxx model, multi dose, no types
-#   completely ineffective vaccine
+#   completely effective vaccine
 # --------------------------------------------------------------------------------
 
 rm(list=ls());gc()
@@ -53,9 +53,9 @@ parameters <- make_vaccine_parameters(
   next_dose_priority_matrix = next_dose_priority
 )
 
-# super ineffective
-parameters$ab_50 <- 1e4
-parameters$ab_50_severe <- 1e4
+# super effective
+parameters$ab_50 <- 2e-12
+parameters$ab_50_severe <- 2e-12
 
 # create variables
 timesteps <- parameters$time_period/dt

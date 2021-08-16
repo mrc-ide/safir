@@ -73,7 +73,9 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
         // newly infected queue the exposure event
         if (susceptible.size() > 0) {
-          exposure->schedule(susceptible, 0.);
+          // double zero{0.0};
+          // exposure->schedule(susceptible, zero);
+          exposure->schedule(susceptible, 0.0);
         }
       }
 

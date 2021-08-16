@@ -53,9 +53,9 @@ parameters <- make_vaccine_parameters(
   next_dose_priority_matrix = next_dose_priority
 )
 
-# super effective
-parameters$ab_50 <- 2e-12
-parameters$ab_50_severe <- 2e-12
+# super ineffective
+parameters$ab_50 <- 1e4
+parameters$ab_50_severe <- 1e4
 
 # create variables
 timesteps <- parameters$time_period/dt

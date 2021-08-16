@@ -112,7 +112,9 @@ Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(
           // sample who gets vaccinated
           bitset_sample_internal(*eligible, Rf_pexp(vr * dt, 1., 1, 0));
           if (eligible->size() > 0) {
-            v0_to_v1v2->schedule(*eligible, 0.);
+            // double zero{0.0};
+            // v0_to_v1v2->schedule(*eligible, zero);
+            v0_to_v1v2->schedule(*eligible, 0.0);
           }
 
         } // end check
