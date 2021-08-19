@@ -128,7 +128,7 @@ ggplot(data = ab_titre_quant_dt) +
 
 # plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
-colnames(dose_out)[2:4] <- as.character(0:vaccine_doses)
+colnames(dose_out)[2:(vaccine_doses+2)] <- as.character(0:vaccine_doses)
 dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
 setnames(dose_out, "variable", "dose")
 
