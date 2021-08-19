@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------------
 #   test vaxx model, multi dose, no types
+#   completely ineffective vaccine
 # --------------------------------------------------------------------------------
 
 rm(list=ls());gc()
@@ -21,12 +22,11 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-# vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
-vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = (tmax/dt)-1))[1:100]
+vaccine_set <- c(0, rep(1e4, times = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -41,7 +41,7 @@ parameters <- safir::get_parameters(
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -52,6 +52,10 @@ parameters <- make_vaccine_parameters(
   strategy_matrix = vaccine_coverage_mat,
   next_dose_priority_matrix = next_dose_priority
 )
+
+# super ineffective
+parameters$ab_50 <- 1e4
+parameters$ab_50_severe <- 1e4
 
 # create variables
 timesteps <- parameters$time_period/dt
@@ -85,7 +89,7 @@ processes <- list(
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
   double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
-  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:2,dt = dt)
+  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
@@ -97,9 +101,6 @@ system.time(simulation_loop_vaccine(
   timesteps = timesteps,
   TRUE
 ))
-
-
-
 
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
@@ -127,7 +128,7 @@ ggplot(data = ab_titre_quant_dt) +
 
 # plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
-colnames(dose_out)[2:4] <- as.character(0:2)
+colnames(dose_out)[2:4] <- as.character(0:vaccine_doses)
 dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
 setnames(dose_out, "variable", "dose")
 

@@ -1,32 +1,14 @@
----
-title: "Vaccine model with multiple doses"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Vaccine model with multiple doses}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
+# --------------------------------------------------------------------------------
+#   test vaxx model, multi dose, no types
+# --------------------------------------------------------------------------------
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-```{r}
-library(safir)
+rm(list=ls());gc()
 library(individual)
-library(nimue)
 library(data.table)
 library(ggplot2)
-```
+library(safir)
+library(nimue)
 
-Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for multiple doses.
-
-Start by making parameters.
-
-```{r}
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
@@ -39,11 +21,11 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
+vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -58,7 +40,7 @@ parameters <- safir::get_parameters(
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -69,11 +51,7 @@ parameters <- make_vaccine_parameters(
   strategy_matrix = vaccine_coverage_mat,
   next_dose_priority_matrix = next_dose_priority
 )
-```
 
-Now we make the variables, events, and processes used in the model.
-
-```{r}
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
@@ -110,22 +88,18 @@ processes <- list(
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
-```
 
-Run the simulation.
-
-```{r}
 system.time(simulation_loop_vaccine(
   variables = variables,
   events = events,
   processes = processes,
-  timesteps = timesteps
+  timesteps = timesteps,
+  TRUE
 ))
-```
 
-Plot. This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won't look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.
 
-```{r}
+
+
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated <- vaccinated$not()
@@ -150,11 +124,7 @@ ggplot(data = ab_titre_quant_dt) +
   geom_ribbon(aes(x=t,ymin=lo,ymax=hi),alpha=0.5) +
   theme_bw()
 
-```
-
-We also want to plot the number of people with each dose over time to check it's working.
-
-```{r}
+# plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
 colnames(dose_out)[2:4] <- as.character(0:vaccine_doses)
 dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
@@ -163,11 +133,8 @@ setnames(dose_out, "variable", "dose")
 ggplot(data = dose_out) +
   geom_line(aes(x=timestep,y=value,color=dose)) +
   theme_bw()
-```
 
-And the states.
-
-```{r}
+# states
 saf_dt <- as.data.table(renderer$to_dataframe())
 saf_dt[, IMild_count := IMild_count + IAsymp_count]
 saf_dt[, IAsymp_count := NULL]
@@ -179,13 +146,4 @@ ggplot(data = saf_dt, aes(t,y,color = compartment)) +
   geom_line() +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
-```
 
-
-## Vaccine allocation algorithm
-
-Two concepts: `step` which occurs within a `phase`. Step refers to which step of the coverage prioritisation matrix (afterwards, strategy matrix)
-we are using to target individuals for a vaccine dose. Phase refers to which dose we are currently distributing.
-
-The strategy matrix used as input to **safir** is exactly the same as the one [described in **nimue**](https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html),
-which is created using the **nimue** function [strategy_matrix](https://mrc-ide.github.io/nimue/reference/strategy_matrix.html).

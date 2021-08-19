@@ -1,6 +1,5 @@
 # --------------------------------------------------------------------------------
 #   test vaxx model, multi dose, no types
-#   completely effective vaccine
 # --------------------------------------------------------------------------------
 
 rm(list=ls());gc()
@@ -20,13 +19,13 @@ dt <- 0.5
 R0 <- 4
 
 # vaccine dosing
-vaccine_doses <- 2
-dose_period <- c(NaN, 28)
-vaccine_set <- c(0, rep(1e4, times = tmax-1))
+vaccine_doses <- 3
+dose_period <- c(NaN, 28, 56)
+vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -41,7 +40,7 @@ parameters <- safir::get_parameters(
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -52,10 +51,6 @@ parameters <- make_vaccine_parameters(
   strategy_matrix = vaccine_coverage_mat,
   next_dose_priority_matrix = next_dose_priority
 )
-
-# super effective
-parameters$ab_50 <- 2e-12
-parameters$ab_50_severe <- 2e-12
 
 # create variables
 timesteps <- parameters$time_period/dt
@@ -102,6 +97,9 @@ system.time(simulation_loop_vaccine(
   TRUE
 ))
 
+
+
+
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated <- vaccinated$not()
@@ -128,7 +126,7 @@ ggplot(data = ab_titre_quant_dt) +
 
 # plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
-colnames(dose_out)[2:4] <- as.character(0:2)
+colnames(dose_out)[2:4] <- as.character(0:vaccine_doses)
 dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
 setnames(dose_out, "variable", "dose")
 
