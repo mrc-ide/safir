@@ -1,5 +1,7 @@
 test_that("get_proportion_vaccinated_all_ages_cpp works", {
 
+  library(individual)
+
   n <- 1e3
   N_age <- 5
   doses <- 3

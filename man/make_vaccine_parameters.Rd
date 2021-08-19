@@ -22,7 +22,8 @@ make_vaccine_parameters(
 
 \item{dose_period}{a vector giving the minimum delay between doses}
 
-\item{strategy_matrix}{a vaccine strategy matrix from \code{\link[nimue]{strategy_matrix}}}
+\item{strategy_matrix}{a vaccine strategy matrix from \code{\link[nimue]{strategy_matrix}}
+or a list of strategy matrices, one for each vaccine dose}
 
 \item{next_dose_priority_matrix}{a binary matrix giving age groups prioritized for next dose;
 it should have one fewer row than the number of doses being given, because on the

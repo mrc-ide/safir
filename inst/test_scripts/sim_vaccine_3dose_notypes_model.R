@@ -19,10 +19,9 @@ dt <- 0.5
 R0 <- 4
 
 # vaccine dosing
-vaccine_doses <- 2
-dose_period <- c(NaN, 28)
-# vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
-vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = (tmax/dt)-1))[1:100]
+vaccine_doses <- 3
+dose_period <- c(NaN, 28, 56)
+vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
@@ -85,7 +84,7 @@ processes <- list(
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
   double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
-  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:2,dt = dt)
+  integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt)
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
@@ -127,7 +126,7 @@ ggplot(data = ab_titre_quant_dt) +
 
 # plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
-colnames(dose_out)[2:4] <- as.character(0:2)
+colnames(dose_out)[2:(vaccine_doses+2)] <- as.character(0:vaccine_doses)
 dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
 setnames(dose_out, "variable", "dose")
 

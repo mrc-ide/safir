@@ -110,9 +110,13 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
   # age groups
   age_size <- parameters$population
 
+  # strategy matrix for this phase
+  vaccine_coverage_mat <- parameters$vaccine_coverage_mat[[phase]]
+  N_prioritisation_steps <- nrow(vaccine_coverage_mat)
+
   stopifnot(is.finite(parameters$N_phase))
   stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
-  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
+  stopifnot(ncol(parameters$next_dose_priority) == ncol(vaccine_coverage_mat))
 
   # calculate coverage for this dose
   coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
@@ -129,17 +133,17 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
     pr_next_dose <- pr_next_dose / age_size
 
     # go through prioritization steps
-    for (p in 1:parameters$N_prioritisation_steps) {
+    for (p in 1:N_prioritisation_steps) {
 
-      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
-      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
+      ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
 
       ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
       # in case an entire row of next_dose_priority matrix was 0
       if (length(ages_2_check_next) < 1) {
         next_dose_not_cover <- FALSE
       } else {
-        next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < parameters$vaccine_coverage_mat[p ,ages_2_check_next])
+        next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < vaccine_coverage_mat[p ,ages_2_check_next])
       }
 
       # if either this dose or prioritized next dose groups not covered, return this step
@@ -155,10 +159,10 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
   } else {
 
     # go through prioritization steps
-    for (p in 1:parameters$N_prioritisation_steps) {
+    for (p in 1:N_prioritisation_steps) {
 
-      ages_2_check <- which(parameters$vaccine_coverage_mat[p, ] > 0)
-      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < parameters$vaccine_coverage_mat[p, ages_2_check])
+      ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
+      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
 
       if (this_dose_not_cover) {
         return(p)

@@ -1,4 +1,3 @@
-library(individual)
 library(nimue)
 
 tmax <- 100
@@ -14,14 +13,14 @@ population <- tab_bins(a = ages,nbins = 17)
 
 # vaccine dosing
 vaccine_doses <- 3
-dose_period <- c(NaN, 14, 7)
-vaccine_set <- rep(80,100)
+dose_period <- c(NaN, 28, 14)
+vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
+vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
 vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(0,nrow = 2, ncol = 17)
-next_dose_priority[1, 15:17] <- 1
-next_dose_priority[2, 10:14] <- 1
+next_dose_priority[1:2, 15:17] <- 1
 
 # base parameters
 parameters <- safir::get_parameters(
@@ -49,7 +48,3 @@ parameters <- make_vaccine_parameters(
 parameters$population <- population
 
 
-variables <- list()
-variables$discrete_age <- IntegerVariable$new(ages)
-
-full_bset <- Bitset$new(n)$insert(1:n)

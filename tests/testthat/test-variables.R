@@ -3,7 +3,7 @@ test_that("create_variables returns the correct output", {
   pop <- get_population("AFG")
 
   pop$n <- as.integer(pop$n/10000)
-  theages <- create_variables(pop, get_parameters("AFG"))
+  theages <- create_variables(pop, get_parameters("AFG", dt = 1))
   expect_length(length(theages$discrete_age), 1)
 
   expect_length(theages$discrete_age$get_values(), sum(pop$n))
@@ -48,7 +48,7 @@ test_that("test identify_ages_to_adjust and swap_ages work", {
   pop$n <- as.integer(pop$n) / 100
 
   parameters <- get_parameters(
-    iso3c = "ATG", population = pop$n
+    iso3c = "ATG", population = pop$n, dt = 1
   )
 
   cont_age <- create_continuous_age_variable(pop, parameters$max_age)
