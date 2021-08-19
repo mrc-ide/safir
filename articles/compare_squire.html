@@ -63,9 +63,6 @@
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
     </li>
     <li>
-      <a href="../articles/params.html">Parameters</a>
-    </li>
-    <li>
       <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
     </li>
   </ul>
@@ -124,16 +121,16 @@
 <span class="co"># Create our simulation parameters</span>
 <span class="va">R0</span> <span class="op">&lt;-</span> <span class="fl">2</span>
 <span class="va">time_period</span> <span class="op">&lt;-</span> <span class="fl">200</span>
+<span class="va">dt</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
 
 <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span>
   population <span class="op">=</span> <span class="va">pop</span><span class="op">$</span><span class="va">n</span>,
   contact_matrix_set <span class="op">=</span> <span class="va">contact_mat</span>,
   iso3c <span class="op">=</span> <span class="va">iso3c</span>,
   R0 <span class="op">=</span> <span class="va">R0</span>,
-  time_period <span class="op">=</span> <span class="va">time_period</span>
-<span class="op">)</span>
-
-<span class="va">dt</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></code></pre></div>
+  time_period <span class="op">=</span> <span class="va">time_period</span>,
+  dt <span class="op">=</span> <span class="va">dt</span>
+<span class="op">)</span></code></pre></div>
 <p>We’re going to compare it to squire. Let’s run that first.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/run_explicit_SEEIR_model.html">run_explicit_SEEIR_model</a></span><span class="op">(</span>
@@ -181,7 +178,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  19.176   0.539  22.179</span></code></pre></div>
+<span class="co">#&gt;  19.732   0.529  20.438</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>

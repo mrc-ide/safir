@@ -104,9 +104,6 @@
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
     </li>
     <li>
-      <a href="../articles/params.html">Parameters</a>
-    </li>
-    <li>
       <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
     </li>
   </ul>
@@ -142,6 +139,7 @@
   contact_matrix_set <span class='op'>=</span> <span class='cn'>NULL</span>,
   time_period <span class='op'>=</span> <span class='fl'>365</span>,
   max_age <span class='op'>=</span> <span class='fl'>100</span>,
+  <span class='va'>dt</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -169,6 +167,10 @@ NULL, which will generate this based on the <code>country</code>.</p></td>
     <tr>
       <th>max_age</th>
       <td><p>the maximum age for humans</p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>Time Step. Default = 0.1</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -63,9 +63,6 @@
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
     </li>
     <li>
-      <a href="../articles/params.html">Parameters</a>
-    </li>
-    <li>
       <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
     </li>
   </ul>
@@ -105,8 +102,11 @@
 <span class="co">#&gt;     format</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
-<p>Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for multiple doses.</p>
-<p>Start by making parameters.</p>
+<div id="setup" class="section level2">
+<h2 class="hasAnchor">
+<a href="#setup" class="anchor"></a>Setup</h2>
+<p>Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for arbitrary number of doses. At the end of this vignette we describe the dose allocation algorithm.</p>
+<p>Start by making parameters. Note that <code>get_vaccine_ab_titre_parameters</code> gets parameters giving antibody titre and decay rates for each supported vaccine type, and that <code>make_vaccine_parameters</code> does final type checking and combines the different parameters into a single list for the simulation. The function <code>make_vaccine_parameters</code> uses a <code>strategy_matrix</code> which is the output of <a href="https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html">strategy_matrix in <strong>nimue</strong></a>. A user can either provide a single matrix that will give the strategy used to allocate all phases (all doses), or a list of matrices, one for each dosing phase.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
 <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">:::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
@@ -150,7 +150,12 @@
   strategy_matrix <span class="op">=</span> <span class="va">vaccine_coverage_mat</span>,
   next_dose_priority_matrix <span class="op">=</span> <span class="va">next_dose_priority</span>
 <span class="op">)</span></code></pre></div>
-<p>Now we make the variables, events, and processes used in the model.</p>
+</div>
+<div id="run-safir" class="section level2">
+<h2 class="hasAnchor">
+<a href="#run-safir" class="anchor"></a>Run <strong>safir</strong>
+</h2>
+<p>Now we make the variables, events, and processes used in the model. In order to track the antibody titre for each vaccinated person, we use a custom function <code>double_count_render_process_daily</code> to write to the output matrix; this is because currently <strong>individual</strong> does not support renderers that track <code>DoubleVariable</code> objects. Unless the antibody titres are a direct object of analysis, it is recommended to not output them, as it slows down the simulation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create variables</span>
 <span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">/</span><span class="va">dt</span>
@@ -197,8 +202,15 @@
   timesteps <span class="op">=</span> <span class="va">timesteps</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  10.520   0.333  11.132</span></code></pre></div>
-<p>Plot. This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won’t look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.</p>
+<span class="co">#&gt;  10.407   0.309  10.732</span></code></pre></div>
+</div>
+<div id="plot-results" class="section level2">
+<h2 class="hasAnchor">
+<a href="#plot-results" class="anchor"></a>Plot Results</h2>
+<div id="antibody-titre" class="section level3">
+<h3 class="hasAnchor">
+<a href="#antibody-titre" class="anchor"></a>Antibody titre</h3>
+<p>This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won’t look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot: ab titre</span>
 <span class="va">vaccinated</span> <span class="op">&lt;-</span> <span class="va">variables</span><span class="op">$</span><span class="va">dose_num</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>set <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
@@ -224,10 +236,14 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>,ymin<span class="op">=</span><span class="va">lo</span>,ymax<span class="op">=</span><span class="va">hi</span><span class="op">)</span>,alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="vaccine_notypes_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+</div>
+<div id="proportion-of-population-with-each-dose" class="section level3">
+<h3 class="hasAnchor">
+<a href="#proportion-of-population-with-each-dose" class="anchor"></a>Proportion of population with each dose</h3>
 <p>We also want to plot the number of people with each dose over time to check it’s working.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dose_out</span> <span class="op">&lt;-</span> <span class="va">dose_renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">vaccine_doses</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="va">vaccine_doses</span><span class="op">)</span>
 <span class="va">dose_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html">as.data.table</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span>,id.vars<span class="op">=</span><span class="st">"timestep"</span><span class="op">)</span>
 <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">setnames</a></span><span class="op">(</span><span class="va">dose_out</span>, <span class="st">"variable"</span>, <span class="st">"dose"</span><span class="op">)</span>
 
@@ -235,7 +251,11 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">timestep</span>,y<span class="op">=</span><span class="va">value</span>,color<span class="op">=</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="vaccine_notypes_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<p>And the states.</p>
+</div>
+<div id="infection-states" class="section level3">
+<h3 class="hasAnchor">
+<a href="#infection-states" class="anchor"></a>Infection states</h3>
+<p>The compartmental states of the model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html">as.data.table</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">saf_dt</span><span class="op">[</span>, <span class="va">IMild_count</span> <span class="op">:=</span> <span class="va">IMild_count</span> <span class="op">+</span> <span class="va">IAsymp_count</span><span class="op">]</span>
@@ -249,11 +269,31 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">compartment</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
 <p><img src="vaccine_notypes_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+</div>
+</div>
+<div id="vaccine-allocation-algorithm" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vaccine-allocation-algorithm" class="anchor"></a>Vaccine allocation algorithm</h2>
+<p>The vaccine dose allocation algorithm is designed to be as similar as possible to the <a href="https://mrc-ide.github.io/nimue/reference/weighted_efficacy.html">weighted_efficacy function from <strong>nimue</strong></a>, generalized to an arbitrary number of doses.</p>
+<p>Vaccine dosing is split into phases, from 1 to the total number of doses. On phase <code>i</code>, dose <code>i</code> is administered to the population until conditions are met. In order to determine when to advance from phase <code>i</code> to <code>i+1</code>, a strategy matrix (coverage prioritisation matrix) is provided, which can be shared across all phases, or a unique strategy matrix for each phase. The strategy matrix used as input to <strong>safir</strong> is exactly the same as the one <a href="https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html">described in <strong>nimue</strong></a>, which is created using the <strong>nimue</strong> function <a href="https://mrc-ide.github.io/nimue/reference/strategy_matrix.html">strategy_matrix</a>. There is an additional piece of input <code>next_dose_priority</code> which describes which (if any) age groups are prioritized for dose <code>i+1</code> while still on phase <code>i</code> (similar to the argument <code>d2_prioritise</code> from <code>weighted_efficacy</code>).</p>
+<p>In order to advance from phase <code>i</code> to <code>i+1</code>, each row (step) of the strategy matrix for that phase must have its coverage targets fulfilled. Additionally, those age groups specified by <code>next_dose_priority</code> must have their next dose coverage targets fulfilled at the same level given by each step of the strategy matrix. Because the strategy matrix will be stepped through before the phase can advance, when the phase goes from <code>i</code> to <code>i+1</code>, we are guaranteed that coverage targets for dose <code>i</code> (and prioritized targets for dose <code>i+1</code>, if any) have been met at the final row of the strategy matrix (the final step).</p>
+<p>The algorithm distributes doses until all phases are complete, at which point no more doses are given, even if there is sufficient supply.</p>
+<p>On a timestep, the algorithm has the following stages (<a href="https://github.com/mrc-ide/safir/blob/main/R/process_vaccination.R">see vaccination_process in R/process_vaccination.R</a>):</p>
+<ol style="list-style-type: decimal">
+<li>Given the current <code>phase</code>, calculate what <code>step</code> of the strategy matrix has not yet been reached.</li>
+<li>If all steps targets’ fulfilled, go on to the next <code>phase</code>.</li>
+<li>Based on this <code>step</code> of the strategy matrix for this <code>phase</code>, find eligible persons (based on what age groups are being targeted, and if the minimum inter-dose time interval has elapsed, if <code>phase &gt; 1</code>). Assign as many doses as possible to these persons.</li>
+<li>If doses remain and this is not the last <code>phase</code>, assign the next dose to those persons prioritized based on <code>next_dose_priority</code>.</li>
+<li>If doses remain, step through the remaining rows of the strategy matrix, assigning doses to individuals in groups that have not yet met their targets.</li>
+</ol>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
