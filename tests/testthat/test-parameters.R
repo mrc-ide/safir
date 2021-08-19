@@ -42,6 +42,7 @@ test_that("test get_parameters returns the correct values from SQUIRE", {
     R0 = R0,
     time_period = time_period,
     tt_contact_matrix = tt_contact_matrix,
+    dt = 1
   )
 
   expect_equal(psq$dur_E, 4.6)
@@ -72,7 +73,8 @@ test_that("test that if max-age is set as NULL get_parameters returns the
     R0 = R0,
     time_period = time_period,
     tt_contact_matrix = tt_contact_matrix,
-    max_age = NULL
+    max_age = NULL,
+    dt = 1
   )
 
   expect_equal(psq$dur_E, 4.6)

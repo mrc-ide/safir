@@ -19,9 +19,13 @@ std::vector<double> get_proportion_vaccinated_all_ages_cpp(
     const int N_age,
     const int dose
 ){
+  // std::cout << "entering get_proportion_vaccinated_all_ages_cpp \n";
   Rcpp::Environment discrete_age_env = Rcpp::as<Rcpp::Environment>(variables["discrete_age"]);
+  // std::cout << "got the discrete_age env \n";
   Rcpp::XPtr<IntegerVariable> discrete_age = Rcpp::as<Rcpp::XPtr<IntegerVariable>>(discrete_age_env[".variable"]);
+  // std::cout << "got the discrete_age xptr \n";
   Rcpp::List dose_time = Rcpp::as<Rcpp::List>(variables["dose_time"]);
+  // std::cout << "made the list of dose times \n";
   std::vector<double> out(N_age, 0.);
   for (int a = 1; a <= N_age; ++a) {
     individual_index_t age_bset = discrete_age->get_index_of_set(a);

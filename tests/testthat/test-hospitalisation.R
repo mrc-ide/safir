@@ -8,7 +8,8 @@ test_that('allocate_treatment can allocate when limit is not exceeded', {
     population = pop$n,
     R0 = 2,
     time_period = 100,
-    tt_contact_matrix = 0
+    tt_contact_matrix = 0,
+    dt = 1
   )
 
   events <- create_events(parameters)
@@ -45,7 +46,8 @@ test_that('allocate_treatment can allocate when limit is exceeded', {
     population = pop$n,
     R0 = 2,
     time_period = 100,
-    tt_contact_matrix = 0
+    tt_contact_matrix = 0,
+    dt = 1
   )
 
   events <- create_events(parameters)

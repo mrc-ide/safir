@@ -32,7 +32,8 @@ test_that("get contact matrix works", {
     population = pop$n,
     contact_matrix_set = contact_mat,
     iso3c = iso3c,
-    time_period = 100
+    time_period = 100,
+    dt = 1
   )
 
   expect_equal(

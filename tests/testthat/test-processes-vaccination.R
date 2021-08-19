@@ -10,7 +10,8 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
     population = pop$n,
     contact_matrix_set = contact_mat,
     iso3c = iso3c,
-    time_period = 365
+    time_period = 365,
+    dt = 1
   )
   parameters$beta_set <- parameters$beta_set*rexp(n = length(parameters$beta_set))
 
