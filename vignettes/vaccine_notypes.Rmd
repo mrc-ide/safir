@@ -180,3 +180,12 @@ ggplot(data = saf_dt, aes(t,y,color = compartment)) +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
 ```
+
+
+## Vaccine allocation algorithm
+
+Two concepts: `step` which occurs within a `phase`. Step refers to which step of the coverage prioritisation matrix (afterwards, strategy matrix)
+we are using to target individuals for a vaccine dose. Phase refers to which dose we are currently distributing.
+
+The strategy matrix used as input to **safir** is exactly the same as the one [described in **nimue**](https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html),
+which is created using the **nimue** function [strategy_matrix](https://mrc-ide.github.io/nimue/reference/strategy_matrix.html).

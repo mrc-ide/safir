@@ -12,7 +12,7 @@
 #' @description Get parameters for vaccine efficacy and antibody titre decay rate.
 #' @export
 get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = FALSE) {
-  stopifnot(max_dose == 2)
+  stopifnot(max_dose %in% c(2,3))
   stopifnot(is.logical(correlated))
   stopifnot(vaccine %in% c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"))
 
@@ -41,9 +41,15 @@ get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = 
     dr_l
   )
 
+  if (max_dose == 3) {
+    mu_ab = rep(c(mu_ab_d1, mu_ab_d2), times = c(1,2))
+  } else {
+    mu_ab = rep(c(mu_ab_d1, mu_ab_d2), times = c(1,1))
+  }
+
   parameters <- list(
     dr_vec = dr_vec,
-    mu_ab = c(mu_ab_d1, mu_ab_d2),
+    mu_ab = mu_ab,
     std10 = std10,
     ab_50 = ab_50,
     ab_50_severe = ab_50_severe,
@@ -60,6 +66,7 @@ get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = 
 #' @param vaccine_set a vector giving the number of doses available each day (not each timestep)
 #' @param dose_period a vector giving the minimum delay between doses
 #' @param strategy_matrix a vaccine strategy matrix from \code{\link[nimue]{strategy_matrix}}
+#' or a list of strategy matrices, one for each vaccine dose
 #' @param next_dose_priority_matrix a binary matrix giving age groups prioritized for next dose;
 #' it should have one fewer row than the number of doses being given, because on the
 #' final allocation phase there will be no future dose to prioritize
@@ -87,10 +94,35 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
 
   storage.mode(next_dose_priority_matrix) <- "integer"
   stopifnot(nrow(next_dose_priority_matrix) == vaccine_doses - 1)
-  stopifnot(ncol(next_dose_priority_matrix) == ncol(strategy_matrix))
 
-  parameters$N_prioritisation_steps <- nrow(strategy_matrix)
-  parameters$vaccine_coverage_mat <- strategy_matrix
+  # one strategy matrix for all dose phases (input matrix)
+  if (inherits(strategy_matrix, 'matrix')) {
+
+    N_age <- ncol(strategy_matrix)
+    # N_prioritisation_steps <- nrow(strategy_matrix)
+
+    strategy_matrix_array <- replicate(n = vaccine_doses, expr = strategy_matrix, simplify = FALSE)
+
+  # one strategy matrix for each dose phase (input list)
+  } else if(inherits(strategy_matrix, 'list')) {
+
+    stopifnot(length(strategy_matrix) == vaccine_doses)
+
+    N_age <- ncol(strategy_matrix[[1]])
+    # N_prioritisation_steps <- nrow(strategy_matrix[[1]])
+
+    strategy_matrix_array <- strategy_matrix
+
+  # bad input
+  } else {
+    stop("invalid object passed for strategy_matrix")
+  }
+
+  stopifnot(ncol(next_dose_priority_matrix) == N_age)
+  stopifnot(parameters$N_age == N_age)
+
+  # parameters$N_prioritisation_steps <- N_prioritisation_steps
+  parameters$vaccine_coverage_mat <- strategy_matrix_array
   parameters$next_dose_priority <- next_dose_priority_matrix
 
   parameters <- c(parameters, vaccine_ab_parameters)

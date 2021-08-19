@@ -27,10 +27,10 @@
 vaccination_process <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("dose_num","dose_time","phase","discrete_age") %in% names(variables)))
-  stopifnot(all(c("N_phase", "dose_period", "vaccine_coverage_mat", "N_prioritisation_steps", "next_dose_priority", "vaccine_set") %in% names(parameters)))
+  stopifnot(all(c("N_phase", "dose_period", "vaccine_coverage_mat", "next_dose_priority", "vaccine_set") %in% names(parameters)))
   stopifnot(is.finite(parameters$N_phase))
   stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
-  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat))
+  stopifnot(ncol(parameters$next_dose_priority) == ncol(parameters$vaccine_coverage_mat[[1]]))
 
   return(
 
@@ -55,7 +55,7 @@ vaccination_process <- function(parameters, variables, events, dt) {
         # calculate what step we are on
         step <- get_vaccination_priority_stage(variables = variables, events = events, phase = phase, parameters = parameters)
 
-        # advance to next phase: recalculate
+        # advance to next phase: recalculate (step = -1 is a signal to advance to the next dosing phase)
         while (step == -1) {
           variables$phase$value <- variables$phase$value + 1L
           phase <- variables$phase$value
@@ -69,7 +69,9 @@ vaccination_process <- function(parameters, variables, events, dt) {
         stopifnot(phase <= parameters$N_phase)
 
         # row of the vaccine coverage matrix
-        p_step <- parameters$vaccine_coverage_mat[step, ]
+        vaccine_coverage_mat <- parameters$vaccine_coverage_mat[[phase]]
+        N_prioritisation_steps <- nrow(vaccine_coverage_mat)
+        p_step <- vaccine_coverage_mat[step, ]
 
         # get eligible persons for this dose phase and strategy step
         eligible <- target_pop(
@@ -97,10 +99,10 @@ vaccination_process <- function(parameters, variables, events, dt) {
         }
 
         # if remaining doses, give out for this dose phase according to the prioritization matrix
-        while( doses_left > 0 & step < parameters$N_prioritisation_steps) {
+        while( doses_left > 0 & step < N_prioritisation_steps) {
 
           step <- step + 1
-          p_step <- parameters$vaccine_coverage_mat[step, ]
+          p_step <- vaccine_coverage_mat[step, ]
 
           eligible <- target_pop(
             dose = phase, variables = variables, events = events, parameters = parameters,
