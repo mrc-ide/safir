@@ -10,6 +10,7 @@ get_parameters(
   contact_matrix_set = NULL,
   time_period = 365,
   max_age = 100,
+  dt,
   ...
 )
 }
@@ -25,6 +26,8 @@ NULL, which will generate this based on the \code{country}.}
 \item{time_period}{Length of simulation. Default = 365}
 
 \item{max_age}{the maximum age for humans}
+
+\item{dt}{Time Step. Default = 0.1}
 
 \item{...}{Other parameters for \link[squire:parameters_explicit_SEEIR]{squire::parameters_explicit_SEEIR}}
 }

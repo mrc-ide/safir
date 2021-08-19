@@ -26,12 +26,14 @@ get_parameters <- function(iso3c = NULL,
                            contact_matrix_set = NULL,
                            time_period = 365,
                            max_age = 100,
+                           dt,
                            ...) {
 
   # if missing a contact matrix but have iso3c then use that
   if (!is.null(iso3c) && is.null(contact_matrix_set)) {
     contact_matrix_set <- squire::get_mixing_matrix(iso3c = iso3c)
   }
+  stopifnot(is.finite(dt) & dt > 0)
 
   country <- get_country(iso3c)
 
@@ -40,9 +42,11 @@ get_parameters <- function(iso3c = NULL,
         population = population,
         country = country,
         contact_matrix_set = contact_matrix_set,
-        # dt = 1, # dt should always be 1 as individual is always a discrete time
+        dt = 1, # we only want to interpolate things to nearest day
         time_period = time_period,
         ...)
+
+  pars$dt <- dt
 
   # create list of asymptomatic parameters
   asymp_list <- get_asymptomatic()
