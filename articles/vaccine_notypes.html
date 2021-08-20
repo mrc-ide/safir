@@ -202,7 +202,7 @@
   timesteps <span class="op">=</span> <span class="va">timesteps</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  10.456   0.309  10.807</span></code></pre></div>
+<span class="co">#&gt;  11.729   0.395  12.147</span></code></pre></div>
 </div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
@@ -214,7 +214,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot: ab titre</span>
 <span class="va">vaccinated</span> <span class="op">&lt;-</span> <span class="va">variables</span><span class="op">$</span><span class="va">dose_num</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>set <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
-<span class="va">vaccinated</span> <span class="op">&lt;-</span> <span class="va">vaccinated</span><span class="op">$</span><span class="fu">not</span><span class="op">(</span><span class="op">)</span>
+<span class="va">vaccinated</span> <span class="op">&lt;-</span> <span class="va">vaccinated</span><span class="op">$</span><span class="fu">not</span><span class="op">(</span>inplace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="va">ab_renderer</span><span class="op">[</span>, <span class="va">vaccinated</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span><span class="op">]</span>
 <span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2e-7</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">}</span><span class="op">)</span>
