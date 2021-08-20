@@ -33,7 +33,7 @@ std::vector<double> get_proportion_vaccinated_all_ages_cpp(
     Rcpp::Environment dose_time_env = Rcpp::as<Rcpp::Environment>(dose_time[dose-1]);
     Rcpp::XPtr<IntegerVariable> dose_time_var = Rcpp::as<Rcpp::XPtr<IntegerVariable>>(dose_time_env[".variable"]);
     individual_index_t vaccinated_bset = dose_time_var->get_index_of_set(-1); // haven't gotten this dose
-    vaccinated_bset = ~vaccinated_bset; // complement = vaccinated people
+    vaccinated_bset = !vaccinated_bset; // complement = vaccinated people
     vaccinated_bset &= age_bset;
     out[a-1] = static_cast<double>(vaccinated_bset.size()) / N;
   }

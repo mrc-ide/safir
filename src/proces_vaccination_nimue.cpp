@@ -103,7 +103,7 @@ Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(
 
           // set who is eligible: SER people in an age group in this priority step AND unvaccinated
           *eligible |= SER;
-          *eligible &= ~(*vaccinated);
+          *eligible &= !(*vaccinated);
 
           // calc rate of vaccination now
           double vr_den = eligible->size();

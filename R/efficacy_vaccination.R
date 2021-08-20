@@ -20,7 +20,7 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 
       # only those with at least 1 dose will need to have titre calculated
       vaccinated <- variables$dose_num$get_index_of(set = 0)
-      vaccinated <- vaccinated$not()
+      vaccinated$not(inplace = TRUE)
 
       if (vaccinated$size() > 0) {
 

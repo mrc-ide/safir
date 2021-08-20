@@ -22,7 +22,7 @@ get_current_coverage <- function(variables, events, dose, parameters) {
   bsets <- vector("list", parameters$N_age)
 
   vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
-  vaccinated_bset <- vaccinated_bset$not() # have gotten this dose
+  vaccinated_bset$not(inplace = TRUE) # have gotten this dose
   vaccinated_bset$or(events$scheduled_dose[[dose]]$get_scheduled()) # have gotten this dose OR are scheduled for it
 
   for (a in 1:parameters$N_age) {
@@ -58,7 +58,8 @@ get_current_eligible_from_coverage <- function(timestep, dt, coverage, variables
 
   # eligible persons are those not covered and in this age group
   bsets <- lapply(X = 1:parameters$N_age,FUN = function(a){
-    not_cov <- coverage[[a]]$not()
+    not_cov <- coverage[[a]]$copy()
+    not_cov$not(inplace = TRUE)
     not_cov$and(variables$discrete_age$get_index_of(a))
   })
 
