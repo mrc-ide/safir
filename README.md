@@ -15,6 +15,12 @@ status](https://github.com/mrc-ide/safir/workflows/R-CMD-check/badge.svg)](https
 It uses the [`{individual}`](https://github.com/mrc-ide/individual)
 package to specify and run the simulation.
 
+**safir** can run individual based stochastic versions of the **squire** and
+**nimue** models, which recover trajectories from those aggregated population
+models (see package vignettes). It also implements a model for vaccination
+with an arbitrary number of doses and antibody titre dynamics which affect
+protective efficacy as well as efficacy against severe disease outcomes. 
+
 ## Installation
 
 ``` r
