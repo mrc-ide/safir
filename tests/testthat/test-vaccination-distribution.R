@@ -14,17 +14,17 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
 
   variables <- list()
-  variables$discrete_age <- IntegerVariable$new(rep(1:length(dose_times),times=sapply(dose_times,nrow)))
+  variables$discrete_age <- IntegerVariable$new(rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1))))
   variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
-  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(sapply(dose_times,nrow)))}))
+  events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(vapply(dose_times,nrow,integer(1))))}))
 
   cov_safir <- get_current_coverage(variables = variables,events = events,dose = 1,parameters = list(N_age = 3))
-  cov_safir <- sapply(cov_safir,function(b){b$size()})
+  cov_safir <- vapply(cov_safir,function(b){b$size()},numeric(1))
 
   expect_equal(
     cov_safir,
@@ -32,7 +32,7 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   )
 
   cov_safir <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = list(N_age = 3))
-  cov_safir <- sapply(cov_safir,function(b){b$size()})
+  cov_safir <- vapply(cov_safir,function(b){b$size()},numeric(1))
 
   expect_equal(
     cov_safir,
@@ -57,9 +57,9 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
+  ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -84,8 +84,8 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue, function(x){sum(x)}, numeric(1)),
+    vapply(eligible, function(b){b$size()}, numeric(1))
   )
 
   t <- 1
@@ -97,11 +97,11 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
 
-  sapply(cov,function(b){b$size()})
+  vapply(cov,function(b){b$size()},numeric(1))
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
   t <- 200
@@ -113,8 +113,8 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
 })
@@ -141,9 +141,9 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
+  ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -166,8 +166,8 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
   t <- 1
@@ -180,8 +180,8 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
   t <- 200
@@ -194,8 +194,8 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
 })
@@ -217,9 +217,9 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
+  ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -242,8 +242,8 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
   t <- 1
@@ -255,8 +255,8 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
   t <- 200
@@ -268,8 +268,8 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
-    sapply(eligible_nimue,function(x){sum(x)}),
-    sapply(eligible,function(b){b$size()})
+    vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
+    vapply(eligible,function(b){b$size()},numeric(1))
   )
 
 })
@@ -291,9 +291,9 @@ test_that("target_pop is giving the same results as nimue", {
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  ages <- rep(1:length(dose_times),times=sapply(dose_times,nrow))
+  ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=sapply(dose_times,nrow), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -317,7 +317,7 @@ test_that("target_pop is giving the same results as nimue", {
     dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3)
   )
 
-  d1_s_out <- sapply(d1_s,function(b){b$size()})
+  d1_s_out <- vapply(d1_s,function(b){b$size()},numeric(1))
 
   expect_equal(d1_n, d1_s_out)
 
@@ -329,7 +329,7 @@ test_that("target_pop is giving the same results as nimue", {
     dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = c(0,1,0)
   )
 
-  d1_pri_s_out <- sapply(d1_pri_s,function(b){b$size()})
+  d1_pri_s_out <- vapply(d1_pri_s,function(b){b$size()},numeric(1))
 
   expect_equal(d1_pri_n, d1_pri_s_out)
 
@@ -341,7 +341,7 @@ test_that("target_pop is giving the same results as nimue", {
     dose = 2,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(0,3)
   )
 
-  d2_s_out <- sapply(d2_s,function(b){b$size()})
+  d2_s_out <- vapply(d2_s,function(b){b$size()},numeric(1))
 
   expect_equal(d2_n, d2_s_out)
 
@@ -353,7 +353,7 @@ test_that("target_pop is giving the same results as nimue", {
     dose = 2,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(1,3)
   )
 
-  d2_t_s_out <- sapply(d2_t_s,function(b){b$size()})
+  d2_t_s_out <- vapply(d2_t_s,function(b){b$size()},numeric(1))
 
   expect_equal(d2_t_n ,d2_t_s_out)
 
@@ -365,7 +365,7 @@ test_that("target_pop is giving the same results as nimue", {
     dose = 2,variables = variables,events = events,parameters = parameters,timestep = 15,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = rep(1,3)
   )
 
-  d2_ok_s_out <- sapply(d2_ok_s,function(b){b$size()})
+  d2_ok_s_out <- vapply(d2_ok_s,function(b){b$size()},numeric(1))
 
   expect_equal(d2_ok_n, d2_ok_s_out)
 })
@@ -398,7 +398,7 @@ test_that("target_pop is working in general case", {
     dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3)
   )
   expect_equal(
-    sapply(p1,function(b){b$size()}),
+    vapply(p1,function(b){b$size()},numeric(1)),
     rep(0, 3)
   )
 
@@ -407,7 +407,7 @@ test_that("target_pop is working in general case", {
     dose = 2,variables = variables,events = events,parameters = parameters,timestep = 8,dt = 1,strategy_matrix_step = rep(1,3)
   )
   expect_equal(
-    sapply(p2,function(b){b$size()}),
+    vapply(p2,function(b){b$size()},numeric(1)),
     c(5,5,0)
   )
 
@@ -419,7 +419,7 @@ test_that("target_pop is working in general case", {
     dose = 3,variables = variables,events = events,parameters = parameters,timestep = 13,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = c(0,0,1)
   )
   expect_equal(
-    sapply(p2_nt,function(b){b$size()}),
+    vapply(p2_nt,function(b){b$size()},numeric(1)),
     c(0,0,5)
   )
 
@@ -428,7 +428,7 @@ test_that("target_pop is working in general case", {
     dose = 3,variables = variables,events = events,parameters = parameters,timestep = 12,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = c(0,0,1)
   )
   expect_equal(
-    sapply(p2_t,function(b){b$size()}),
+    vapply(p2_t,function(b){b$size()},numeric(1)),
     c(0,0,0)
   )
 
@@ -437,7 +437,7 @@ test_that("target_pop is working in general case", {
     dose = 3,variables = variables,events = events,parameters = parameters,timestep = 13,dt = 1,strategy_matrix_step = rep(1,3)
   )
   expect_equal(
-    sapply(p3_nt,function(b){b$size()}),
+    vapply(p3_nt,function(b){b$size()},numeric(1)),
     c(0,0,5)
   )
 
@@ -446,7 +446,7 @@ test_that("target_pop is working in general case", {
     dose = 3,variables = variables,events = events,parameters = parameters,timestep = 12,dt = 1,strategy_matrix_step = rep(1,3)
   )
   expect_equal(
-    sapply(p3_t,function(b){b$size()}),
+    vapply(p3_t,function(b){b$size()},numeric(1)),
     c(0,0,0)
   )
 
@@ -482,7 +482,7 @@ test_that("assign doses is working for phase 1", {
     events = events,dose = 1,eligible = targeted,parameters = parameters
   )
   expect_equal(
-    sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
+    vapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()},numeric(1)),
     c(0,0,0)
   )
 
@@ -573,7 +573,7 @@ test_that("assign doses is working for phase 2", {
   )
 
   expect_equal(
-    sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()}),
+    vapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()},numeric(1)),
     c(0,0,0)
   )
 
@@ -591,7 +591,7 @@ test_that("assign doses is working for phase 2", {
     events = events,dose = phase,eligible = targeted,parameters = parameters
   )
 
-  sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
+  sched_size <- vapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()},numeric(1))
   sched_age <- var_local$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled())
   expect_equal(
     sched_size,
@@ -616,7 +616,7 @@ test_that("assign doses is working for phase 2", {
     events = events,dose = phase,eligible = targeted,parameters = parameters
   )
 
-  sched_size <- sapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()})
+  sched_size <- vapply(X = 1:3,FUN = function(x){events$scheduled_dose[[x]]$get_scheduled()$size()},numeric(1))
   sched_age <- var_local$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled())
   expect_equal(
     sched_size,

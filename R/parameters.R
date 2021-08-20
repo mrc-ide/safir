@@ -137,7 +137,7 @@ interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
   xout <- seq(min(x), end, 1)
 
   # build array from matrix list
-  rep_mats <- mapply(rep, y, diff(x_all))
+  rep_mats <- Map(rep, y, diff(x_all))
   yout <- array(unlist(rep_mats), dim = c(dim(y[[1]]), length(xout)))
 
   return(yout)

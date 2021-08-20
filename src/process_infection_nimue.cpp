@@ -27,7 +27,6 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
     Rcpp::XPtr<TargetedEvent> exposure,
     const double dt
 ) {
-
   // the states we need to pull
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
@@ -42,7 +41,6 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
   // the process lambda
   return Rcpp::XPtr<process_t>(
     new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age](size_t t) mutable {
-
       individual_index_t infectious = states->get_index_of(inf_states);
 
       if (infectious.size() > 0) {
