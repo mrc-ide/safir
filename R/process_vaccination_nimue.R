@@ -29,7 +29,7 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
       if (mv > 0) {
 
         # calculate prioritisation step and which age groups are eligible right now
-        pr <- sapply(X = 1:parameters$N_age,FUN = function(a){get_proportion_vaccinated_nimue(variables = variables,age = a)})
+        pr <- vapply(X = 1:parameters$N_age, FUN = function(a){get_proportion_vaccinated_nimue(variables = variables,age = a)}, FUN.VALUE = numeric(1))
 
         vaccination_target_mat <- matrix(data = 0,nrow = parameters$N_prioritisation_steps,ncol = parameters$N_age)
         for (p in 1:parameters$N_prioritisation_steps) {
