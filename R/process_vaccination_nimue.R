@@ -57,7 +57,8 @@ vaccination_process_nimue <- function(parameters, variables, events, dt) {
 
           # set who is eligible: SER people in an age group in this priority step AND unvaccinated
           variables$eligible$or(SER)
-          variables$eligible$and(variables$vaccinated$not())
+          unvaccinated <- variables$vaccinated$copy()$not(inplace = TRUE)
+          variables$eligible$and(unvaccinated)
 
           # calc rate of vaccination now
           vr_den <- variables$eligible$size()

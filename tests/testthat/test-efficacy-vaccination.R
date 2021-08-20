@@ -20,7 +20,7 @@ test_that("get_time_since_last_dose works", {
   }
 
   vaccinated <- dose_num$get_index_of(set = 0)
-  vaccinated <- vaccinated$not()
+  vaccinated$not(inplace = TRUE)
 
   # safir
   safir_out <- get_time_since_last_dose(timestep = timestep,dt = dt,vaccinated = vaccinated,dose_num = dose_num,dose_time = dose_time,N_phase = N_phase)

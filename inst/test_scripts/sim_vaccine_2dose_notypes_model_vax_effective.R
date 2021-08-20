@@ -104,7 +104,7 @@ system.time(simulation_loop_vaccine(
 
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
-vaccinated <- vaccinated$not()
+vaccinated$not(inplace = TRUE)
 
 ab_titre <- ab_renderer[, vaccinated$to_vector()]
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
