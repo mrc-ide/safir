@@ -27,7 +27,6 @@ Rcpp::IntegerMatrix cross_tab_margins(
     const int a_margin,
     const int b_margin
 ) {
-
   Rcpp::IntegerMatrix out(a_margin, b_margin);
 
   for (auto i = 0u; i < a.size(); ++i) {
@@ -44,7 +43,6 @@ Rcpp::NumericMatrix cross_tab_margins_internal(
     const int a_margin,
     const int b_margin
 ) {
-
   Rcpp::NumericMatrix out(a_margin, b_margin);
 
   for (auto i = 0u; i < a.size(); ++i) {
@@ -90,7 +88,6 @@ Rcpp::NumericMatrix get_contact_matrix_cpp(
     SEXP array,
     const int i
 ) {
-
   SEXP dims = Rf_getAttrib(array, R_DimSymbol);
   int d1 = INTEGER(dims)[0];
   int d2 = INTEGER(dims)[1];

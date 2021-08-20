@@ -453,10 +453,10 @@ assert_same_length <- function(x, y, message =  "%s and %s must be the same leng
 # multiple objects all same length
 #' @noRd
 assert_same_length_multiple <- function(...) {
-  l <- mapply(length, list(...))
+  l <- Map(length, list(...))
   if (length(unique(l)) != 1) {
-    l_names <- sapply(match.call(expand.dots = FALSE)$..., deparse)
-    stop(sprintf("variables %s must be the same length", nice_format(l_names)), call. = FALSE)
+    l_names <- lapply(match.call(expand.dots = FALSE)$..., deparse)
+    stop(sprintf("variables %s must be the same length", nice_format(unlist(l_names))), call. = FALSE)
   }
   return(TRUE)
 }
