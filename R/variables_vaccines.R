@@ -12,7 +12,7 @@
 #' @title Create vaccination variables (nimue vaccine model)
 #' @description Create all individual variables for humans
 #'
-#' @param variables a list
+#' @param variables a list from [create_variables]
 #' @param pop population list
 #' @importFrom individual Bitset
 #' @importFrom individual IntegerVariable

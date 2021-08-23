@@ -12,7 +12,7 @@ create_variables(pop, parameters)
 \item{parameters}{model parameters}
 }
 \value{
-named list of individual::Variable
+named list of variable objects
 }
 \description{
 Create all age & state variables for simulated population

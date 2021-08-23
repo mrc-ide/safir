@@ -7,10 +7,10 @@
 
 
 #' @title Schedule events for individuals at initialisation (nimue vaccine model)
-#' @param parameters write me!
-#' @param events write me!
-#' @param variables write me!
-#' @param dt write me!
+#' @param parameters model parameters from [get_parameters_nimue]
+#' @param events model events
+#' @param variables model variables
+#' @param dt size of time step
 #' @export
 setup_events_nimue <- function(
     parameters,

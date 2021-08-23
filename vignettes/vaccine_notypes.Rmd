@@ -205,9 +205,9 @@ In order to advance from phase `i` to `i+1`, each row (step) of the strategy mat
 The algorithm distributes doses until all phases are complete, at which point no more doses are given, even if there is sufficient supply.
 
 On a timestep, the algorithm has the following stages ([see vaccination_process in R/process_vaccination.R](https://github.com/mrc-ide/safir/blob/main/R/process_vaccination.R)):
-
-  1. Given the current `phase`, calculate what `step` of the strategy matrix has not yet been reached.
-  2. If all steps targets' fulfilled, go on to the next `phase`.
+  
+  1. Given the current phase (dose) being distributed, find out what step of the prioritisation/strategy matrix the algorithm has attained, based on current coverage for that dose compared against coverage targets in the rows of the strategy matrix; if `next_dose_priority` has non-zero entries, compare those too for the next dose.
+  2. If all coverage targets (all rows) of the strategy matrix are fulfilled, step to the next dosing phase.
   3. Based on this `step` of the strategy matrix for this `phase`, find eligible persons (based on what age groups are being targeted, and if the minimum inter-dose time interval has elapsed, if `phase > 1`). Assign as many doses as possible to these persons.
   4. If doses remain and this is not the last `phase`, assign the next dose to those persons prioritized based on `next_dose_priority`.
   5. If doses remain, step through the remaining rows of the strategy matrix, assigning doses to individuals in groups that have not yet met their targets.

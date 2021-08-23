@@ -29,8 +29,8 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
   // vectors we can build once
-  std::vector<double> beta(17, 0.);
-  std::vector<double> lambda(17, 0.);
+  std::vector<double> beta(17, 0.0);
+  std::vector<double> lambda(17, 0.0);
 
   return Rcpp::XPtr<process_t>(
     new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
@@ -66,7 +66,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
         std::vector<double> lambda_sus(sus_ages.size());
         for (auto i = 0u; i < sus_ages.size(); ++i) {
           lambda_sus[i] = lambda[sus_ages[i] - 1] * dt;
-          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1., 1, 0);
+          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
         }
 
         // infected

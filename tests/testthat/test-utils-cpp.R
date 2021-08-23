@@ -72,13 +72,13 @@ test_that("get proportion vaccinated works", {
   vaxx <- individual::Bitset$new(1e4)
   vaxx$insert(sample.int(n = 1e4,size = 4e3,replace = F))
 
-  pr_r <- sapply(X = 1:10,FUN = function(x){
+  pr_r <- vapply(X = 1:10,FUN = function(x){
     get_proportion_vaccinated_nimue(variables = list(discrete_age=age,vaccinated=vaxx),age = x)
-  })
+  }, numeric(1))
 
-  pr_cpp <- sapply(X = 1:10,FUN = function(x){
+  pr_cpp <- vapply(X = 1:10,FUN = function(x){
     get_proportion_vaccinated_nimue_internal(discrete_age = age$.variable,vaccinated = vaxx$.bitset,age = x)
-  })
+  }, numeric(1))
 
   expect_equal(pr_r,pr_cpp)
 })

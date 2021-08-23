@@ -12,7 +12,7 @@
 #' @param time_period maximum time of simulation
 #' @param max_age max age for humans
 #' @param dt time step size
-#' @param ... Other parameters for \code{\link[nimue]{parameters}}
+#' @param ... Other parameters for [nimue::parameters]
 #' @export
 get_parameters_nimue <- function(population, contact_mat, time_period, max_age = 100, dt = 1, ...) {
   stopifnot(length(population)==17)

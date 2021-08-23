@@ -10,7 +10,7 @@
 
 #' @title Create events
 #'
-#' @param parameters write me!
+#' @param parameters model parameters
 #' @importFrom individual TargetedEvent
 #' @export
 create_events <- function(parameters) {

@@ -17,7 +17,7 @@
 #' @param pop population list
 #' @param parameters model parameters
 #'
-#' @return named list of individual::Variable
+#' @return named list of variable objects
 #' @export
 create_variables <- function(pop, parameters) {
 
@@ -35,7 +35,7 @@ create_variables <- function(pop, parameters) {
 #' @param parameters model parameters
 #' @param continuous return both age by year and bin?
 #' @importFrom individual IntegerVariable
-#' @return named list of individual::Variable
+#' @return named list of variable objects
 create_age_variables <- function(pop, parameters, continuous = FALSE) {
 
   cont_age <- create_continuous_age_variable(pop, parameters$max_age)

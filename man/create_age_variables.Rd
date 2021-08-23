@@ -14,7 +14,7 @@ create_age_variables(pop, parameters, continuous = FALSE)
 \item{continuous}{return both age by year and bin?}
 }
 \value{
-named list of individual::Variable
+named list of variable objects
 }
 \description{
 Create individual variables for continuous and discrete age

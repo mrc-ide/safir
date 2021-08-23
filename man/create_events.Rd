@@ -7,7 +7,7 @@
 create_events(parameters)
 }
 \arguments{
-\item{parameters}{write me!}
+\item{parameters}{model parameters}
 }
 \description{
 Create events
