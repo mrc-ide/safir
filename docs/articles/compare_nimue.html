@@ -91,9 +91,9 @@
 
     
     
-<div id="setup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h2>
+<div id="setup" class="section level1">
+<h1 class="hasAnchor">
+<a href="#setup" class="anchor"></a>Setup</h1>
 <p>Let’s compare <strong>safir</strong> to <strong>nimue</strong>. Set up our parameters for running. We use a time step of 0.1 days.</p>
 <p>Do a run of <strong>nimue</strong> with increasing vaccination.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -109,7 +109,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
 <span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
-<span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">:::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
+<span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
 <span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">2e2</span><span class="op">)</span>
 <span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
 
@@ -128,10 +128,10 @@
   vaccine_efficacy_infection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">17</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 </div>
-<div id="run-safir" class="section level2">
-<h2 class="hasAnchor">
+<div id="run-safir" class="section level1">
+<h1 class="hasAnchor">
 <a href="#run-safir" class="anchor"></a>Run <strong>safir</strong>
-</h2>
+</h1>
 <p>Do a <strong>safir</strong> run. Because running the individual based verion of <strong>nimue</strong> is computationally expensive, we use <code>categorical_count_renderer_process_daily</code> and <code>integer_count_render_process_daily</code> to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes <code>vaccination_process_nimue_cpp</code> and <code>infection_process_nimue_cpp</code> (R versions are <code>vaccination_process_nimue</code> and <code>infection_process_nimue_cpp</code>; tests are included in the package to ensure the same results are returned when using identical random number seeds).</p>
 <p>The function <code>get_parameters_nimue</code> grabs parameters directly from the <strong>nimue</strong> package. Then make the basic <strong>squire</strong> transmission model variables using <code>create_variables</code>. Then, attach additional variables to model <strong>nimue</strong> vaccines using <code>create_vaccine_variables_nimue</code>. The same routine is used to make events, calling <code>create_events</code> and <code>create_events_nimue</code>. Listeners are attached similarly.</p>
 <p>Next, make renderer objects. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken. The process list can then be made, and finally <code>setup_events_nimue</code> is called to queue initial events (this allows the model to be initialized from any valid state, not just S and E individuals).</p>
@@ -182,8 +182,7 @@
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  31.004   0.132  31.148</span></code></pre></div>
-</div>
+<span class="co">#&gt;  30.773   0.107  30.883</span></code></pre></div>
 <div id="plot-vaccinations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-vaccinations" class="anchor"></a>Plot vaccinations</h2>
@@ -260,6 +259,34 @@
 <a href="#ensemble-plot" class="anchor"></a>Ensemble plot</h2>
 <p>This is the same run as above, but with 40 repetitions. 95% quantiles and means are plotted for <strong>safir</strong>.</p>
 <p><img src="nimue_comparison.png" width="100%"></p>
+</div>
+</div>
+<div id="code-design" class="section level1">
+<h1 class="hasAnchor">
+<a href="#code-design" class="anchor"></a>Code design</h1>
+<div id="parameters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#parameters" class="anchor"></a>Parameters</h2>
+<p>The function <code>get_parameters_nimue</code> is used to generate parameters from the nimue model, and source code is in R/parameters_nimue.R.</p>
+</div>
+<div id="variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#variables" class="anchor"></a>Variables</h2>
+<p>The function <code>create_vaccine_variables_nimue</code> adds additional information needed for the model to the output of <code>create_variables</code>. It can be found in R/variables_vaccines.R.</p>
+</div>
+<div id="events-processes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#events-processes" class="anchor"></a>Events &amp; Processes</h2>
+<p>The function <code>create_events_nimue</code> attaches additional events for modeling the vaccination process to the events list. <code>attach_event_listeners_nimue</code> attaches additional listeners to the vaccination events. Both functions can be found in R/events_vaccination_nimue.R.</p>
+<p><code>setup_events_nimue</code> initializes event scheduling based on the initial state of the model. This is needed so that the model can be initialized from any valid state, instead of just <strong>S</strong> and <strong>E</strong> persons who are unvaccinated. It can be found in R/initialize_events_nimue.R.</p>
+<p>The infection process can either use an R implementation <code>infection_process_nimue</code> or C++ implementation <code>infection_process_nimue_cpp</code>. The R version is in R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.</p>
+<p>Likewise the vaccination process has the R version <code>vaccination_process_nimue</code> and <code>vaccination_process_nimue_cpp</code>, in R/process_vaccination_nimue.R and src/process_vaccination_nimue.cpp, respectively.</p>
+</div>
+<div id="simulation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#simulation" class="anchor"></a>Simulation</h2>
+<p>Because the variables list used for the simulation contains some bitset objects which are not variables, the function <code>simulation_loop_nimue</code> is used to run the simulation to handle variable updating correctly. It can be found in r/simulation_loop_nimue.R.</p>
+</div>
 </div>
   </div>
 

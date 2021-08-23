@@ -7,10 +7,10 @@
 
 
 #' @title Schedule events for individuals at initialisation (vaccine model, multi-dose, no types)
-#' @param parameters write me!
-#' @param events write me!
-#' @param variables write me!
-#' @param dt write me!
+#' @param parameters model parameters
+#' @param events list of model events
+#' @param variables list of model variables
+#' @param dt size of time step
 #' @export
 setup_events_vaccine <- function(
   parameters,

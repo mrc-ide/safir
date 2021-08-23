@@ -212,6 +212,10 @@ The infection process can either use an R implementation `infection_process_nimu
 C++ implementation `infection_process_nimue_cpp`.  The R version is in 
 R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.
 
+Likewise the vaccination process has the R version `vaccination_process_nimue`
+and `vaccination_process_nimue_cpp`, in R/process_vaccination_nimue.R and
+src/process_vaccination_nimue.cpp, respectively.
+
 ## Simulation
 
 Because the variables list used for the simulation contains some bitset objects

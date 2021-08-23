@@ -9,7 +9,7 @@
 #' @title Append vaccination events
 #'
 #' @param events a named list of individual::Event
-#' @param parameters write me!
+#' @param parameters model parameters
 #' @importFrom individual TargetedEvent
 #' @export
 create_events_vaccination <- function(events, parameters) {

@@ -7,13 +7,13 @@
 setup_events_nimue(parameters, events, variables, dt)
 }
 \arguments{
-\item{parameters}{write me!}
+\item{parameters}{model parameters from \link{get_parameters_nimue}}
 
-\item{events}{write me!}
+\item{events}{model events}
 
-\item{variables}{write me!}
+\item{variables}{model variables}
 
-\item{dt}{write me!}
+\item{dt}{size of time step}
 }
 \description{
 Schedule events for individuals at initialisation (nimue vaccine model)

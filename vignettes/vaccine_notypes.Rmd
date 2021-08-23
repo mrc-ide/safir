@@ -22,7 +22,7 @@ library(data.table)
 library(ggplot2)
 ```
 
-## Setup
+# Setup
 
 Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for arbitrary number of doses. At the end of this vignette we describe the dose allocation algorithm.
 
@@ -30,7 +30,7 @@ Start by making parameters. Note that `get_vaccine_ab_titre_parameters` gets par
 
 ```{r}
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -73,7 +73,7 @@ parameters <- make_vaccine_parameters(
 )
 ```
 
-## Run **safir**
+# Run **safir**
 
 Now we make the variables, events, and processes used in the model. In order to track the antibody titre for each vaccinated person, we use a custom function `double_count_render_process_daily` to write to the output matrix; this is because currently **individual** does not support renderers that track `DoubleVariable` objects. Unless the antibody titres are a direct object of analysis, it is recommended to not output them, as it slows down the simulation.
 
@@ -193,10 +193,28 @@ ggplot(data = saf_dt, aes(t,y,color = compartment)) +
   facet_wrap(~compartment, scales = "free")
 ```
 
+# Code design
 
-## Vaccine allocation algorithm
+## Variables
 
-The vaccine dose allocation algorithm is designed to be as similar as possible to the [weighted_efficacy function from **nimue**](https://mrc-ide.github.io/nimue/reference/weighted_efficacy.html), generalized to an arbitrary number of doses.
+`create_vaccine_variables` attaches various variable types and other data to the variables list needed to simulate vaccine allocation and antibody
+titre dynamics. It can be found in R/variables_vaccines.R.
+
+## Antibody titre dynamics process
+
+The process `vaccine_ab_titre_process` calculates daily updates for antibody titres for everyone in the population who has received at least one
+dose of the vaccine. For each vaccinated individual, the time since their last dose is found, which is used to find the daily decay rate which is used
+to update their Ab titre. Efficacy against infection and against severe disease are also calculated at this time.
+
+New values for ab titres are drawn when individuals are given a vaccine dose, but these are found in `schedule_dose_vaccine` in R/events_vaccination.R
+and are described later.
+
+The code can be found in R/efficacy_vaccination.R.
+
+## Vaccine allocation process
+
+The vaccine dose allocation algorithm is designed to be as similar as possible to the [weighted_efficacy function from **nimue**](https://mrc-ide.github.io/nimue/reference/weighted_efficacy.html), generalized to an arbitrary number of doses. The vaccination
+process is `vaccination_process` and can be found in R/process_vaccination.R with many supporting functions in R/distribution_vaccines.R.
 
 Vaccine dosing is split into phases, from 1 to the total number of doses. On phase `i`, dose `i` is administered to the population until conditions are met. In order to determine when to advance from phase `i` to `i+1`, a strategy matrix (coverage prioritisation matrix) is provided, which can be shared across all phases, or a unique strategy matrix for each phase. The strategy matrix used as input to **safir** is exactly the same as the one [described in **nimue**](https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html), which is created using the **nimue** function [strategy_matrix](https://mrc-ide.github.io/nimue/reference/strategy_matrix.html). There is an additional piece of input `next_dose_priority` which describes which (if any) age groups are prioritized for dose `i+1` while still on phase `i` (similar to the argument `d2_prioritise` from `weighted_efficacy`).
 
@@ -211,4 +229,23 @@ On a timestep, the algorithm has the following stages ([see vaccination_process 
   3. Based on this `step` of the strategy matrix for this `phase`, find eligible persons (based on what age groups are being targeted, and if the minimum inter-dose time interval has elapsed, if `phase > 1`). Assign as many doses as possible to these persons.
   4. If doses remain and this is not the last `phase`, assign the next dose to those persons prioritized based on `next_dose_priority`.
   5. If doses remain, step through the remaining rows of the strategy matrix, assigning doses to individuals in groups that have not yet met their targets.
+
+## Infection process
+
+The infection process can either use an R implementation `infection_process_vaccine` or
+C++ implementation `infection_process_vaccine_cpp`.  The R version is in 
+R/process_infection_vaccine.R and the C++ one in src/process_infection_vaccine.cpp.
+
+## Vaccine events
+
+`create_events_vaccination` attaches additional `individual::TargetedEvent` objects to the events
+list to schedule doses for eligible individuals. `attach_event_listeners_vaccination` and
+`setup_events_vaccine` attach listeners and initialize the initial model state,
+respectively. These functions can be round in R/events_vaccination.R.
+
+## Simulation
+
+Because the variables list used for the simulation contains some objects
+which are not variables, the function `simulation_loop_vaccine` is used to run
+the simulation to handle variable updating correctly. It can be found in r/simulation_loop_vaccine.R.
 

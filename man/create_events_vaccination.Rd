@@ -9,7 +9,7 @@ create_events_vaccination(events, parameters)
 \arguments{
 \item{events}{a named list of individual::Event}
 
-\item{parameters}{write me!}
+\item{parameters}{model parameters}
 }
 \description{
 Append vaccination events

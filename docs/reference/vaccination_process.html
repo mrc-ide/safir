@@ -42,13 +42,14 @@
 <meta property="og:title" content="Vaccination distribution process (multiple doses, no types) — vaccination_process" />
 <meta property="og:description" content="This function distributes vaccine doses each day for the vaccine
 model with multiple doses but no types. It distributes vaccines according to the
-following strategy.* start at \code{phase = 1}, meaning we begin by distributing the first dose
-* use \code{\link{get_vaccination_priority_stage}} to check what stage of the
-prioritization matrix \code{vaccine_coverage_mat} from \code{\link[nimue]{strategy_matrix}}
+following strategy.
+start at phase = 1, meaning we begin by distributing the first dose
+use get_vaccination_priority_stage to check what stage of the
+prioritization matrix vaccine_coverage_mat from strategy_matrix
 we should be using to decide who to vaccinate.
-* we can advance one row of the prioritization matrix when coverage for this dose (phase) &amp;gt;=
+we can advance one row of the prioritization matrix when coverage for this dose (phase) &amp;gt;=
 prioritization matrix and coverage for next dose (phase) &amp;gt;= prioritization matrix groups prioritized
-for the next dose by the matrix \code{next_dose_priority}.
+for the next dose by the matrix next_dose_priority.
 
 " />
 
@@ -142,14 +143,15 @@ for the next dose by the matrix \code{next_dose_priority}.
     <div class="ref-description">
     <p>This function distributes vaccine doses each day for the vaccine
 model with multiple doses but no types. It distributes vaccines according to the
-following strategy.</p><pre>* start at \code{phase = 1}, meaning we begin by distributing the first dose
-* use \code{\link{get_vaccination_priority_stage}} to check what stage of the
-prioritization matrix \code{vaccine_coverage_mat} from \code{\link[nimue]{strategy_matrix}}
-we should be using to decide who to vaccinate.
-* we can advance one row of the prioritization matrix when coverage for this dose (phase) &gt;=
+following strategy.</p><ul>
+<li><p>start at <code>phase = 1</code>, meaning we begin by distributing the first dose</p></li>
+<li><p>use <code><a href='get_vaccination_priority_stage.html'>get_vaccination_priority_stage</a></code> to check what stage of the
+prioritization matrix <code>vaccine_coverage_mat</code> from <code><a href='https://rdrr.io/pkg/nimue/man/strategy_matrix.html'>strategy_matrix</a></code>
+we should be using to decide who to vaccinate.</p></li>
+<li><p>we can advance one row of the prioritization matrix when coverage for this dose (phase) &gt;=
 prioritization matrix and coverage for next dose (phase) &gt;= prioritization matrix groups prioritized
-for the next dose by the matrix \code{next_dose_priority}.
-</pre>
+for the next dose by the matrix <code>next_dose_priority</code>.</p></li>
+</ul>
 
     </div>
 
