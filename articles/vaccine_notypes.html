@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -68,7 +68,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/mrc-ide/safir/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -84,7 +91,7 @@
       <h1 data-toc-skip>Vaccine model with multiple doses</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/mrc-ide/safir/blob/master/vignettes/vaccine_notypes.Rmd"><code>vignettes/vaccine_notypes.Rmd</code></a></small>
       <div class="hidden name"><code>vaccine_notypes.Rmd</code></div>
 
     </div>
@@ -92,7 +99,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">safir</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/safir">safir</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/individual">individual</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">nimue</span><span class="op">)</span>
 <span class="co">#&gt; </span>
@@ -102,14 +109,14 @@
 <span class="co">#&gt;     format</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
-<div id="setup" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h2>
+<div id="setup" class="section level1">
+<h1 class="hasAnchor">
+<a href="#setup" class="anchor"></a>Setup</h1>
 <p>Here we will set up the model with vaccinations. In this model only a single type of vaccine is distributed but it allows for arbitrary number of doses. At the end of this vignette we describe the dose allocation algorithm.</p>
 <p>Start by making parameters. Note that <code>get_vaccine_ab_titre_parameters</code> gets parameters giving antibody titre and decay rates for each supported vaccine type, and that <code>make_vaccine_parameters</code> does final type checking and combines the different parameters into a single list for the simulation. The function <code>make_vaccine_parameters</code> uses a <code>strategy_matrix</code> which is the output of <a href="https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html">strategy_matrix in <strong>nimue</strong></a>. A user can either provide a single matrix that will give the strategy used to allocate all phases (all doses), or a list of matrices, one for each dosing phase.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
-<span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">:::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
+<span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
 <span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">1e3</span><span class="op">)</span>
 <span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
 
@@ -151,10 +158,10 @@
   next_dose_priority_matrix <span class="op">=</span> <span class="va">next_dose_priority</span>
 <span class="op">)</span></code></pre></div>
 </div>
-<div id="run-safir" class="section level2">
-<h2 class="hasAnchor">
+<div id="run-safir" class="section level1">
+<h1 class="hasAnchor">
 <a href="#run-safir" class="anchor"></a>Run <strong>safir</strong>
-</h2>
+</h1>
 <p>Now we make the variables, events, and processes used in the model. In order to track the antibody titre for each vaccinated person, we use a custom function <code>double_count_render_process_daily</code> to write to the output matrix; this is because currently <strong>individual</strong> does not support renderers that track <code>DoubleVariable</code> objects. Unless the antibody titres are a direct object of analysis, it is recommended to not output them, as it slows down the simulation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create variables</span>
@@ -202,8 +209,7 @@
   timesteps <span class="op">=</span> <span class="va">timesteps</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  11.729   0.395  12.147</span></code></pre></div>
-</div>
+<span class="co">#&gt;  11.777   0.348  12.876</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>
@@ -271,21 +277,53 @@
 <p><img src="vaccine_notypes_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
 </div>
-<div id="vaccine-allocation-algorithm" class="section level2">
+</div>
+<div id="code-design" class="section level1">
+<h1 class="hasAnchor">
+<a href="#code-design" class="anchor"></a>Code design</h1>
+<div id="variables" class="section level2">
 <h2 class="hasAnchor">
-<a href="#vaccine-allocation-algorithm" class="anchor"></a>Vaccine allocation algorithm</h2>
-<p>The vaccine dose allocation algorithm is designed to be as similar as possible to the <a href="https://mrc-ide.github.io/nimue/reference/weighted_efficacy.html">weighted_efficacy function from <strong>nimue</strong></a>, generalized to an arbitrary number of doses.</p>
+<a href="#variables" class="anchor"></a>Variables</h2>
+<p><code>create_vaccine_variables</code> attaches various variable types and other data to the variables list needed to simulate vaccine allocation and antibody titre dynamics. It can be found in R/variables_vaccines.R.</p>
+</div>
+<div id="antibody-titre-dynamics-process" class="section level2">
+<h2 class="hasAnchor">
+<a href="#antibody-titre-dynamics-process" class="anchor"></a>Antibody titre dynamics process</h2>
+<p>The process <code>vaccine_ab_titre_process</code> calculates daily updates for antibody titres for everyone in the population who has received at least one dose of the vaccine. For each vaccinated individual, the time since their last dose is found, which is used to find the daily decay rate which is used to update their Ab titre. Efficacy against infection and against severe disease are also calculated at this time.</p>
+<p>New values for ab titres are drawn when individuals are given a vaccine dose, but these are found in <code>schedule_dose_vaccine</code> in R/events_vaccination.R and are described later.</p>
+<p>The code can be found in R/efficacy_vaccination.R.</p>
+</div>
+<div id="vaccine-allocation-process" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vaccine-allocation-process" class="anchor"></a>Vaccine allocation process</h2>
+<p>The vaccine dose allocation algorithm is designed to be as similar as possible to the <a href="https://mrc-ide.github.io/nimue/reference/weighted_efficacy.html">weighted_efficacy function from <strong>nimue</strong></a>, generalized to an arbitrary number of doses. The vaccination process is <code>vaccination_process</code> and can be found in R/process_vaccination.R with many supporting functions in R/distribution_vaccines.R.</p>
 <p>Vaccine dosing is split into phases, from 1 to the total number of doses. On phase <code>i</code>, dose <code>i</code> is administered to the population until conditions are met. In order to determine when to advance from phase <code>i</code> to <code>i+1</code>, a strategy matrix (coverage prioritisation matrix) is provided, which can be shared across all phases, or a unique strategy matrix for each phase. The strategy matrix used as input to <strong>safir</strong> is exactly the same as the one <a href="https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html">described in <strong>nimue</strong></a>, which is created using the <strong>nimue</strong> function <a href="https://mrc-ide.github.io/nimue/reference/strategy_matrix.html">strategy_matrix</a>. There is an additional piece of input <code>next_dose_priority</code> which describes which (if any) age groups are prioritized for dose <code>i+1</code> while still on phase <code>i</code> (similar to the argument <code>d2_prioritise</code> from <code>weighted_efficacy</code>).</p>
 <p>In order to advance from phase <code>i</code> to <code>i+1</code>, each row (step) of the strategy matrix for that phase must have its coverage targets fulfilled. Additionally, those age groups specified by <code>next_dose_priority</code> must have their next dose coverage targets fulfilled at the same level given by each step of the strategy matrix. Because the strategy matrix will be stepped through before the phase can advance, when the phase goes from <code>i</code> to <code>i+1</code>, we are guaranteed that coverage targets for dose <code>i</code> (and prioritized targets for dose <code>i+1</code>, if any) have been met at the final row of the strategy matrix (the final step).</p>
 <p>The algorithm distributes doses until all phases are complete, at which point no more doses are given, even if there is sufficient supply.</p>
 <p>On a timestep, the algorithm has the following stages (<a href="https://github.com/mrc-ide/safir/blob/main/R/process_vaccination.R">see vaccination_process in R/process_vaccination.R</a>):</p>
 <ol style="list-style-type: decimal">
-<li>Given the current <code>phase</code>, calculate what <code>step</code> of the strategy matrix has not yet been reached.</li>
-<li>If all steps targets’ fulfilled, go on to the next <code>phase</code>.</li>
+<li>Given the current phase (dose) being distributed, find out what step of the prioritisation/strategy matrix the algorithm has attained, based on current coverage for that dose compared against coverage targets in the rows of the strategy matrix; if <code>next_dose_priority</code> has non-zero entries, compare those too for the next dose.</li>
+<li>If all coverage targets (all rows) of the strategy matrix are fulfilled, step to the next dosing phase.</li>
 <li>Based on this <code>step</code> of the strategy matrix for this <code>phase</code>, find eligible persons (based on what age groups are being targeted, and if the minimum inter-dose time interval has elapsed, if <code>phase &gt; 1</code>). Assign as many doses as possible to these persons.</li>
 <li>If doses remain and this is not the last <code>phase</code>, assign the next dose to those persons prioritized based on <code>next_dose_priority</code>.</li>
 <li>If doses remain, step through the remaining rows of the strategy matrix, assigning doses to individuals in groups that have not yet met their targets.</li>
 </ol>
+</div>
+<div id="infection-process" class="section level2">
+<h2 class="hasAnchor">
+<a href="#infection-process" class="anchor"></a>Infection process</h2>
+<p>The infection process can either use an R implementation <code>infection_process_vaccine</code> or C++ implementation <code>infection_process_vaccine_cpp</code>. The R version is in R/process_infection_vaccine.R and the C++ one in src/process_infection_vaccine.cpp.</p>
+</div>
+<div id="vaccine-events" class="section level2">
+<h2 class="hasAnchor">
+<a href="#vaccine-events" class="anchor"></a>Vaccine events</h2>
+<p><code>create_events_vaccination</code> attaches additional <code><a href="https://mrc-ide.github.io/individual/reference/TargetedEvent.html">individual::TargetedEvent</a></code> objects to the events list to schedule doses for eligible individuals. <code>attach_event_listeners_vaccination</code> and <code>setup_events_vaccine</code> attach listeners and initialize the initial model state, respectively. These functions can be round in R/events_vaccination.R.</p>
+</div>
+<div id="simulation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#simulation" class="anchor"></a>Simulation</h2>
+<p>Because the variables list used for the simulation contains some objects which are not variables, the function <code>simulation_loop_vaccine</code> is used to run the simulation to handle variable updating correctly. It can be found in r/simulation_loop_vaccine.R.</p>
+</div>
 </div>
   </div>
 

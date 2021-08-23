@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -110,7 +110,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mrc-ide/safir/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -125,7 +130,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get parameters from squire model</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/parameters.R'><code>R/parameters.R</code></a></small>
     <div class="hidden name"><code>get_parameters.Rd</code></div>
     </div>
 
@@ -152,17 +157,15 @@
     </tr>
     <tr>
       <th>population</th>
-      <td><p>Population vector (for each age group). Default = NULL,
-which will cause population to be sourced from <code>country</code></p></td>
+      <td><p>Population vector (for each age group). Default = NULL, which will cause population to be sourced from country</p></td>
     </tr>
     <tr>
       <th>contact_matrix_set</th>
-      <td><p>Contact matrices used in simulation. Default =
-NULL, which will generate this based on the <code>country</code>.</p></td>
+      <td><p>Contact matrices used in simulation. Default = NULL, which will generate this based on the country.</p></td>
     </tr>
     <tr>
       <th>time_period</th>
-      <td><p>Length of simulation. Default = 365</p></td>
+      <td><p>length of simulation (in days)</p></td>
     </tr>
     <tr>
       <th>max_age</th>
@@ -170,7 +173,7 @@ NULL, which will generate this based on the <code>country</code>.</p></td>
     </tr>
     <tr>
       <th>dt</th>
-      <td><p>Time Step. Default = 0.1</p></td>
+      <td><p>size of time step</p></td>
     </tr>
     <tr>
       <th>...</th>

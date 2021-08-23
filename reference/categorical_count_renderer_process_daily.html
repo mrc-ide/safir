@@ -74,7 +74,7 @@ for simulations with small timesteps." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -112,7 +112,12 @@ for simulations with small timesteps." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mrc-ide/safir/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -127,7 +132,7 @@ for simulations with small timesteps." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Render categories every day</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/render.R'><code>R/render.R</code></a></small>
     <div class="hidden name"><code>categorical_count_renderer_process_daily.Rd</code></div>
     </div>
 
@@ -163,23 +168,6 @@ for simulations with small timesteps.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a function which can be passed as a process to <code>simulation_loop</code></p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>#' @title Render double variables every day
-#' @description This only renders output on timesteps
-#' that correspond to a day. This saves memory and potentially time for
-#' simulations with small timesteps.
-#' @param renderer a <code><a href='https://mrc-ide.github.io/individual/reference/Render.html'>Render</a></code> object
-#' @param variable a <code><a href='https://mrc-ide.github.io/individual/reference/DoubleVariable.html'>DoubleVariable</a></code> object
-#' @param dt size of time step
-#' @export
-double_count_render_process_daily &lt;- function(renderer, variable, dt) 
-stopifnot(inherits(variable, "DoubleVariable"))
-stopifnot(inherits(renderer, "Render"))
-function(t) 
-if ((t * dt) %% 1 == 0) 
-values &lt;- variable$get_values()
-renderer$render(name = as.character(1:length(values)), value = values,timestep = as.integer(t * dt))</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

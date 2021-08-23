@@ -73,7 +73,7 @@ Calls infection_process_cpp_internal to return an external pointer object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -111,7 +111,12 @@ Calls infection_process_cpp_internal to return an external pointer object." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mrc-ide/safir/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -126,7 +131,7 @@ Calls infection_process_cpp_internal to return an external pointer object." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>C++ infection process (squire transmission model)</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/process_infection.R'><code>R/process_infection.R</code></a></small>
     <div class="hidden name"><code>infection_process_cpp.Rd</code></div>
     </div>
 
@@ -146,11 +151,11 @@ Calls <code><a href='infection_process_cpp_internal.html'>infection_process_cpp_
     </tr>
     <tr>
       <th>variables</th>
-      <td><p>Model variable</p></td>
+      <td><p>a list of model variables, the output of <a href='create_variables.html'>create_variables</a></p></td>
     </tr>
     <tr>
       <th>events</th>
-      <td><p>Model events</p></td>
+      <td><p>a list of <a href='https://mrc-ide.github.io/individual/reference/TargetedEvent.html'>individual::TargetedEvent</a>, the output of <a href='create_events.html'>create_events</a></p></td>
     </tr>
     <tr>
       <th>dt</th>
