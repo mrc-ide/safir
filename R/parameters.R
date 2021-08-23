@@ -14,9 +14,12 @@
 
 #' @title Get parameters from squire model
 #'
-#' @inheritParams squire::parameters_explicit_SEEIR
 #' @param iso3c Character for country iso3c
+#' @param population Population vector (for each age group). Default = NULL, which will cause population to be sourced from country
+#' @param contact_matrix_set Contact matrices used in simulation. Default = NULL, which will generate this based on the country.
+#' @param time_period length of simulation (in days)
 #' @param max_age the maximum age for humans
+#' @param dt size of time step
 #' @param ... Other parameters for [squire::parameters_explicit_SEEIR]
 #'
 #' @return squire model parameters

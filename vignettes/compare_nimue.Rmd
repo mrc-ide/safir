@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Setup
+# Setup
 
 Let's compare **safir** to **nimue**. Set up our parameters for running. We use a time step of 0.1 days.
 
@@ -29,7 +29,7 @@ library(individual)
 library(ggplot2)
 
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -51,7 +51,7 @@ increasing <- run(
 ```
 
 
-## Run **safir**
+# Run **safir**
 
 Do a **safir** run. Because running the individual based verion of **nimue** is computationally expensive, we use `categorical_count_renderer_process_daily` and `integer_count_render_process_daily` to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes `vaccination_process_nimue_cpp` and `infection_process_nimue_cpp` (R versions are `vaccination_process_nimue` and `infection_process_nimue_cpp`; tests are included in the package to ensure the same results are returned when using identical random number seeds).
 
@@ -183,3 +183,41 @@ This is the same run as above, but with 40 repetitions. 95% quantiles and means 
 ```{r echo=FALSE, out.width='100%'}
 knitr::include_graphics('./nimue_comparison.png')
 ```
+
+# Code design
+
+## Parameters
+
+The function `get_parameters_nimue` is used to generate parameters from the nimue
+model, and source code is in R/parameters_nimue.R.
+
+## Variables
+
+The function `create_vaccine_variables_nimue` adds additional information needed
+for the model to the output of `create_variables`. It can be found in R/variables_vaccines.R.
+
+## Events & Processes
+
+The function `create_events_nimue` attaches additional events for modeling the
+vaccination process to the events list.
+`attach_event_listeners_nimue` attaches additional listeners to
+the vaccination events. Both functions can be found in R/events_vaccination_nimue.R.
+
+`setup_events_nimue` initializes event scheduling based on the initial state of the model.
+This is needed so that the model can be initialized from any valid state, instead
+of just **S** and **E** persons who are unvaccinated. It can be found 
+in R/initialize_events_nimue.R.
+
+The infection process can either use an R implementation `infection_process_nimue` or
+C++ implementation `infection_process_nimue_cpp`.  The R version is in 
+R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.
+
+Likewise the vaccination process has the R version `vaccination_process_nimue`
+and `vaccination_process_nimue_cpp`, in R/process_vaccination_nimue.R and
+src/process_vaccination_nimue.cpp, respectively.
+
+## Simulation
+
+Because the variables list used for the simulation contains some bitset objects
+which are not variables, the function `simulation_loop_nimue` is used to run
+the simulation to handle variable updating correctly. It can be found in r/simulation_loop_nimue.R.

@@ -7,13 +7,13 @@
 setup_events(parameters, events, variables, dt)
 }
 \arguments{
-\item{parameters}{write me!}
+\item{parameters}{model parameters}
 
-\item{events}{write me!}
+\item{events}{a list of \link[individual:TargetedEvent]{individual::TargetedEvent}, the output of \link{create_events}}
 
-\item{variables}{write me!}
+\item{variables}{a list of model variables, the output of \link{create_variables}}
 
-\item{dt}{write me!}
+\item{dt}{size of the time step}
 }
 \description{
 Schedule events for individuals at initialisation

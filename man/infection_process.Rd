@@ -9,12 +9,12 @@ infection_process(parameters, variables, events, dt)
 \arguments{
 \item{parameters}{Model parameters}
 
-\item{variables}{Model variable}
+\item{variables}{a list of model variables, the output of \link{create_variables}}
 
-\item{events}{Model events}
+\item{events}{a list of \link[individual:TargetedEvent]{individual::TargetedEvent}, the output of \link{create_events}}
 
 \item{dt}{the time step}
 }
 \description{
-S -> E if infected.
+simulates the process of infection.
 }

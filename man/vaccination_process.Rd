@@ -18,11 +18,13 @@ vaccination_process(parameters, variables, events, dt)
 \description{
 This function distributes vaccine doses each day for the vaccine
 model with multiple doses but no types. It distributes vaccines according to the
-following strategy.\preformatted{* start at \code{phase = 1}, meaning we begin by distributing the first dose
-* use \code{\link{get_vaccination_priority_stage}} to check what stage of the
+following strategy.
+\itemize{
+\item start at \code{phase = 1}, meaning we begin by distributing the first dose
+\item use \code{\link{get_vaccination_priority_stage}} to check what stage of the
 prioritization matrix \code{vaccine_coverage_mat} from \code{\link[nimue]{strategy_matrix}}
 we should be using to decide who to vaccinate.
-* we can advance one row of the prioritization matrix when coverage for this dose (phase) >=
+\item we can advance one row of the prioritization matrix when coverage for this dose (phase) >=
 prioritization matrix and coverage for next dose (phase) >= prioritization matrix groups prioritized
 for the next dose by the matrix \code{next_dose_priority}.
 }

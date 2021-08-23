@@ -24,7 +24,7 @@ get_parameters_nimue(
 
 \item{dt}{time step size}
 
-\item{...}{Other parameters for \code{\link[nimue]{parameters}}}
+\item{...}{Other parameters for \link[nimue:parameters]{nimue::parameters}}
 }
 \description{
 This calls \code{\link[nimue]{parameters}} from \href{https://mrc-ide.github.io/nimue/index.html}{nimue}.

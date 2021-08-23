@@ -17,17 +17,15 @@ get_parameters(
 \arguments{
 \item{iso3c}{Character for country iso3c}
 
-\item{population}{Population vector (for each age group). Default = NULL,
-which will cause population to be sourced from \code{country}}
+\item{population}{Population vector (for each age group). Default = NULL, which will cause population to be sourced from country}
 
-\item{contact_matrix_set}{Contact matrices used in simulation. Default =
-NULL, which will generate this based on the \code{country}.}
+\item{contact_matrix_set}{Contact matrices used in simulation. Default = NULL, which will generate this based on the country.}
 
-\item{time_period}{Length of simulation. Default = 365}
+\item{time_period}{length of simulation (in days)}
 
 \item{max_age}{the maximum age for humans}
 
-\item{dt}{Time Step. Default = 0.1}
+\item{dt}{size of time step}
 
 \item{...}{Other parameters for \link[squire:parameters_explicit_SEEIR]{squire::parameters_explicit_SEEIR}}
 }

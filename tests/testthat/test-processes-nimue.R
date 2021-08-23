@@ -1,7 +1,7 @@
 test_that("c++ infection process (nimue vaccine model) returns identical results as R version", {
 
   iso3c <- "GBR"
-  pop <- safir:::get_population(iso3c)
+  pop <- safir::get_population(iso3c)
   pop$n <- as.integer(pop$n / 2e2)
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -58,7 +58,7 @@ test_that("c++ infection process (nimue vaccine model) returns identical results
 test_that("c++ vaccination process (nimue vaccine model) returns identical results as R version", {
 
   iso3c <- "GBR"
-  pop <- safir:::get_population(iso3c)
+  pop <- safir::get_population(iso3c)
   pop$n <- as.integer(pop$n / 2e2)
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 

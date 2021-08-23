@@ -19,7 +19,12 @@ package to specify and run the simulation.
 **nimue** models, which recover trajectories from those aggregated population
 models (see package vignettes). It also implements a model for vaccination
 with an arbitrary number of doses and antibody titre dynamics which affect
-protective efficacy as well as efficacy against severe disease outcomes. 
+protective efficacy as well as efficacy against severe disease outcomes.
+
+Because **safir** implements multiple models as individual based simulations,
+there is a large amount of code, but the central disease progression is shared
+across the models within **safir**. Each vignette describes how the simulation
+functions and where the relevant code can be found.
 
 ## Installation
 

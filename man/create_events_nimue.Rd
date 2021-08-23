@@ -9,7 +9,7 @@ create_events_nimue(events, parameters)
 \arguments{
 \item{events}{a named list of individual::Event}
 
-\item{parameters}{write me!}
+\item{parameters}{parameters from \link{get_parameters_nimue}}
 }
 \description{
 Append vaccination events (nimue vaccine model)

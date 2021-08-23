@@ -7,10 +7,10 @@
 
 
 #' @title Schedule events for individuals at initialisation
-#' @param parameters write me!
-#' @param events write me!
-#' @param variables write me!
-#' @param dt write me!
+#' @param parameters model parameters
+#' @param events a list of [individual::TargetedEvent], the output of [create_events]
+#' @param variables a list of model variables, the output of [create_variables]
+#' @param dt size of the time step
 #' @export
 setup_events <- function(
     parameters,

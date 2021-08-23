@@ -7,11 +7,11 @@
 
 #' @title Infection process (squire transmission model)
 #'
-#' @description S -> E if infected.
+#' @description simulates the process of infection.
 #'
 #' @param parameters Model parameters
-#' @param variables Model variable
-#' @param events Model events
+#' @param variables a list of model variables, the output of [create_variables]
+#' @param events a list of [individual::TargetedEvent], the output of [create_events]
 #' @param dt the time step
 #' @export
 infection_process <- function(parameters, variables, events, dt) {
@@ -62,8 +62,8 @@ infection_process <- function(parameters, variables, events, dt) {
 #' Calls \code{\link{infection_process_cpp_internal}} to return an external pointer object.
 #'
 #' @param parameters Model parameters
-#' @param variables Model variable
-#' @param events Model events
+#' @param variables a list of model variables, the output of [create_variables]
+#' @param events a list of [individual::TargetedEvent], the output of [create_events]
 #' @param dt the time step
 #' @export
 infection_process_cpp <- function(parameters, variables, events, dt) {

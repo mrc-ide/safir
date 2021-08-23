@@ -7,7 +7,7 @@
 create_vaccine_variables_nimue(variables, pop)
 }
 \arguments{
-\item{variables}{a list}
+\item{variables}{a list from \link{create_variables}}
 
 \item{pop}{population list}
 }

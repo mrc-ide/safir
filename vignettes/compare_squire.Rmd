@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Setup
+# Setup
 
 Let's compare **safir** to **squire**. Set up our parameters for running. We use a time step of 0.1 days. We use `get_parameters` to grab parameters directly from the **squire** package.
 
@@ -29,7 +29,7 @@ library(parallel)
 
 iso3c <- "ATG"
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 
 # use as many as you want normally.
 options("mc.cores" = 2)
@@ -43,7 +43,7 @@ R0 <- 2
 time_period <- 200
 dt <- 0.1
 
-parameters <- safir::get_parameters(
+parameters <- get_parameters(
   population = pop$n,
   contact_matrix_set = contact_mat,
   iso3c = iso3c,
@@ -60,7 +60,7 @@ out <- squire::run_explicit_SEEIR_model(
   population = pop$n,
   country = "Antigua and Barbuda",
   contact_matrix_set = contact_mat,
-  time_period = 200,
+  time_period = time_period,
   replicates = nrep,
   day_return = TRUE,
   R0 = R0,
@@ -68,7 +68,7 @@ out <- squire::run_explicit_SEEIR_model(
 )
 ```
 
-## Run **safir**
+# Run **safir**
 
 Now we can run safir in parallel. Note that the timesteps is the maximum day divided by the size of the step, `dt`.
 
@@ -145,3 +145,37 @@ Here's a run of **safir** vs. **squire** on GBR with 20 repetitions.
 ```{r echo=FALSE, out.width='100%'}
 knitr::include_graphics('./squire_comparison.png')
 ```
+
+# Code design
+
+## Parameters
+
+The function `get_parameters` is used to generate parameters from the squire
+model, and source code is in R/parameters.R.
+
+## Variables
+
+The function `create_variables` creates state variables for the model. It returns
+a list containing a `individual::CategoricalVariable` labeled
+`states` which records the disease status of each individual, and a
+`individual::IntegerVariable` labeled `discrete_age` which contains
+the age bin of each individual.
+
+The main function and code to generate the age variable is found in R/variables.R
+and the function which generates the disease state variable is found in R/variables_states.R.
+
+## Events & Processes
+
+The function `create_events` creates a list of `individual::TargetedEvent`
+object which are responsible for modeling the disease progression of individuals
+after infection is initiated. `attach_event_listeners` attaches listeners to
+each event which execute the state updates and dynamics when each event is triggered
+for scheduled individuals. Both functions can be found in R/events.R.
+
+`setup_events` initializes event scheduling based on the initial state of the model.
+This is needed so that the model can be initialized from any valid state, instead
+of just **S** and **E** persons. It can be found in R/initialize_events.R.
+
+The infection process can either use an R implementation `infection_process` or
+C++ implementation `infection_process_cpp`.  The R version is in R/process_infection.R
+and the C++ one in src/process_infection.cpp.

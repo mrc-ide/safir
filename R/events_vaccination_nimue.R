@@ -15,7 +15,7 @@ nimue_states_names <- c("vaccine_states", "eligible", "vaccinated", "empty")
 #' @title Append vaccination events (nimue vaccine model)
 #'
 #' @param events a named list of individual::Event
-#' @param parameters write me!
+#' @param parameters parameters from [get_parameters_nimue]
 #' @importFrom individual TargetedEvent
 #' @export
 create_events_nimue <- function(events, parameters) {

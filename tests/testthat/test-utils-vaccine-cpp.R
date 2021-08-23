@@ -28,7 +28,7 @@ test_that("get_proportion_vaccinated_all_ages_cpp works", {
   for (i in 1:doses) {
 
     R_out <- get_current_coverage(variables = variables,events = events,dose = i,parameters = parameters)
-    R_out <- sapply(R_out, function(a){a$size()})
+    R_out <- vapply(R_out, function(a){a$size()}, numeric(1))
     R_out <- R_out / ages_size
 
     cpp_out <- get_proportion_vaccinated_all_ages_cpp(variables = variables,N_age = N_age,dose = i)

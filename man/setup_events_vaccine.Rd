@@ -7,13 +7,13 @@
 setup_events_vaccine(parameters, events, variables, dt)
 }
 \arguments{
-\item{parameters}{write me!}
+\item{parameters}{model parameters}
 
-\item{events}{write me!}
+\item{events}{list of model events}
 
-\item{variables}{write me!}
+\item{variables}{list of model variables}
 
-\item{dt}{write me!}
+\item{dt}{size of time step}
 }
 \description{
 Schedule events for individuals at initialisation (vaccine model, multi-dose, no types)
