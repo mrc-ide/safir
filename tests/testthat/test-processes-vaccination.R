@@ -2,7 +2,7 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
 
   # pars
   iso3c <- "GBR"
-  pop <- safir:::get_population(iso3c)
+  pop <- safir::get_population(iso3c)
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
   pop$n <- as.integer(pop$n / 100)
 
