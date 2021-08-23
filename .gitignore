@@ -8,4 +8,5 @@ Meta
 inst/doc
 /doc/
 /Meta/
-^docs$
+docs
+/docs/
