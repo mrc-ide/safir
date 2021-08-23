@@ -18,6 +18,7 @@ Description: Implements an individual-based model of COVID-19 transmission.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/mrc-ide/safir, https://mrc-ide.github.io/safir/
 Remotes: 
     mrc-ide/individual,
     mrc-ide/squire,
