@@ -7,6 +7,7 @@
 #include <Rcpp.h>
 #include <individual.h>
 #include "../inst/include/utils.hpp"
+#include "../inst/include/efficacy_vaccination.hpp"
 
 //' @title C++ infection process for vaccine model (multi-dose, no types)
 //' @description this is an internal function, you should use the R interface
@@ -22,7 +23,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
     Rcpp::List parameters,
     Rcpp::XPtr<CategoricalVariable> states,
     Rcpp::XPtr<IntegerVariable> discrete_age,
-    Rcpp::XPtr<DoubleVariable> ef_infection,
+    Rcpp::XPtr<DoubleVariable> ab_titre,
     Rcpp::XPtr<TargetedEvent> exposure,
     const double dt
 ) {
@@ -31,11 +32,11 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
   // vectors we can build once
-  std::vector<double> beta(17, 0.);
-  std::vector<double> lambda(17, 0.);
+  std::vector<double> beta(17, 0.0);
+  std::vector<double> lambda(17, 0.0);
 
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, ef_infection, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
+    new process_t([parameters, states, discrete_age, ab_titre, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
 
       individual_index_t infectious = states->get_index_of(inf_states);
 
@@ -59,13 +60,14 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
         std::vector<int> sus_ages = discrete_age->get_values(susceptible);
 
         // get efficacy
-        std::vector<double> infection_efficacy = ef_infection->get_values(susceptible);
+        std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
+        std::vector<double> infection_efficacy = vaccine_efficacy_infection(ab_titre_susceptible, parameters);
 
         // FoI for each susceptible person
         std::vector<double> lambda_sus(sus_ages.size());
         for (auto i = 0u; i < sus_ages.size(); ++i) {
           lambda_sus[i] = lambda[sus_ages[i] - 1] * infection_efficacy[i] * dt;
-          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1., 1, 0);
+          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
         }
 
         // infected
@@ -73,8 +75,6 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
         // newly infected queue the exposure event
         if (susceptible.size() > 0) {
-          // double zero{0.0};
-          // exposure->schedule(susceptible, zero);
           exposure->schedule(susceptible, 0.0);
         }
       }

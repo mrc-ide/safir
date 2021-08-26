@@ -80,7 +80,7 @@ infection_process_vaccine_cpp <- function(parameters, variables, events, dt) {
       parameters = parameters,
       states = variables$states$.variable,
       discrete_age = variables$discrete_age$.variable,
-      ef_infection = variables$ef_infection$.variable,
+      ab_titre = variables$ab_titre$.variable,
       exposure = events$exposure$.event,
       dt = dt
     )

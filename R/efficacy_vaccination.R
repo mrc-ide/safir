@@ -42,13 +42,6 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
         # schedule an update
         variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated)
 
-        # # vaccine efficacy
-        # ef_infection <- vaccine_efficacy_infection(ab_titre = current_ab_titre,parameters = parameters)
-        # ef_severe <- vaccine_efficacy_severe(ab_titre = current_ab_titre,ef_infection = ef_infection,parameters = parameters)
-        #
-        # variables$ef_infection$queue_update(values = ef_infection, index = vaccinated)
-        # variables$ef_severe$queue_update(values = ef_severe, index = vaccinated)
-
       }
 
     }

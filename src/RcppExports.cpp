@@ -61,18 +61,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // infection_process_vaccine_cpp_internal
-Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<DoubleVariable> ef_infection, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
-RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP ef_infectionSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
+Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<DoubleVariable> ab_titre, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
+RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP ab_titreSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DoubleVariable> >::type ef_infection(ef_infectionSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<DoubleVariable> >::type ab_titre(ab_titreSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type exposure(exposureSEXP);
     Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
-    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, states, discrete_age, ef_infection, exposure, dt));
+    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, states, discrete_age, ab_titre, exposure, dt));
     return rcpp_result_gen;
 END_RCPP
 }

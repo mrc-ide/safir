@@ -66,12 +66,6 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
 
   variables$ab_titre$queue_update(values = zdose, index = target)
 
-  ef_infection <- vaccine_efficacy_infection(ab_titre = zdose,parameters = parameters)
-  ef_severe <- vaccine_efficacy_severe(ab_titre = zdose,ef_infection = ef_infection,parameters = parameters)
-
-  variables$ef_infection$queue_update(values = ef_infection, index = target)
-  variables$ef_severe$queue_update(values = ef_severe, index = target)
-
 }
 
 
