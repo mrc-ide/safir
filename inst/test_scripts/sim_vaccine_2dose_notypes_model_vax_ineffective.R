@@ -86,7 +86,8 @@ double_count_render_process_daily <- function(variable, dt) {
 processes <- list(
   vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
-  infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+  # infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+  infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
   double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
   integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt)
