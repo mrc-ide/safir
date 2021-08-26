@@ -8,6 +8,14 @@
 \description{
 safir is an individual-based simulation model of COVD-19 based on squire.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/mrc-ide/safir}
+  \item \url{https://mrc-ide.github.io/safir/}
+}
+
+}
 \author{
 \strong{Maintainer}: OJ Watson \email{o.watson15@imperial.ac.uk}
 
