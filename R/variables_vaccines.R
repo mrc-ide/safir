@@ -71,10 +71,8 @@ create_vaccine_variables <- function(variables, parameters) {
   variables$phase <- new.env(hash = FALSE)
   variables$phase$value <- 1L
 
-  # ab and efficacy dynamics
+  # ab dynamics
   variables$ab_titre <- DoubleVariable$new(initial_values = rep(0,n))
-  variables$ef_infection <- DoubleVariable$new(initial_values = rep(1,n))
-  variables$ef_severe <- DoubleVariable$new(initial_values = rep(1,n))
 
   if (correlated) {
     variables$zdose <- DoubleVariable$new(initial_values = rep(NaN,n))
@@ -118,8 +116,6 @@ update_vaccine_variables <- function(variables) {
   }
   variables$dose_num$.update()
   variables$ab_titre$.update()
-  variables$ef_infection$.update()
-  variables$ef_severe$.update()
 
   if (!is.null(variables$zdose)) {
     variables$zdose$.update()
