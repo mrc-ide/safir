@@ -86,7 +86,7 @@ double_count_render_process_daily <- function(variable, dt) {
 processes <- list(
   vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
-  # infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+  infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
   double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
@@ -108,6 +108,7 @@ vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated$not(inplace = TRUE)
 
 ab_titre <- ab_renderer[, vaccinated$to_vector()]
+ab_titre[which(!is.finite(ab_titre))] <- NaN
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
 ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){

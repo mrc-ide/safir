@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{vaccine_efficacy_severe_cpp}
 \alias{vaccine_efficacy_severe_cpp}
-\title{Compute vaccine efficacy against severe disease from Ab titre}
+\title{Compute vaccine efficacy against severe disease from Ab titre (C++)}
 \usage{
 vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters)
 }
@@ -12,6 +12,9 @@ vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters)
 \item{ef_infection}{a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}}
 
 \item{parameters}{model parameters}
+}
+\value{
+a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 }
 \description{
 This needs the efficacy against infection because efficacy against severe disease,

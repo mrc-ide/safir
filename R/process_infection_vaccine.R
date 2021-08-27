@@ -39,7 +39,7 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
         # get infection modifier and ages
         ab_titre <- variables$ab_titre$get_values(susceptible)
-        infection_efficacy <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = parameters)
+        infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters)
         ages <- variables$discrete_age$get_values(susceptible)
 
         # FoI for each susceptible based on their age group
