@@ -11,6 +11,31 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// vaccine_efficacy_infection_cpp
+std::vector<double> vaccine_efficacy_infection_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters);
+RcppExport SEXP _safir_vaccine_efficacy_infection_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_infection_cpp(ab_titre, parameters));
+    return rcpp_result_gen;
+END_RCPP
+}
+// vaccine_efficacy_severe_cpp
+std::vector<double> vaccine_efficacy_severe_cpp(const std::vector<double>& ab_titre, const std::vector<double>& ef_infection, const Rcpp::List& parameters);
+RcppExport SEXP _safir_vaccine_efficacy_severe_cpp(SEXP ab_titreSEXP, SEXP ef_infectionSEXP, SEXP parametersSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type ef_infection(ef_infectionSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vaccination_process_nimue_cpp_internal
 Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
 RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
@@ -61,18 +86,30 @@ BEGIN_RCPP
 END_RCPP
 }
 // infection_process_vaccine_cpp_internal
-Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<DoubleVariable> ef_infection, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
-RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP ef_infectionSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
+Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<DoubleVariable> ab_titre, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
+RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP ab_titreSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DoubleVariable> >::type ef_infection(ef_infectionSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<DoubleVariable> >::type ab_titre(ab_titreSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type exposure(exposureSEXP);
     Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
-    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, states, discrete_age, ef_infection, exposure, dt));
+    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, states, discrete_age, ab_titre, exposure, dt));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compare_floats
+bool compare_floats(const double a, const double b);
+RcppExport SEXP _safir_compare_floats(SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(compare_floats(a, b));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -205,10 +242,13 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 2},
+    {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 3},
     {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
     {"_safir_infection_process_vaccine_cpp_internal", (DL_FUNC) &_safir_infection_process_vaccine_cpp_internal, 6},
+    {"_safir_compare_floats", (DL_FUNC) &_safir_compare_floats, 2},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
     {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
