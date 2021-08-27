@@ -84,10 +84,18 @@ get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_ti
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
 vaccine_efficacy_infection <- function(ab_titre, parameters) {
-  nt <- exp(ab_titre)
-  ef_infection <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50)))) # reported efficacy in trials
-  ef_infection <- 1 - ef_infection
-  return(ef_infection)
+  # null value is 1
+  ef_infection <- rep(1, length(ab_titre))
+  if (any(is.finite(ab_titre))) {
+    # if some vaccinated individuals with ab titre, calc efficacy for them
+    finite_ab <- which(is.finite(ab_titre))
+    nt <- exp(ab_titre[finite_ab])
+    ef_infection[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50)))) # reported efficacy in trials
+    ef_infection[finite_ab] <- 1 - ef_infection[finite_ab]
+    return(ef_infection)
+  } else {
+    return(ef_infection)
+  }
 }
 
 
@@ -100,9 +108,17 @@ vaccine_efficacy_infection <- function(ab_titre, parameters) {
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
 vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
-  nt <- exp(ab_titre)
-  ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
-  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
-  ef_severe <- 1 - ef_severe
-  return(ef_severe)
+  # null value is 1
+  ef_severe <- rep(1, length(ab_titre))
+  if (any(is.finite(ab_titre))) {
+    # if some vaccinated individuals with ab titre, calc efficacy for them
+    finite_ab <- which(is.finite(ab_titre))
+    nt <- exp(ab_titre[finite_ab])
+    ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
+    ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection[finite_ab]))
+    ef_severe[finite_ab] <- 1 - ef_severe[finite_ab]
+    return(ef_severe)
+  } else {
+    return(ef_severe)
+  }
 }
