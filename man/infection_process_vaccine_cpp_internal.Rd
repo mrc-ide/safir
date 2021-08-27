@@ -20,11 +20,11 @@ infection_process_vaccine_cpp_internal(
 
 \item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
 
+\item{ab_titre}{a \code{\link[individual]{DoubleVariable}}}
+
 \item{exposure}{a \code{\link[individual]{TargetedEvent}}}
 
 \item{dt}{size of time step}
-
-\item{ef_infection}{a \code{\link[individual]{DoubleVariable}}}
 }
 \description{
 this is an internal function, you should use the R interface

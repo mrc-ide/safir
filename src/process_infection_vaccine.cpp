@@ -15,7 +15,7 @@
 //' @param parameters a list of parameters from \code{\link{get_parameters}}
 //' @param states a \code{\link[individual]{CategoricalVariable}}
 //' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-//' @param ef_infection a \code{\link[individual]{DoubleVariable}}
+//' @param ab_titre a \code{\link[individual]{DoubleVariable}}
 //' @param exposure a \code{\link[individual]{TargetedEvent}}
 //' @param dt size of time step
 // [[Rcpp::export]]

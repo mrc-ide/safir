@@ -70,7 +70,7 @@ infection_process_nimue_cpp_internal <- function(parameters, states, vaccine_sta
 #' @param parameters a list of parameters from \code{\link{get_parameters}}
 #' @param states a \code{\link[individual]{CategoricalVariable}}
 #' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-#' @param ef_infection a \code{\link[individual]{DoubleVariable}}
+#' @param ab_titre a \code{\link[individual]{DoubleVariable}}
 #' @param exposure a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
 infection_process_vaccine_cpp_internal <- function(parameters, states, discrete_age, ab_titre, exposure, dt) {
