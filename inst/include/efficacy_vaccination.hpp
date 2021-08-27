@@ -13,7 +13,7 @@
 //' @title Compute vaccine efficacy against infection from Ab titre
 //' @param ab_titre a vector of Ab titres
 //' @param parameters model parameters
-std::vector<double> vaccine_efficacy_infection(
+std::vector<double> vaccine_efficacy_infection_cpp(
     const std::vector<double>& ab_titre,
     const Rcpp::List& parameters
 );
@@ -24,7 +24,7 @@ std::vector<double> vaccine_efficacy_infection(
 //' @param ab_titre a vector of Ab titres
 //' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 //' @param parameters model parameters
-std::vector<double> vaccine_efficacy_infection(
+std::vector<double> vaccine_efficacy_severe_cpp(
         const std::vector<double>& ab_titre,
         const std::vector<double>& ef_infection,
         const Rcpp::List& parameters

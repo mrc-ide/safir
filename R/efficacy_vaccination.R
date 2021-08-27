@@ -80,7 +80,8 @@ get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_ti
 
 #' @title Compute vaccine efficacy against infection from Ab titre
 #' @param ab_titre a vector of Ab titres
-#' @param parameters model parameters
+#' @param parameters model parameters.
+#' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
 vaccine_efficacy_infection <- function(ab_titre, parameters) {
   nt <- exp(ab_titre)
@@ -96,6 +97,7 @@ vaccine_efficacy_infection <- function(ab_titre, parameters) {
 #' @param ab_titre a vector of Ab titres
 #' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 #' @param parameters model parameters
+#' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
 vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
   nt <- exp(ab_titre)

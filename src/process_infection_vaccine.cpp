@@ -61,7 +61,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
         // get efficacy
         std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
-        std::vector<double> infection_efficacy = vaccine_efficacy_infection(ab_titre_susceptible, parameters);
+        std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters);
 
         // FoI for each susceptible person
         std::vector<double> lambda_sus(sus_ages.size());

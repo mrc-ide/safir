@@ -9,7 +9,10 @@ vaccine_efficacy_infection(ab_titre, parameters)
 \arguments{
 \item{ab_titre}{a vector of Ab titres}
 
-\item{parameters}{model parameters}
+\item{parameters}{model parameters.}
+}
+\value{
+a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 }
 \description{
 Compute vaccine efficacy against infection from Ab titre
