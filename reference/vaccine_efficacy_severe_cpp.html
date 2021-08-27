@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Continuous age variable — create_continuous_age_variable • safir</title>
+<title>Compute vaccine efficacy against severe disease from Ab titre (C++) — vaccine_efficacy_severe_cpp • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Continuous age variable — create_continuous_age_variable" />
-<meta property="og:description" content="Create a continuous age variable for the population" />
+<meta property="og:title" content="Compute vaccine efficacy against severe disease from Ab titre (C++) — vaccine_efficacy_severe_cpp" />
+<meta property="og:description" content="This needs the efficacy against infection because efficacy against severe disease,
+conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection))." />
 
 
 
@@ -129,33 +130,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Continuous age variable</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables.R'><code>R/variables.R</code></a></small>
-    <div class="hidden name"><code>create_continuous_age_variable.Rd</code></div>
+    <h1>Compute vaccine efficacy against severe disease from Ab titre (C++)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/RcppExports.R'><code>R/RcppExports.R</code></a></small>
+    <div class="hidden name"><code>vaccine_efficacy_severe_cpp.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create a continuous age variable for the population</p>
+    <p>This needs the efficacy against infection because efficacy against severe disease,
+conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_continuous_age_variable</span><span class='op'>(</span><span class='va'>pop</span>, max_age <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>vaccine_efficacy_severe_cpp</span><span class='op'>(</span><span class='va'>ab_titre</span>, <span class='va'>ef_infection</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>pop</th>
-      <td><p>population list</p></td>
+      <th>ab_titre</th>
+      <td><p>a vector of Ab titres</p></td>
     </tr>
     <tr>
-      <th>max_age</th>
-      <td><p>maximum age to be drawn</p></td>
+      <th>ef_infection</th>
+      <td><p>a vector of efficacy against infection from <code><a href='vaccine_efficacy_infection.html'>vaccine_efficacy_infection</a></code></p></td>
+    </tr>
+    <tr>
+      <th>parameters</th>
+      <td><p>model parameters</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>continuous age variable</p>
+    <p>a numeric vector, 0 is maximally proective, 1 is maximally unprotective</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
