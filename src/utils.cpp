@@ -6,6 +6,12 @@
 
 #include "../inst/include/utils.hpp"
 
+// [[Rcpp::export]]
+bool compare_floats(const double a, const double b) {
+  static double eps = std::sqrt(std::numeric_limits<double>::epsilon());
+  return std::fabs(a - b) < eps;
+};
+
 //' @title Cross tabulate two vectors with given margins
 //' @description this is a replacement for \code{\link[base]{table}} that allows empty
 //' cells because the margins have been specified. The input vectors \code{a} and \code{b}

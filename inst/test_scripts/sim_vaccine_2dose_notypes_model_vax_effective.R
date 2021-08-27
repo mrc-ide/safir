@@ -107,6 +107,7 @@ vaccinated <- variables$dose_num$get_index_of(set = 0)
 vaccinated$not(inplace = TRUE)
 
 ab_titre <- ab_renderer[, vaccinated$to_vector()]
+ab_titre[which(!is.finite(ab_titre))] <- NaN
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
 ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){

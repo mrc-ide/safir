@@ -1,3 +1,10 @@
+test_that("float equality works", {
+
+  expect_true(safir:::compare_floats(1,1.0))
+  expect_false(safir:::compare_floats(1,0.9999))
+
+})
+
 test_that("cross tab works", {
 
   a_mar <- 4

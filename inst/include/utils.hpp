@@ -7,8 +7,11 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <limits>
 #include <Rcpp.h>
 #include <individual.h>
+
+bool compare_floats(const double a, const double b);
 
 Rcpp::IntegerMatrix cross_tab_margins(
     const Rcpp::IntegerVector& a,
