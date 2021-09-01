@@ -16,8 +16,8 @@ std::vector<double> vaccine_efficacy_infection_cpp(
     const std::vector<double>& ab_titre,
     const Rcpp::List& parameters
 ) {
-  double k = Rcpp::as<double>(parameters["k"]);
-  double ab_50 = Rcpp::as<double>(parameters["ab_50"]);
+  static double k = Rcpp::as<double>(parameters["k"]);
+  static double ab_50 = Rcpp::as<double>(parameters["ab_50"]);
 
   std::vector<double> ef_infection(ab_titre.size(), 1.0);
 
@@ -48,8 +48,8 @@ std::vector<double> vaccine_efficacy_severe_cpp(
     const std::vector<double>& ef_infection,
     const Rcpp::List& parameters
 ) {
-  double k = Rcpp::as<double>(parameters["k"]);
-  double ab_50_severe = Rcpp::as<double>(parameters["ab_50_severe"]);
+  static double k = Rcpp::as<double>(parameters["k"]);
+  static double ab_50_severe = Rcpp::as<double>(parameters["ab_50_severe"]);
 
   std::vector<double> ef_severe(ab_titre.size(), 1.0);
 
