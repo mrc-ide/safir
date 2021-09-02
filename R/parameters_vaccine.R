@@ -6,7 +6,7 @@
 
 
 #' @title Get vaccine efficacy and Ab titre parameters
-#' @param vaccine which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"
+#' @param vaccine which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna" (controls the mean titre associated with each dose)
 #' @param max_dose maximum number of doses
 #' @param correlated are doses correlated?
 #' @param hl_s Half life of antibody decay - short

@@ -5,14 +5,15 @@
 # --------------------------------------------------------------------------------
 
 
-#' @title Get variant of concern parameters
+#' @title Get variant of concern transmission parameters
 #' @param tmax the maximum day of simulation (not the number of time steps)
 #' @param voc_types character vector of variant names (must include "wt" and "none")
 #' @export
 get_voc_parameters <- function(
   tmax,
   voc_types = c("alpha", "beta", "delta", "wt", "none"),
-  voc_trajectory = NULL
+  voc_trajectory = NULL,
+  vaccine_parameters
 ) {
 
   stopifnot(is.finite(tmax))
@@ -33,7 +34,10 @@ get_voc_parameters <- function(
 
   parameters <- list()
   parameters$voc_types <- voc_types
+  parameters$voc_num <- length(voc_types) - 1
   parameters$voc_trajectory <- voc_trajectory
+
+  if ()
 
   return(parameters)
 }

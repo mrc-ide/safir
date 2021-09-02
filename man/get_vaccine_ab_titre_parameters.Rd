@@ -19,7 +19,7 @@ get_vaccine_ab_titre_parameters(
 )
 }
 \arguments{
-\item{vaccine}{which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"}
+\item{vaccine}{which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna" (controls the mean titre associated with each dose)}
 
 \item{max_dose}{maximum number of doses}
 

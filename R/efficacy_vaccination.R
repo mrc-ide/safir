@@ -98,6 +98,30 @@ vaccine_efficacy_infection <- function(ab_titre, parameters) {
   }
 }
 
+#' @title Compute vaccine efficacy against infection from Ab titre for each variant of concern
+#' @param ab_titre a vector of Ab titres
+#' @param parameters model parameters.
+#' @return a numeric matrix, 0 is maximally proective, 1 is maximally unprotective.
+#' The rows correspond to each variant and columns are each individual.
+#' @export
+vaccine_efficacy_infection_voc <- function(ab_titre, parameters) {
+  # null value is 1
+  ef_infection <- matrix(1, ncol = length(ab_titre), nrow = parameters$voc_num)
+  if (any(is.finite(ab_titre))) {
+    # if some vaccinated individuals with ab titre, calc efficacy for them
+    finite_ab <- which(is.finite(ab_titre))
+    nt <- exp(ab_titre[finite_ab])
+    for (v in seq_len(parameters$voc_num)) {
+      ef_infection[v, finite_ab] <- 1 / (1 + exp(-parameters$k[v] * (log10(nt) - log10(parameters$ab_50[v])))) # reported efficacy in trials
+    }
+    ef_infection[, finite_ab] <- 1 - ef_infection[, finite_ab]
+    return(ef_infection)
+  } else {
+    return(ef_infection)
+  }
+}
+
+
 
 #' @title Compute vaccine efficacy against severe disease from Ab titre
 #' @description This needs the efficacy against infection because efficacy against severe disease,
@@ -117,6 +141,33 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
     ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
     ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection[finite_ab]))
     ef_severe[finite_ab] <- 1 - ef_severe[finite_ab]
+    return(ef_severe)
+  } else {
+    return(ef_severe)
+  }
+}
+
+#' @title Compute vaccine efficacy against severe disease from Ab titre for each variant of concern
+#' @description This needs the efficacy against infection because efficacy against severe disease,
+#' conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).
+#' @param ab_titre a vector of Ab titres
+#' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
+#' @param parameters model parameters
+#' @return a numeric matrix, 0 is maximally proective, 1 is maximally unprotective.
+#' The rows correspond to each variant and columns are each individual.
+#' @export
+vaccine_efficacy_severe_voc <- function(ab_titre, ef_infection, parameters) {
+  # null value is 1
+  ef_severe <- matrix(1, ncol = length(ab_titre), nrow = parameters$voc_num)
+  if (any(is.finite(ab_titre))) {
+    # if some vaccinated individuals with ab titre, calc efficacy for them
+    finite_ab <- which(is.finite(ab_titre))
+    nt <- exp(ab_titre[finite_ab])
+    for (v in seq_len(parameters$voc_num)) {
+      ef_severe_uncond <- 1 / (1 + exp(-parameters$k[v] * (log10(nt) - log10(parameters$ab_50_severe[v]))))
+      ef_severe[v, finite_ab] <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection[v, finite_ab]))
+    }
+    ef_severe[v, finite_ab] <- 1 - ef_severe[v, finite_ab]
     return(ef_severe)
   } else {
     return(ef_severe)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameters_variants.R
 \name{get_voc_parameters}
 \alias{get_voc_parameters}
-\title{Get variant of concern parameters}
+\title{Get variant of concern transmission parameters}
 \usage{
 get_voc_parameters(
   tmax,
@@ -16,5 +16,5 @@ get_voc_parameters(
 \item{voc_types}{character vector of variant names (must include "wt" and "none")}
 }
 \description{
-Get variant of concern parameters
+Get variant of concern transmission parameters
 }

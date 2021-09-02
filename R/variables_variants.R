@@ -11,6 +11,7 @@
 #' @param variables a list
 #' @param parameters list of model parameters
 #' @importFrom individual CategoricalVariable
+#' @importFrom individual Bitset
 #' @return named list of individual::Variable
 #' @export
 create_voc_variables <- function(variables, parameters) {
@@ -20,6 +21,9 @@ create_voc_variables <- function(variables, parameters) {
 
   # this tracks what a person's current infection is
   variables$voc <- CategoricalVariable$new(categories = parameters$voc_types,initial_values = rep("none", n))
+
+  # bitsets for new infections on each round
+  variables$voc_new_inf <- replicate(n = parameters$voc_num, expr = {Bitset$new(size = n)})
 
   return(variables)
 }
