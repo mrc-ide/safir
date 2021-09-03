@@ -4,14 +4,47 @@
 \alias{get_vaccine_ab_titre_parameters}
 \title{Get vaccine efficacy and Ab titre parameters}
 \usage{
-get_vaccine_ab_titre_parameters(vaccine, max_dose = 2, correlated = FALSE)
+get_vaccine_ab_titre_parameters(
+  vaccine,
+  max_dose = 2,
+  correlated = FALSE,
+  hl_s = 108,
+  hl_l = 3650,
+  period_s = 250,
+  t_period_l = 365,
+  ab_50 = 0.2,
+  ab_50_severe = 0.03,
+  std10 = 0.44,
+  k = 2.94,
+  mu_ab_list = data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
+    mu_ab_d1 = c(13/94, 1/59, 28/164, ((185 + 273)/2)/321), mu_ab_d2 = c(223/94, 32/59,
+    28/164, 654/158))
+)
 }
 \arguments{
-\item{vaccine}{which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"}
+\item{vaccine}{which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna" (controls the mean titre associated with each dose)}
 
 \item{max_dose}{maximum number of doses}
 
 \item{correlated}{are doses correlated?}
+
+\item{hl_s}{Half life of antibody decay - short}
+
+\item{hl_l}{Half life of antibody decay - long}
+
+\item{period_s}{length of the initial decay rate (shortest half-life)}
+
+\item{t_period_l}{Time point at which to have switched to longest half-life}
+
+\item{ab_50}{titre relative to convalescent required to provide 50\% protection from infection, on linear scale}
+
+\item{ab_50_severe}{titre relative to convalescent required to provide 50\% protection from severe disease, on linear scale}
+
+\item{std10}{Pooled standard deviation of antibody level on log10 data}
+
+\item{k}{shape parameter of efficacy curve}
+
+\item{mu_ab_list}{a data.frame}
 }
 \description{
 Get parameters for vaccine efficacy and antibody titre decay rate.

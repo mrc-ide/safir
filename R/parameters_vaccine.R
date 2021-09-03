@@ -6,34 +6,47 @@
 
 
 #' @title Get vaccine efficacy and Ab titre parameters
-#' @param vaccine which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"
+#' @param vaccine which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna" (controls the mean titre associated with each dose)
 #' @param max_dose maximum number of doses
 #' @param correlated are doses correlated?
+#' @param hl_s Half life of antibody decay - short
+#' @param hl_l Half life of antibody decay - long
+#' @param period_s length of the initial decay rate (shortest half-life)
+#' @param t_period_l Time point at which to have switched to longest half-life
+#' @param ab_50 titre relative to convalescent required to provide 50% protection from infection, on linear scale
+#' @param ab_50_severe titre relative to convalescent required to provide 50% protection from severe disease, on linear scale
+#' @param std10 Pooled standard deviation of antibody level on log10 data
+#' @param k shape parameter of efficacy curve
+#' @param mu_ab_list a data.frame
 #' @description Get parameters for vaccine efficacy and antibody titre decay rate.
 #' @export
-get_vaccine_ab_titre_parameters <- function(vaccine, max_dose = 2, correlated = FALSE) {
-  stopifnot(max_dose %in% c(2,3))
-  stopifnot(is.logical(correlated))
-  stopifnot(vaccine %in% c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"))
-
-  mu_ab_list <- data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
+get_vaccine_ab_titre_parameters <- function(
+  vaccine, max_dose = 2, correlated = FALSE,
+  hl_s = 108, hl_l = 3650,
+  period_s = 250, t_period_l = 365,
+  ab_50 = 0.2,
+  ab_50_severe = 0.03,
+  std10 = 0.44,
+  k = 2.94,
+  mu_ab_list = data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
                            mu_ab_d1 = c(13/94, 1/59, 28/164, ((185+273)/2)/321),
                            mu_ab_d2 = c(223/94, 32/59, 28/164, 654/158))
+) {
 
-  hl_s <- 108 # Half life of antibody decay - short
-  hl_l <- 3650 # Half life of antibody decay - long
-  period_s <- 250
-  t_period_l <- 365 # Time point at which to have switched to longest half-life
+  stopifnot(max_dose %in%  1:(ncol(mu_ab_list) - 1))
+  stopifnot(is.logical(correlated))
+  stopifnot(vaccine %in% mu_ab_list[, "name"])
+
+  stopifnot(all(is.finite(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k))))
+  stopifnot(all(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k) > 0))
+
+
   time_to_decay <- t_period_l - period_s # time in days to reach longest half-life
   dr_s <- -log(2)/hl_s # Corresponding decay rate in days for half life above
   dr_l <- -log(2)/hl_l
 
   mu_ab_d1 <- mu_ab_list[mu_ab_list$name == vaccine, "mu_ab_d1"] # mean titre dose 1
   mu_ab_d2 <- mu_ab_list[mu_ab_list$name == vaccine, "mu_ab_d2"] # mean titre dose 2
-  ab_50 <- 0.2 # titre relative to convalescent required to provide 50% protection from infection, on linear scale
-  ab_50_severe <- 0.03
-  std10 <- 0.44 # Pooled standard deviation of antibody level on log10 data
-  k <- 2.94 # shape parameter of efficacy curve
 
   dr_vec <- c(
     rep(dr_s, period_s),
@@ -99,21 +112,17 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   if (inherits(strategy_matrix, 'matrix')) {
 
     N_age <- ncol(strategy_matrix)
-    # N_prioritisation_steps <- nrow(strategy_matrix)
-
     strategy_matrix_array <- replicate(n = vaccine_doses, expr = strategy_matrix, simplify = FALSE)
 
-  # one strategy matrix for each dose phase (input list)
+    # one strategy matrix for each dose phase (input list)
   } else if(inherits(strategy_matrix, 'list')) {
 
     stopifnot(length(strategy_matrix) == vaccine_doses)
 
     N_age <- ncol(strategy_matrix[[1]])
-    # N_prioritisation_steps <- nrow(strategy_matrix[[1]])
-
     strategy_matrix_array <- strategy_matrix
 
-  # bad input
+    # bad input
   } else {
     stop("invalid object passed for strategy_matrix")
   }
@@ -121,7 +130,6 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   stopifnot(ncol(next_dose_priority_matrix) == N_age)
   stopifnot(parameters$N_age == N_age)
 
-  # parameters$N_prioritisation_steps <- N_prioritisation_steps
   parameters$vaccine_coverage_mat <- strategy_matrix_array
   parameters$next_dose_priority <- next_dose_priority_matrix
 
