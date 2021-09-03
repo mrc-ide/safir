@@ -138,14 +138,29 @@
     <p>Get parameters for vaccine efficacy and antibody titre decay rate.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_vaccine_ab_titre_parameters</span><span class='op'>(</span><span class='va'>vaccine</span>, max_dose <span class='op'>=</span> <span class='fl'>2</span>, correlated <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_vaccine_ab_titre_parameters</span><span class='op'>(</span>
+  <span class='va'>vaccine</span>,
+  max_dose <span class='op'>=</span> <span class='fl'>2</span>,
+  correlated <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  hl_s <span class='op'>=</span> <span class='fl'>108</span>,
+  hl_l <span class='op'>=</span> <span class='fl'>3650</span>,
+  period_s <span class='op'>=</span> <span class='fl'>250</span>,
+  t_period_l <span class='op'>=</span> <span class='fl'>365</span>,
+  ab_50 <span class='op'>=</span> <span class='fl'>0.2</span>,
+  ab_50_severe <span class='op'>=</span> <span class='fl'>0.03</span>,
+  std10 <span class='op'>=</span> <span class='fl'>0.44</span>,
+  k <span class='op'>=</span> <span class='fl'>2.94</span>,
+  mu_ab_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Pfizer"</span>, <span class='st'>"AstraZeneca"</span>, <span class='st'>"Sinovac"</span>, <span class='st'>"Moderna"</span><span class='op'>)</span>,
+    mu_ab_d1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>13</span><span class='op'>/</span><span class='fl'>94</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>59</span>, <span class='fl'>28</span><span class='op'>/</span><span class='fl'>164</span>, <span class='op'>(</span><span class='op'>(</span><span class='fl'>185</span> <span class='op'>+</span> <span class='fl'>273</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>321</span><span class='op'>)</span>, mu_ab_d2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>223</span><span class='op'>/</span><span class='fl'>94</span>, <span class='fl'>32</span><span class='op'>/</span><span class='fl'>59</span>,
+    <span class='fl'>28</span><span class='op'>/</span><span class='fl'>164</span>, <span class='fl'>654</span><span class='op'>/</span><span class='fl'>158</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>vaccine</th>
-      <td><p>which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna"</p></td>
+      <td><p>which vaccine? should be one of: "Pfizer", "AstraZeneca", "Sinovac", "Moderna" (controls the mean titre associated with each dose)</p></td>
     </tr>
     <tr>
       <th>max_dose</th>
@@ -154,6 +169,42 @@
     <tr>
       <th>correlated</th>
       <td><p>are doses correlated?</p></td>
+    </tr>
+    <tr>
+      <th>hl_s</th>
+      <td><p>Half life of antibody decay - short</p></td>
+    </tr>
+    <tr>
+      <th>hl_l</th>
+      <td><p>Half life of antibody decay - long</p></td>
+    </tr>
+    <tr>
+      <th>period_s</th>
+      <td><p>length of the initial decay rate (shortest half-life)</p></td>
+    </tr>
+    <tr>
+      <th>t_period_l</th>
+      <td><p>Time point at which to have switched to longest half-life</p></td>
+    </tr>
+    <tr>
+      <th>ab_50</th>
+      <td><p>titre relative to convalescent required to provide 50% protection from infection, on linear scale</p></td>
+    </tr>
+    <tr>
+      <th>ab_50_severe</th>
+      <td><p>titre relative to convalescent required to provide 50% protection from severe disease, on linear scale</p></td>
+    </tr>
+    <tr>
+      <th>std10</th>
+      <td><p>Pooled standard deviation of antibody level on log10 data</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>shape parameter of efficacy curve</p></td>
+    </tr>
+    <tr>
+      <th>mu_ab_list</th>
+      <td><p>a data.frame</p></td>
     </tr>
     </table>
 
