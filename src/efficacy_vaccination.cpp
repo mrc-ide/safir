@@ -57,7 +57,7 @@ std::vector<double> vaccine_efficacy_severe_cpp(
     if (std::isfinite(ab_titre[i])) {
       double nt = std::exp(ab_titre[i]);
       double ef_severe_uncond = 1.0 / (1.0 + std::exp(-k * (std::log10(nt) - std::log10(ab_50_severe))));
-      ef_severe[i] = 1.0 - ((1.0 - ef_severe_uncond)/(1.0 - ef_infection[i]));
+      ef_severe[i] = 1.0 - ((1.0 - ef_severe_uncond) / ef_infection[i]); // 1 - (1 - ef_infection) goes from hazard reduction scale to efficacy, simplifies to ef_infection
       ef_severe[i] = 1.0 - ef_severe[i];
     } else {
       continue;
