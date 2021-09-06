@@ -111,7 +111,7 @@ create_hospital_scheduler_listener <- function(
 #' @title Schedule outcome
 #' @description
 #' schedule individuals into follow up events based based on bernoulli draws of
-#' `prob_successful`
+#' `prob_successful`. It does not modify the input bitset `target`.
 #' @param target the individuals to draw from
 #' @param prob_successful the probability each target individual is successful
 #' @param success_event will be scheduled on success

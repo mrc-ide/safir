@@ -1,10 +1,10 @@
 # --------------------------------------------------
-#   Simulation loop for vaccine model (multi-dose, no types)
+#   Simulation loop for variants
 #   Sean L. Wu (slwood89@gmail.com)
-#   May 2021
+#   August 2021
 # --------------------------------------------------
 
-#' @title Simulation loop for safir (multi-dose, no types vaccine model)
+#' @title Simulation loop for safir (variants of concern, multi-dose, no types vaccine model)
 #' @description a modification of \code{\link[individual]{simulation_loop}}
 #' to deal with the presence of special values in the \code{variables} list, and
 #' also adds an optional progress bar
@@ -15,7 +15,7 @@
 #' @param progress dispaly a progress bar?
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @export
-simulation_loop_vaccine <- function(
+simulation_loop_voc <- function(
   variables,
   events,
   processes,
@@ -28,6 +28,8 @@ simulation_loop_vaccine <- function(
   if (progress) {
     pb <- txtProgressBar(min = 1, max = timesteps, initial = 1, style = 3)
   }
+
+  stopifnot("voc" %in% names(variables))
 
   events_2_loop <- which(names(events) != "scheduled_dose")
 
@@ -49,6 +51,7 @@ simulation_loop_vaccine <- function(
 
     # state updates
     update_vaccine_variables(variables = variables)
+    update_voc_variables(variables = variables)
     variables$states$.update()
 
     # event clocks tick

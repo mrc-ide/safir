@@ -17,5 +17,5 @@ schedule_outcome(target, prob_successful, success_event, failure_event)
 }
 \description{
 schedule individuals into follow up events based based on bernoulli draws of
-\code{prob_successful}
+\code{prob_successful}. It does not modify the input bitset \code{target}.
 }

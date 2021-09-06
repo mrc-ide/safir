@@ -5,9 +5,9 @@
 \title{Simulation loop for safir (multi-dose, no types vaccine model)}
 \usage{
 simulation_loop_vaccine(
-  variables = list(),
-  events = list(),
-  processes = list(),
+  variables,
+  events,
+  processes,
   timesteps,
   progress = FALSE
 )

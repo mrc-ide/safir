@@ -16,9 +16,9 @@
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @export
 simulation_loop_nimue <- function(
-  variables = list(),
-  events = list(),
-  processes = list(),
+  variables,
+  events,
+  processes,
   timesteps,
   progress = FALSE
 ) {
