@@ -162,6 +162,8 @@ vaccine_efficacy_severe_voc <- function(ab_titre, ef_infection, parameters) {
   # null value is 1
   ef_severe <- matrix(1, ncol = length(ab_titre), nrow = parameters$voc_num)
   if (any(is.finite(ab_titre))) {
+    # input is on "hazard reduction" scale, convert to efficacy
+    ef_infection <- 1 - ef_infection
     # if some vaccinated individuals with ab titre, calc efficacy for them
     finite_ab <- which(is.finite(ab_titre))
     nt <- exp(ab_titre[finite_ab])

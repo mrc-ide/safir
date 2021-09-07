@@ -60,7 +60,7 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
     }
 
   } else {
-    # uncorrelated doses (also use for dose 1 of correlated dose titre)
+    # uncorrelated doses
     zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
   }
 

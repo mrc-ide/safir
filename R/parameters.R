@@ -71,7 +71,7 @@ get_parameters <- function(iso3c = NULL,
   )
 
   pars$country <- country
-
+  attr(pars, "type") <- "base_squire"
   return(pars)
 
 }

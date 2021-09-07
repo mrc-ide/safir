@@ -69,6 +69,7 @@ get_vaccine_ab_titre_parameters <- function(
     k = k,
     correlated = correlated
   )
+  attr(parameters, "type") <- "ab_titre"
   return(parameters)
 }
 
