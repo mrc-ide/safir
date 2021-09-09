@@ -78,4 +78,3 @@ ggplot(data = rbind(saf_dt,sq_dt), aes(t,y,color = model)) +
   geom_line() +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
-
