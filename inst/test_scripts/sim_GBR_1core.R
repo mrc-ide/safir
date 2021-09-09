@@ -58,7 +58,10 @@ system.time(individual::simulation_loop(
 ))
 df <- renderer$to_dataframe()
 
+state_t0 <- get_state_vector(psq = parameters)
+
 saf_dt <- as.data.table(df)
+saf_dt <- rbind(data.table(t(state_t0)), saf_dt)
 saf_dt[, IMild_count := IMild_count + IAsymp_count]
 saf_dt[, IAsymp_count := NULL]
 saf_dt <- melt(saf_dt,id.vars = c("timestep"),variable.name = "name")
