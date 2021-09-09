@@ -4,9 +4,6 @@
 #   June 2021
 # --------------------------------------------------
 
-# should prob move to individual eventually
-
-
 #' @title Render integer variables
 #' @description Renders the number of individuals in each integer count. Should only be used
 #' for integer variables with bounded ranges
@@ -45,6 +42,7 @@ integer_count_render_process_daily <- function(renderer, variable, margin, dt) {
     }
   }
 }
+
 
 #' @title Render categories every day
 #' @description Renders the number of individuals in each category, but only

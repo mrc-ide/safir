@@ -12,6 +12,7 @@ bool compare_floats(const double a, const double b) {
   return std::fabs(a - b) < eps;
 };
 
+
 //' @title Cross tabulate two vectors with given margins
 //' @description this is a replacement for \code{\link[base]{table}} that allows empty
 //' cells because the margins have been specified. The input vectors \code{a} and \code{b}
@@ -41,6 +42,37 @@ Rcpp::IntegerMatrix cross_tab_margins(
 
   return out;
 };
+
+
+//' @title Cross tabulate doses and age
+//' @description The input vectors \code{doses} and \code{age}
+//' must have the same number of values, this function does no argument checking.
+//' @param doses a \code{\link[individual]{IntegerVariable}}
+//' @param age a \code{\link[individual]{IntegerVariable}}
+//' @param num_doses number of doses
+//' @param num_ages number of age groups
+//' @examples
+//' a <- IntegerVariable$new(0:4)
+//' b <- IntegerVariable$new(c(1,2,3,1,2))
+//' cross_tab_doses_age(a$.variable,b$.variable,4,3)
+//' table(a$get_values(), b$get_values())
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerMatrix cross_tab_doses_age(
+    Rcpp::XPtr<IntegerVariable> doses,
+    Rcpp::XPtr<IntegerVariable> age,
+    const size_t num_doses,
+    const size_t num_ages
+) {
+  Rcpp::IntegerMatrix out(num_doses + 1, num_ages);
+
+  for (auto i = 0u; i < doses->size; ++i) {
+    out(doses->values[i], age->values[i]-1)++;
+  }
+
+  return out;
+};
+
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix cross_tab_margins_internal(
