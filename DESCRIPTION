@@ -29,22 +29,15 @@ Suggests:
     testthat,
     mockery,
     tidyverse,
-    xml2,
-    rvest,
     knitr,
     rmarkdown,
-    jsonlite,
-    data.table,
-    DiagrammeR
+    data.table
 Imports:
     individual (>= 0.1.0),
     Rcpp,
     squire (>= 0.6.4),
     nimue,
     ggplot2,
-    tibble,
-    tidyr,
-    dplyr,
     magrittr
 Depends: 
     R (>= 2.10)
