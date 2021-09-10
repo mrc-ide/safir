@@ -41,6 +41,8 @@ Imports:
     magrittr
 VignetteBuilder: knitr
 NeedsCompilation: yes
+Depends: 
+    R (>= 2.10)
 LinkingTo: 
     Rcpp,
     individual

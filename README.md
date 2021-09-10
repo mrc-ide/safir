@@ -1,7 +1,6 @@
 # **safir**
 
 <!-- badges: start -->
-
 [![R build
 status](https://github.com/mrc-ide/safir/workflows/R-CMD-check/badge.svg)](https://github.com/mrc-ide/safir/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/mrc-ide/safir/badge)](https://www.codefactor.io/repository/github/mrc-ide/safir)
@@ -11,7 +10,6 @@ status](https://github.com/mrc-ide/safir/workflows/R-CMD-check/badge.svg)](https
 **safir**: **s**quire **a**nd **f**riends **i**ndividual **r**ewrite
 (and maintains the squire naming
 [theme](https://en.wikipedia.org/wiki/Knights_of_the_Round_Table#Safir)).
-
 It uses the [`{individual}`](https://github.com/mrc-ide/individual)
 package to specify and run the simulation.
 
@@ -48,8 +46,6 @@ This includes the following vignettes:
     [`{nimue}`](https://github.com/mrc-ide/nimue).
 -   **`Vaccine model with multiple doses`**: runs the model for
     explicit tracking of antibody titre for a 2 dose vaccine.
--   **`Code Design`**: a diary of ideas, notes, etc. as
-    [`{safir}`](https://github.com/mrc-ide/safir) is developed.
 
 ## License
 

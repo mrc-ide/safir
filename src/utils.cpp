@@ -52,10 +52,12 @@ Rcpp::IntegerMatrix cross_tab_margins(
 //' @param num_doses number of doses
 //' @param num_ages number of age groups
 //' @examples
+//' \dontrun{
 //' a <- IntegerVariable$new(0:4)
 //' b <- IntegerVariable$new(c(1,2,3,1,2))
 //' cross_tab_doses_age(a$.variable,b$.variable,4,3)
 //' table(a$get_values(), b$get_values())
+//' }
 //' @export
 // [[Rcpp::export]]
 Rcpp::IntegerMatrix cross_tab_doses_age(

@@ -21,8 +21,10 @@ create_incidence_tracking_listener <- function(renderer) {
 #' @param events a list of events
 #' @param renderer a \code{\link[individual]{Render}} object
 #' @examples
+#' \dontrun{
 #' incidence_renderer <- individual::Render$new(timesteps)
 #' attach_tracking_listener_incidence(events = events,renderer = incidence_renderer)
+#' }
 #' @export
 attach_tracking_listener_incidence <- function(events, renderer) {
   events$exposure$add_listener(

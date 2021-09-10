@@ -54,6 +54,7 @@ integer_count_render_process_daily <- function(renderer, variable, margin, dt) {
 #' @param parameters model parameters
 #' @param dt size of time step
 #' @examples
+#' \dontrun{
 #' # if the rendered is called dose_age_renderer
 #' tmp <- as.data.table(dose_age_renderer$to_dataframe())
 #' tmp <- melt(tmp,id.vars="timestep")
@@ -61,8 +62,8 @@ integer_count_render_process_daily <- function(renderer, variable, margin, dt) {
 #' tmp[ , variable := NULL]
 #' tmp <- cbind(tmp, tmp1)
 #' setnames(x = tmp,old = c("V1", "V2"),new = c("dose","age"))
-#'
 #' dose_dt <- tmp[, .(value = sum(value)), by = .(dose, timestep)]
+#' }
 #' @export
 dose_age_render_process_daily <- function(renderer, age, dose, parameters, dt) {
   stopifnot(inherits(age, "IntegerVariable"))

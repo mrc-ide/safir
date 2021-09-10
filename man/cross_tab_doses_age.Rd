@@ -20,8 +20,10 @@ The input vectors \code{doses} and \code{age}
 must have the same number of values, this function does no argument checking.
 }
 \examples{
+\dontrun{
 a <- IntegerVariable$new(0:4)
 b <- IntegerVariable$new(c(1,2,3,1,2))
 cross_tab_doses_age(a$.variable,b$.variable,4,3)
 table(a$get_values(), b$get_values())
+}
 }

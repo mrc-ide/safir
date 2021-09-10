@@ -17,6 +17,8 @@ anytime after all events have been made and initialized and before
 simulation begins.
 }
 \examples{
+\dontrun{
 incidence_renderer <- individual::Render$new(timesteps)
 attach_tracking_listener_incidence(events = events,renderer = incidence_renderer)
+}
 }

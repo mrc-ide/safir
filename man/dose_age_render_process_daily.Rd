@@ -24,6 +24,7 @@ This only renders output on timesteps that correspond to a day.
 See examples for how to quickly summarize the output.
 }
 \examples{
+\dontrun{
 # if the rendered is called dose_age_renderer
 tmp <- as.data.table(dose_age_renderer$to_dataframe())
 tmp <- melt(tmp,id.vars="timestep")
@@ -31,6 +32,6 @@ tmp1 <- tmp[, tstrsplit(variable, "_", keep = c(2, 4))]
 tmp[ , variable := NULL]
 tmp <- cbind(tmp, tmp1)
 setnames(x = tmp,old = c("V1", "V2"),new = c("dose","age"))
-
 dose_dt <- tmp[, .(value = sum(value)), by = .(dose, timestep)]
+}
 }
