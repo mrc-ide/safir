@@ -75,8 +75,8 @@ dose_age_render_process_daily <- function(renderer, age, dose, parameters, dt) {
     if ((t * dt) %% 1 == 0) {
       day <- as.integer(t * dt)
       dose_age_tab <- cross_tab_doses_age(doses = dose$.variable, age = age$.variable, num_doses = num_dose, num_ages = num_age)
-      for (d in 1:nrow(dose_age_tab)) {
-        for (a in 1:ncol(dose_age_tab)) {
+      for (d in seq_len(dose_age_tab)) {
+        for (a in seq_len(dose_age_tab)) {
           renderer$render(paste0("dose_", d-1, "_age_", a, "_count"), dose_age_tab[d, a], day)
         }
       }
