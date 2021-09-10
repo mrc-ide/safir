@@ -17,6 +17,37 @@ test_that("cross tab works", {
 
 })
 
+test_that("cross tab for dose/age works", {
+
+  a <- IntegerVariable$new(0:4)
+  b <- IntegerVariable$new(c(1,2,3,1,2))
+
+  comp1 <- cross_tab_doses_age(a$.variable,b$.variable,4,3)
+  comp2 <- as.matrix(table(a$get_values(), b$get_values()))
+
+  expect_equal(comp1, matrix(comp2, 5, 3))
+
+  dose_vals <- sample(x = 0:3,size = 100,replace = TRUE)
+  age_vals <- sample(x = 1:10,size = 100,replace = TRUE)
+
+  a <- IntegerVariable$new(dose_vals)
+  b <- IntegerVariable$new(age_vals)
+  comp1 <- cross_tab_doses_age(a$.variable,b$.variable,3,10)
+  comp2 <- matrix(table(a$get_values(), b$get_values()), 4, 10)
+
+  expect_equal(comp1, comp2)
+
+  dose_vals <- c(0,0,0,3)
+  age_vals <- c(1,2,2,1)
+  a <- IntegerVariable$new(dose_vals)
+  b <- IntegerVariable$new(age_vals)
+
+  comp1 <- cross_tab_doses_age(a$.variable,b$.variable,3,2)
+  comp2 <- matrix(data = c(1, 2, 0, 0, 0, 0, 1, 0),nrow = 4, ncol = 2, byrow = TRUE)
+  expect_equal(comp1, comp2)
+})
+
+
 test_that("tab_bins works", {
 
   nbin <- 10

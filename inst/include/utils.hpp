@@ -7,6 +7,9 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <vector>
+#include <numeric>      // std::iota
+#include <algorithm>    // std::sort, std::stable_sort
 #include <limits>
 #include <Rcpp.h>
 #include <individual.h>
@@ -18,6 +21,13 @@ Rcpp::IntegerMatrix cross_tab_margins(
     const Rcpp::IntegerVector& b,
     const int a_margin,
     const int b_margin
+);
+
+Rcpp::IntegerMatrix cross_tab_doses_age(
+        Rcpp::XPtr<IntegerVariable> doses,
+        Rcpp::XPtr<IntegerVariable> age,
+        const size_t num_doses,
+        const size_t num_ages
 );
 
 Rcpp::NumericMatrix cross_tab_margins_internal(
