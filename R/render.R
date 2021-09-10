@@ -55,7 +55,7 @@ integer_count_render_process_daily <- function(renderer, variable, margin, dt) {
 #' @param dt size of time step
 #' @examples
 #' \dontrun{
-#' # if the rendered is called dose_age_renderer
+#' # if the renderer object is called dose_age_renderer
 #' tmp <- as.data.table(dose_age_renderer$to_dataframe())
 #' tmp <- melt(tmp,id.vars="timestep")
 #' tmp1 <- tmp[, tstrsplit(variable, "_", keep = c(2, 4))]
@@ -75,8 +75,8 @@ dose_age_render_process_daily <- function(renderer, age, dose, parameters, dt) {
     if ((t * dt) %% 1 == 0) {
       day <- as.integer(t * dt)
       dose_age_tab <- cross_tab_doses_age(doses = dose$.variable, age = age$.variable, num_doses = num_dose, num_ages = num_age)
-      for (d in seq_len(dose_age_tab)) {
-        for (a in seq_len(dose_age_tab)) {
+      for (d in seq_len(nrow(dose_age_tab))) {
+        for (a in seq_len(ncol(dose_age_tab))) {
           renderer$render(paste0("dose_", d-1, "_age_", a, "_count"), dose_age_tab[d, a], day)
         }
       }
