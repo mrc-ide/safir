@@ -2,9 +2,8 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  code_design: code_design.html
   compare_nimue: compare_nimue.html
   compare_squire: compare_squire.html
   vaccine_notypes: vaccine_notypes.html
-last_built: 2021-09-07T22:46Z
+last_built: 2021-09-10T01:44Z
 

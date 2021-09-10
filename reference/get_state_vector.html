@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create events — create_events • safir</title>
+<title>Get vector of states from parameters — get_state_vector • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Create events — create_events" />
-<meta property="og:description" content="Create events" />
+<meta property="og:title" content="Get vector of states from parameters — get_state_vector" />
+<meta property="og:description" content="Get initial state conditions of the model from parameters." />
 
 
 
@@ -126,26 +126,29 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create events</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/events.R'><code>R/events.R</code></a></small>
-    <div class="hidden name"><code>create_events.Rd</code></div>
+    <h1>Get vector of states from parameters</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables_states.R'><code>R/variables_states.R</code></a></small>
+    <div class="hidden name"><code>get_state_vector.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create events</p>
+    <p>Get initial state conditions of the model from parameters.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_events</span><span class='op'>(</span><span class='va'>parameters</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_state_vector</span><span class='op'>(</span><span class='va'>psq</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>model parameters</p></td>
+      <th>psq</th>
+      <td><p>the model parameters</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>a named vector</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

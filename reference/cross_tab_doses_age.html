@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create events — create_events • safir</title>
+<title>Cross tabulate doses and age — cross_tab_doses_age • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Create events — create_events" />
-<meta property="og:description" content="Create events" />
+<meta property="og:title" content="Cross tabulate doses and age — cross_tab_doses_age" />
+<meta property="og:description" content="The input vectors doses and age
+must have the same number of values, this function does no argument checking." />
 
 
 
@@ -126,27 +127,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create events</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/events.R'><code>R/events.R</code></a></small>
-    <div class="hidden name"><code>create_events.Rd</code></div>
+    <h1>Cross tabulate doses and age</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/RcppExports.R'><code>R/RcppExports.R</code></a></small>
+    <div class="hidden name"><code>cross_tab_doses_age.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create events</p>
+    <p>The input vectors <code>doses</code> and <code>age</code>
+must have the same number of values, this function does no argument checking.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_events</span><span class='op'>(</span><span class='va'>parameters</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>cross_tab_doses_age</span><span class='op'>(</span><span class='va'>doses</span>, <span class='va'>age</span>, <span class='va'>num_doses</span>, <span class='va'>num_ages</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>parameters</th>
-      <td><p>model parameters</p></td>
+      <th>doses</th>
+      <td><p>a <code><a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>IntegerVariable</a></code></p></td>
+    </tr>
+    <tr>
+      <th>age</th>
+      <td><p>a <code><a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>IntegerVariable</a></code></p></td>
+    </tr>
+    <tr>
+      <th>num_doses</th>
+      <td><p>number of doses</p></td>
+    </tr>
+    <tr>
+      <th>num_ages</th>
+      <td><p>number of age groups</p></td>
     </tr>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>a</span> <span class='op'>&lt;-</span> <span class='va'>IntegerVariable</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span>
+<span class='va'>b</span> <span class='op'>&lt;-</span> <span class='va'>IntegerVariable</span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>,<span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>cross_tab_doses_age</span><span class='op'>(</span><span class='va'>a</span><span class='op'>$</span><span class='va'>.variable</span>,<span class='va'>b</span><span class='op'>$</span><span class='va'>.variable</span>,<span class='fl'>4</span>,<span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>a</span><span class='op'>$</span><span class='fu'>get_values</span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>b</span><span class='op'>$</span><span class='fu'>get_values</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
