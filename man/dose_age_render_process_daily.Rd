@@ -25,7 +25,7 @@ See examples for how to quickly summarize the output.
 }
 \examples{
 \dontrun{
-# if the rendered is called dose_age_renderer
+# if the renderer object is called dose_age_renderer
 tmp <- as.data.table(dose_age_renderer$to_dataframe())
 tmp <- melt(tmp,id.vars="timestep")
 tmp1 <- tmp[, tstrsplit(variable, "_", keep = c(2, 4))]

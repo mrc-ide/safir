@@ -25,14 +25,15 @@ infection_process <- function(parameters, variables, events, dt) {
 
         if (infectious$size() > 0) {
 
+          day <- ceiling(timestep * dt)
+
           # Group infection by age
           ages <- variables$discrete_age$get_values(infectious)
           inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
 
           # calculate FoI for each age group
           m <- get_contact_matrix(parameters)
-          # lambda <- parameters$beta_set[ceiling(timestep * dt)] * rowSums(m %*% diag(inf_ages))
-          lambda <- parameters$beta_set[ceiling(timestep * dt)] * as.vector(m %*% inf_ages)
+          lambda <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
 
           # Transition from S to E
           susceptible <- variables$states$get_index_of("S")
@@ -43,6 +44,12 @@ infection_process <- function(parameters, variables, events, dt) {
 
           # infected
           susceptible$sample(rate = pexp(q = lambda * dt))
+
+          # # FoI from contact outside the population
+          # lambda_external <- parameters$lambda_external[day]
+          #
+          # # infected
+          # susceptible$sample(rate = pexp(q = (lambda + lambda_external) * dt))
 
           # newly infecteds queue the exposure event
           if (susceptible$size() > 0) {

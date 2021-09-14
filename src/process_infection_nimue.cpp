@@ -38,9 +38,21 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
   Rcpp::NumericMatrix rel_inf = Rcpp::as<Rcpp::NumericMatrix>(parameters["rel_infectiousness_vaccinated"]);
   std::vector<double> rel_inf_age = Rcpp::as<std::vector<double>>(parameters["rel_infectiousness"]);
 
+  // parameters
+  SEXP mix_mat_set = parameters["mix_mat_set"];
+  SEXP beta_set = parameters["beta_set"];
+
+  // vaccine_efficacy_infection
+  SEXP vaccine_efficacy_infection = parameters["vaccine_efficacy_infection"];
+  SEXP dims = Rf_getAttrib(vaccine_efficacy_infection, R_DimSymbol);
+  int d1 = INTEGER(dims)[0];
+  int d2 = INTEGER(dims)[1];
+  int d3 = INTEGER(dims)[2];
+  double* vaccine_efficacy_infection_ptr = REAL(vaccine_efficacy_infection);
+
   // the process lambda
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age](size_t t) mutable {
+    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age, mix_mat_set, beta_set, vaccine_efficacy_infection_ptr, d1, d2, d3](size_t t) mutable {
       individual_index_t infectious = states->get_index_of(inf_states);
 
       if (infectious.size() > 0) {
@@ -59,8 +71,8 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
         std::vector<double> inf_ages = mult_2matrix_rowsum(inf_age_vax, rel_inf);
 
         // calculate FoI for each age group
-        Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
-        std::fill(beta.begin(), beta.end(), get_vector_cpp(parameters["beta_set"], tnow));
+        Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
+        std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
         std::vector<double> m_inf_ages_rel = matrix_2vec_mult_cpp(m, inf_ages, rel_inf_age);
         std::transform(beta.begin(), beta.end(), m_inf_ages_rel.begin(), lambda.begin(), std::multiplies<double>());
 
@@ -69,20 +81,14 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
         std::vector<int> sus_vaxx = vaccine_states->get_values(susceptible);
         std::vector<int> sus_ages = discrete_age->get_values(susceptible);
 
-        SEXP vaccine_efficacy_infection = parameters["vaccine_efficacy_infection"];
-        SEXP dims = Rf_getAttrib(vaccine_efficacy_infection, R_DimSymbol);
-        int d1 = INTEGER(dims)[0];
-        int d2 = INTEGER(dims)[1];
-        int d3 = INTEGER(dims)[2];
-        double* vaccine_efficacy_infection_ptr = REAL(vaccine_efficacy_infection);
-
+        // calculate FoI on susceptibles
         std::vector<double> lambda_sus(sus_ages.size());
 
         for (auto i = 0u; i < sus_ages.size(); ++i) {
           int age = sus_ages[i] - 1;
           int vax = sus_vaxx[i] - 1;
           lambda_sus[i] = lambda[age] * vaccine_efficacy_infection_ptr[tnow + (age * d1) + (vax * d1 * d2)] * dt;
-          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1., 1, 0);
+          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
         }
 
         // infected

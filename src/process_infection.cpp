@@ -32,8 +32,13 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   std::vector<double> beta(17, 0.0);
   std::vector<double> lambda(17, 0.0);
 
+  // parameters
+  SEXP mix_mat_set = parameters["mix_mat_set"];
+  SEXP beta_set = parameters["beta_set"];
+
+  // infection process fn
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
+    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda, mix_mat_set, beta_set](size_t t) mutable {
 
       individual_index_t infectious = states->get_index_of(inf_states);
 
@@ -47,8 +52,8 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
         std::vector<int> inf_ages = tab_bins(ages, 17);
 
         // calculate FoI for each age group
-        Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
-        std::fill(beta.begin(), beta.end(), get_vector_cpp(parameters["beta_set"], tnow));
+        Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
+        std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
         std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
         std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
 

@@ -19,6 +19,8 @@
 #' @param contact_matrix_set Contact matrices used in simulation. Default = NULL, which will generate this based on the country.
 #' @param time_period length of simulation (in days)
 #' @param max_age the maximum age for humans
+#' @param lambda_external a vector of length equal to \code{time_period} giving an additional additive term contributing to the force of infection.
+#' Models infectious contacts the population has with external (unmodeled) populations.
 #' @param dt size of time step
 #' @param ... Other parameters for [squire::parameters_explicit_SEEIR]
 #'
@@ -29,14 +31,16 @@ get_parameters <- function(iso3c = NULL,
                            contact_matrix_set = NULL,
                            time_period = 365,
                            max_age = 100,
+                           lambda_external = NULL,
                            dt,
                            ...) {
+
+  stopifnot(is.finite(dt) & dt > 0)
 
   # if missing a contact matrix but have iso3c then use that
   if (!is.null(iso3c) && is.null(contact_matrix_set)) {
     contact_matrix_set <- squire::get_mixing_matrix(iso3c = iso3c)
   }
-  stopifnot(is.finite(dt) & dt > 0)
 
   country <- get_country(iso3c)
 
@@ -71,6 +75,16 @@ get_parameters <- function(iso3c = NULL,
   )
 
   pars$country <- country
+
+  # external FoI term
+  if (!is.null(lambda_external)) {
+    stopifnot(length(lambda_external) != time_period)
+    stopifnot(all(is.finite(lambda_external)))
+    stopifnot(all(lambda_external >= 0))
+    pars$lambda_external <- as.numeric(lambda_external)
+  } else {
+    pars$lambda_external <- rep(0, time_period)
+  }
 
   return(pars)
 
