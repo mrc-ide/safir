@@ -42,14 +42,14 @@ infection_process <- function(parameters, variables, events, dt) {
           # FoI for each susceptible person
           lambda <- lambda[ages]
 
-          # infected
-          susceptible$sample(rate = pexp(q = lambda * dt))
-
-          # # FoI from contact outside the population
-          # lambda_external <- parameters$lambda_external[day]
-          #
           # # infected
-          # susceptible$sample(rate = pexp(q = (lambda + lambda_external) * dt))
+          # susceptible$sample(rate = pexp(q = lambda * dt))
+
+          # FoI from contact outside the population
+          lambda_external <- parameters$lambda_external[day]
+
+          # infected
+          susceptible$sample(rate = pexp(q = (lambda + lambda_external) * dt))
 
           # newly infecteds queue the exposure event
           if (susceptible$size() > 0) {

@@ -47,14 +47,14 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
         # FoI for each susceptible based on their age group
         lambda <- lambda[ages]
 
-        # sample infections; individual FoI adjusted by vaccine efficacy
-        susceptible$sample(rate = pexp(q = (lambda * infection_efficacy) * dt))
-
-        # # FoI from contact outside the population
-        # lambda_external <- parameters$lambda_external[day]
-        #
         # # sample infections; individual FoI adjusted by vaccine efficacy
-        # susceptible$sample(rate = pexp(q = ((lambda * infection_efficacy) + lambda_external) * dt))
+        # susceptible$sample(rate = pexp(q = (lambda * infection_efficacy) * dt))
+
+        # FoI from contact outside the population
+        lambda_external <- parameters$lambda_external[day]
+
+        # sample infections; individual FoI adjusted by vaccine efficacy
+        susceptible$sample(rate = pexp(q = ((lambda * infection_efficacy) + lambda_external) * dt))
 
         # newly infecteds queue the exposure event
         if (susceptible$size() > 0) {

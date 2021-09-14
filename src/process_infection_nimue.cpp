@@ -41,6 +41,7 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
   // parameters
   SEXP mix_mat_set = parameters["mix_mat_set"];
   SEXP beta_set = parameters["beta_set"];
+  SEXP lambda_external = parameters["lambda_external"];
 
   // vaccine_efficacy_infection
   SEXP vaccine_efficacy_infection = parameters["vaccine_efficacy_infection"];
@@ -52,7 +53,7 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
 
   // the process lambda
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age, mix_mat_set, beta_set, vaccine_efficacy_infection_ptr, d1, d2, d3](size_t t) mutable {
+    new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age, mix_mat_set, beta_set, lambda_external, vaccine_efficacy_infection_ptr, d1, d2, d3](size_t t) mutable {
       individual_index_t infectious = states->get_index_of(inf_states);
 
       if (infectious.size() > 0) {
@@ -81,13 +82,17 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
         std::vector<int> sus_vaxx = vaccine_states->get_values(susceptible);
         std::vector<int> sus_ages = discrete_age->get_values(susceptible);
 
+        // FoI from contact outside the population
+        double lambda_ext = get_vector_cpp(lambda_external, tnow);
+
         // calculate FoI on susceptibles
         std::vector<double> lambda_sus(sus_ages.size());
 
         for (auto i = 0u; i < sus_ages.size(); ++i) {
           int age = sus_ages[i] - 1;
           int vax = sus_vaxx[i] - 1;
-          lambda_sus[i] = lambda[age] * vaccine_efficacy_infection_ptr[tnow + (age * d1) + (vax * d1 * d2)] * dt;
+          double VE = vaccine_efficacy_infection_ptr[tnow + (age * d1) + (vax * d1 * d2)];
+          lambda_sus[i] = ((lambda[age] * VE) + lambda_ext) * dt;
           lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
         }
 
