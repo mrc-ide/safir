@@ -11,10 +11,21 @@
 #' @param contact_mat a contact matrix from \code{\link[squire]{get_mixing_matrix}}
 #' @param time_period maximum time of simulation
 #' @param max_age max age for humans
+#' @param lambda_external a vector of length equal to \code{time_period} giving an additional additive term contributing to the force of infection.
+#' Models infectious contacts the population has with external (unmodeled) populations.
 #' @param dt time step size
 #' @param ... Other parameters for [nimue::parameters]
 #' @export
-get_parameters_nimue <- function(population, contact_mat, time_period, max_age = 100, dt = 1, ...) {
+get_parameters_nimue <- function(
+  population,
+  contact_mat,
+  time_period,
+  max_age = 100,
+  lambda_external = NULL,
+  dt = 1,
+  ...
+) {
+
   stopifnot(length(population)==17)
   stopifnot(is.finite(population))
 
@@ -81,6 +92,16 @@ get_parameters_nimue <- function(population, contact_mat, time_period, max_age =
 
   # drop extra cols to line up with 1:4 vaccine states
   pars$rel_infectiousness_vaccinated <- pars$rel_infectiousness_vaccinated[,-c(3,5)]
+
+  # external FoI term
+  if (!is.null(lambda_external)) {
+    stopifnot(length(lambda_external) != time_period)
+    stopifnot(all(is.finite(lambda_external)))
+    stopifnot(all(lambda_external >= 0))
+    pars$lambda_external <- as.numeric(lambda_external)
+  } else {
+    pars$lambda_external <- rep(0, time_period)
+  }
 
   return(pars)
 }

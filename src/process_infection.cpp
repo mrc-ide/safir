@@ -32,8 +32,14 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   std::vector<double> beta(17, 0.0);
   std::vector<double> lambda(17, 0.0);
 
+  // parameters
+  SEXP mix_mat_set = parameters["mix_mat_set"];
+  SEXP beta_set = parameters["beta_set"];
+  SEXP lambda_external = parameters["lambda_external"];
+
+  // infection process fn
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda](size_t t) mutable {
+    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda, mix_mat_set, beta_set, lambda_external](size_t t) mutable {
 
       individual_index_t infectious = states->get_index_of(inf_states);
 
@@ -47,10 +53,13 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
         std::vector<int> inf_ages = tab_bins(ages, 17);
 
         // calculate FoI for each age group
-        Rcpp::NumericMatrix m = get_contact_matrix_cpp(parameters["mix_mat_set"], 0);
-        std::fill(beta.begin(), beta.end(), get_vector_cpp(parameters["beta_set"], tnow));
+        Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
+        std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
         std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
         std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
+
+        // FoI from contact outside the population
+        double lambda_ext = get_vector_cpp(lambda_external, tnow);
 
         // transition from S to E
         individual_index_t susceptible = states->get_index_of("S");
@@ -59,7 +68,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
         // FoI for each susceptible person
         std::vector<double> lambda_sus(sus_ages.size());
         for (auto i = 0u; i < sus_ages.size(); ++i) {
-          lambda_sus[i] = lambda[sus_ages[i] - 1] * dt;
+          lambda_sus[i] = (lambda[sus_ages[i] - 1] + lambda_ext) * dt;
           lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
         }
 
