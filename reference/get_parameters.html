@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.6</span>
       </span>
     </div>
 
@@ -141,6 +141,7 @@
   contact_matrix_set <span class='op'>=</span> <span class='cn'>NULL</span>,
   time_period <span class='op'>=</span> <span class='fl'>365</span>,
   max_age <span class='op'>=</span> <span class='fl'>100</span>,
+  lambda_external <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>dt</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
@@ -167,6 +168,11 @@
     <tr>
       <th>max_age</th>
       <td><p>the maximum age for humans</p></td>
+    </tr>
+    <tr>
+      <th>lambda_external</th>
+      <td><p>a vector of length equal to <code>time_period</code> giving an additional additive term contributing to the force of infection.
+Models infectious contacts the population has with external (unmodeled) populations.</p></td>
     </tr>
     <tr>
       <th>dt</th>
