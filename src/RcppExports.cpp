@@ -152,6 +152,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cross_tab_doses_age
+Rcpp::IntegerMatrix cross_tab_doses_age(Rcpp::XPtr<IntegerVariable> doses, Rcpp::XPtr<IntegerVariable> age, const size_t num_doses, const size_t num_ages);
+RcppExport SEXP _safir_cross_tab_doses_age(SEXP dosesSEXP, SEXP ageSEXP, SEXP num_dosesSEXP, SEXP num_agesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type doses(dosesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type age(ageSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type num_doses(num_dosesSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type num_ages(num_agesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cross_tab_doses_age(doses, age, num_doses, num_ages));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cross_tab_margins_internal
 Rcpp::NumericMatrix cross_tab_margins_internal(const std::vector<int>& a, const std::vector<int>& b, const int a_margin, const int b_margin);
 RcppExport SEXP _safir_cross_tab_margins_internal(SEXP aSEXP, SEXP bSEXP, SEXP a_marginSEXP, SEXP b_marginSEXP) {
@@ -277,6 +291,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_infection_process_vaccine_cpp_internal", (DL_FUNC) &_safir_infection_process_vaccine_cpp_internal, 6},
     {"_safir_compare_floats", (DL_FUNC) &_safir_compare_floats, 2},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
+    {"_safir_cross_tab_doses_age", (DL_FUNC) &_safir_cross_tab_doses_age, 4},
     {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},

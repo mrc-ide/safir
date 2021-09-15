@@ -40,13 +40,9 @@ get_vaccine_ab_titre_parameters <- function(
   stopifnot(all(is.finite(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k))))
   stopifnot(all(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k) > 0))
 
-
   time_to_decay <- t_period_l - period_s # time in days to reach longest half-life
   dr_s <- -log(2)/hl_s # Corresponding decay rate in days for half life above
   dr_l <- -log(2)/hl_l
-
-  mu_ab_d1 <- mu_ab_list[mu_ab_list$name == vaccine, "mu_ab_d1"] # mean titre dose 1
-  mu_ab_d2 <- mu_ab_list[mu_ab_list$name == vaccine, "mu_ab_d2"] # mean titre dose 2
 
   dr_vec <- c(
     rep(dr_s, period_s),
@@ -54,11 +50,10 @@ get_vaccine_ab_titre_parameters <- function(
     dr_l
   )
 
-  if (max_dose == 3) {
-    mu_ab = rep(c(mu_ab_d1, mu_ab_d2), times = c(1,2))
-  } else {
-    mu_ab = rep(c(mu_ab_d1, mu_ab_d2), times = c(1,1))
-  }
+  mu_ab <- as.numeric(mu_ab_list[mu_ab_list$name == vaccine, -1])
+
+  stopifnot(length(mu_ab) >= max_dose)
+  stopifnot(all(is.finite(mu_ab)))
 
   parameters <- list(
     dr_vec = dr_vec,

@@ -10,6 +10,7 @@ get_parameters(
   contact_matrix_set = NULL,
   time_period = 365,
   max_age = 100,
+  lambda_external = NULL,
   dt,
   ...
 )
@@ -24,6 +25,9 @@ get_parameters(
 \item{time_period}{length of simulation (in days)}
 
 \item{max_age}{the maximum age for humans}
+
+\item{lambda_external}{a vector of length equal to \code{time_period} giving an additional additive term contributing to the force of infection.
+Models infectious contacts the population has with external (unmodeled) populations. If \code{NULL}, it is set to 0.}
 
 \item{dt}{size of time step}
 

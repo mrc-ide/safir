@@ -9,6 +9,7 @@ get_parameters_nimue(
   contact_mat,
   time_period,
   max_age = 100,
+  lambda_external = NULL,
   dt = 1,
   ...
 )
@@ -21,6 +22,9 @@ get_parameters_nimue(
 \item{time_period}{maximum time of simulation}
 
 \item{max_age}{max age for humans}
+
+\item{lambda_external}{a vector of length equal to \code{time_period} giving an additional additive term contributing to the force of infection.
+Models infectious contacts the population has with external (unmodeled) populations.}
 
 \item{dt}{time step size}
 

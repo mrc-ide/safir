@@ -5,16 +5,21 @@
 \title{Get variant of concern transmission parameters}
 \usage{
 get_voc_parameters(
-  tmax,
+  safir_parameters,
   voc_types = c("alpha", "beta", "delta", "wt", "none"),
   voc_trajectory = NULL,
   vaccine_parameters
 )
 }
 \arguments{
-\item{tmax}{the maximum day of simulation (not the number of time steps)}
+\item{safir_parameters}{either a single object from \code{\link{get_parameters}}
+or a list of objects from \code{\link{get_parameters}}}
 
 \item{voc_types}{character vector of variant names (must include "wt" and "none")}
+
+\item{vaccine_parameters}{either a single object from \code{\link{get_vaccine_ab_titre_parameters}}
+or a list of objects from \code{\link{get_vaccine_ab_titre_parameters}} giving efficacy parameters
+for each variant}
 }
 \description{
 Get variant of concern transmission parameters

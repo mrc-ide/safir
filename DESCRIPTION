@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.2.3
+Version: 0.2.6
 Authors@R: c(
           person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
           person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
@@ -29,26 +29,20 @@ Suggests:
     testthat,
     mockery,
     tidyverse,
-    xml2,
-    rvest,
     knitr,
     rmarkdown,
-    jsonlite,
-    data.table,
-    DiagrammeR
+    data.table
 Imports:
-    individual (>= 0.1.0),
+    individual,
     Rcpp,
-    squire (>= 0.6.4),
+    squire,
     nimue,
     ggplot2,
-    tibble,
-    tidyr,
-    dplyr,
     magrittr
+VignetteBuilder: knitr
+NeedsCompilation: yes
 Depends: 
     R (>= 2.10)
-VignetteBuilder: knitr
 LinkingTo: 
     Rcpp,
     individual

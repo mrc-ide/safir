@@ -40,7 +40,14 @@ parameters <- safir::get_parameters(
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
+mu_ab_list_3dose <- data.frame(
+  name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
+  d1 = c(13/94, 1/59, 28/164, ((185 + 273)/2)/321),
+  d2 = c(223/94, 32/59,28/164, 654/158)
+)
+mu_ab_list_3dose <- cbind(mu_ab_list_3dose, d3 = mu_ab_list_3dose[, 3])
+
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE,mu_ab_list = mu_ab_list_3dose)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
