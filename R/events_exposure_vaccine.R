@@ -68,4 +68,3 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
   )
 
 }
-

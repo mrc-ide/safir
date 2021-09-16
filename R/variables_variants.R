@@ -16,11 +16,11 @@
 #' @export
 create_voc_variables <- function(variables, parameters) {
 
-  stopifnot(all(c("wt","none") %in% parameters$voc_types))
+  stopifnot("wt" %in% parameters$voc_types)
   n <- sum(parameters$population)
 
   # this tracks what a person's current infection is
-  variables$voc <- CategoricalVariable$new(categories = parameters$voc_types,initial_values = rep("none", n))
+  variables$voc <- CategoricalVariable$new(categories = c("none", parameters$voc_types),initial_values = rep("none", n))
 
   # bitsets for new infections on each round
   variables$voc_new_inf <- replicate(n = parameters$voc_num, expr = {Bitset$new(size = n)})

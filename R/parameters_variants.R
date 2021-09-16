@@ -16,17 +16,17 @@
 #' @export
 get_voc_parameters <- function(
   safir_parameters,
-  voc_types = c("alpha", "beta", "delta", "wt", "none"),
+  voc_types = c("alpha", "beta", "delta", "wt"),
   voc_trajectory = NULL,
   vaccine_parameters
 ) {
 
   stopifnot(is.character(voc_types))
-  stopifnot(c("wt","none") %in% voc_types)
+  stopifnot("wt" %in% voc_types)
 
   parameters <- list()
   parameters$voc_types <- voc_types
-  parameters$voc_num <- length(voc_types) - 1
+  parameters$voc_num <- length(voc_types)
 
 
   if (!is.null(attr(safir_parameters, "type"))) {
@@ -47,13 +47,12 @@ get_voc_parameters <- function(
   stopifnot(tmax > 1)
 
   if (is.null(voc_trajectory)) {
-    vocs <- voc_types[voc_types != "none"]
-    voc_trajectory <- matrix(data = 0, nrow = tmax,ncol = length(vocs),dimnames = list(NULL, vocs))
+    voc_trajectory <- matrix(data = 0, nrow = tmax,ncol = length(voc_types),dimnames = list(NULL, voc_types))
     voc_trajectory[, "wt"] <- 1
   }
 
   stopifnot(all(rowSums(voc_trajectory) == 1))
-  stopifnot(ncol(voc_trajectory) == (length(voc_types) - 1))
+  stopifnot(ncol(voc_trajectory) == parameters$voc_num)
   stopifnot(nrow(voc_trajectory) == tmax)
 
   parameters$voc_trajectory <- voc_trajectory
