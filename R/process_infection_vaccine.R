@@ -73,59 +73,6 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
   ) # end return
 }
 
-# infection_process_vaccine <- function(parameters, variables, events, dt) {
-#
-#   stopifnot(all(c("states","discrete_age") %in% names(variables)))
-#
-#   return(
-#
-#     # process without vaccination
-#     function(timestep) {
-#
-#       # current day of simulation
-#       day <- ceiling(timestep * dt)
-#
-#       # FoI from contact outside the population
-#       lambda_external <- parameters$lambda_external[day]
-#
-#       # infectious classes
-#       infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
-#
-#       if (infectious$size() > 0 | lambda_external > 0) {
-#
-#         # Group infection by age
-#         ages <- variables$discrete_age$get_values(infectious)
-#         inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
-#
-#         # calculate FoI for each age group
-#         m <- get_contact_matrix(parameters)
-#         lambda <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
-#
-#         # Transition from S to E
-#         susceptible <- variables$states$get_index_of("S")
-#
-#         # get infection modifier and ages
-#         ab_titre <- variables$ab_titre$get_values(susceptible)
-#         infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters)
-#         ages <- variables$discrete_age$get_values(susceptible)
-#
-#         # FoI for each susceptible based on their age group
-#         lambda <- lambda[ages]
-#
-#         # sample infections; individual FoI adjusted by vaccine efficacy
-#         susceptible$sample(rate = pexp(q = ((lambda * infection_efficacy) + lambda_external) * dt))
-#
-#         # newly infecteds queue the exposure event
-#         if (susceptible$size() > 0) {
-#           events$exposure$schedule(susceptible, delay = 0)
-#         }
-#
-#       }
-#     }
-#
-#   )
-# }
-
 
 #' @title C++ infection process for vaccine model (multi-dose, no types)
 #'
