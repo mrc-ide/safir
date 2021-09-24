@@ -78,7 +78,7 @@ get_parameters <- function(iso3c = NULL,
 
   # external FoI term
   if (!is.null(lambda_external)) {
-    stopifnot(length(lambda_external) != time_period)
+    stopifnot(length(lambda_external) == time_period)
     stopifnot(all(is.finite(lambda_external)))
     stopifnot(all(lambda_external >= 0))
     pars$lambda_external <- as.numeric(lambda_external)
