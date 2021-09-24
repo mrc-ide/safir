@@ -54,12 +54,17 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
   // the process lambda
   return Rcpp::XPtr<process_t>(
     new process_t([parameters, states, vaccine_states, discrete_age, exposure, dt, inf_states, beta, lambda, rel_inf, rel_inf_age, mix_mat_set, beta_set, lambda_external, vaccine_efficacy_infection_ptr, d1, d2, d3](size_t t) mutable {
+
+      // current day (subtract one for zero-based indexing)
+      size_t tnow = std::ceil((double)t * dt) - 1.;
+
+      // FoI from contact outside the population
+      double lambda_ext = get_vector_cpp(lambda_external, tnow);
+
+      // infectious classes
       individual_index_t infectious = states->get_index_of(inf_states);
 
-      if (infectious.size() > 0) {
-
-        // current day (subtract one for zero-based indexing)
-        size_t tnow = std::ceil((double)t * dt) - 1.;
+      if (infectious.size() > 0 || lambda_ext > 0.0) {
 
         // infection by vaccine status
         std::vector<int> inf_vaxx = vaccine_states->get_values(infectious);
@@ -81,9 +86,6 @@ Rcpp::XPtr<process_t> infection_process_nimue_cpp_internal(
         individual_index_t susceptible = states->get_index_of("S");
         std::vector<int> sus_vaxx = vaccine_states->get_values(susceptible);
         std::vector<int> sus_ages = discrete_age->get_values(susceptible);
-
-        // FoI from contact outside the population
-        double lambda_ext = get_vector_cpp(lambda_external, tnow);
 
         // calculate FoI on susceptibles
         std::vector<double> lambda_sus(sus_ages.size());

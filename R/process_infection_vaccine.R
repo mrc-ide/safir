@@ -22,11 +22,16 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
     # process without vaccination
     function(timestep) {
 
+      # current day of simulation
+      day <- ceiling(timestep * dt)
+
+      # FoI from contact outside the population
+      lambda_external <- parameters$lambda_external[day]
+
+      # infectious classes
       infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
 
-      if (infectious$size() > 0) {
-
-        day <- ceiling(timestep * dt)
+      if (infectious$size() > 0 | lambda_external > 0) {
 
         # Group infection by age
         ages <- variables$discrete_age$get_values(infectious)
@@ -46,12 +51,6 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
         # FoI for each susceptible based on their age group
         lambda <- lambda[ages]
-
-        # # sample infections; individual FoI adjusted by vaccine efficacy
-        # susceptible$sample(rate = pexp(q = (lambda * infection_efficacy) * dt))
-
-        # FoI from contact outside the population
-        lambda_external <- parameters$lambda_external[day]
 
         # sample infections; individual FoI adjusted by vaccine efficacy
         susceptible$sample(rate = pexp(q = ((lambda * infection_efficacy) + lambda_external) * dt))
