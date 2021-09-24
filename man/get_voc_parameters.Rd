@@ -6,7 +6,7 @@
 \usage{
 get_voc_parameters(
   safir_parameters,
-  voc_types = c("alpha", "beta", "delta", "wt", "none"),
+  voc_types = c("alpha", "beta", "delta", "wt"),
   voc_trajectory = NULL,
   vaccine_parameters
 )
