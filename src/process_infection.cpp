@@ -41,12 +41,16 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   return Rcpp::XPtr<process_t>(
     new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda, mix_mat_set, beta_set, lambda_external](size_t t) mutable {
 
+      // current day (subtract one for zero-based indexing)
+      size_t tnow = std::ceil((double)t * dt) - 1.;
+
+      // FoI from contact outside the population
+      double lambda_ext = get_vector_cpp(lambda_external, tnow);
+
+      // infectious classes
       individual_index_t infectious = states->get_index_of(inf_states);
 
-      if (infectious.size() > 0) {
-
-        // current day (subtract one for zero-based indexing)
-        size_t tnow = std::ceil((double)t * dt) - 1.;
+      if (infectious.size() > 0 || lambda_ext > 0.0) {
 
         // group infection by age
         std::vector<int> ages = discrete_age->get_values(infectious);
@@ -57,9 +61,6 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
         std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
         std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
         std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
-
-        // FoI from contact outside the population
-        double lambda_ext = get_vector_cpp(lambda_external, tnow);
 
         // transition from S to E
         individual_index_t susceptible = states->get_index_of("S");
