@@ -76,7 +76,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
           // FoI on each susceptible person from infectives
           for (auto i = 0u; i < sus_ages.size(); ++i) {
-            lambda[i] += lambda[sus_ages[i] - 1];
+            lambda[i] += lambda_age[sus_ages[i] - 1];
           }
 
         }
