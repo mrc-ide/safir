@@ -16,49 +16,58 @@
 #' @export
 infection_process <- function(parameters, variables, events, dt) {
 
-    return(
+  return(
 
-      # process without vaccination
-      function(timestep) {
+    # process without vaccination
+    function(timestep) {
 
-        # current day of simulation
-        day <- ceiling(timestep * dt)
+      # current day of simulation
+      day <- ceiling(timestep * dt)
 
-        # FoI from contact outside the population
-        lambda_external <- parameters$lambda_external[day]
+      # FoI from contact outside the population
+      lambda_external <- parameters$lambda_external[day]
 
-        # infectious classes
-        infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
+      # infectious classes
+      infectious <- variables$states$get_index_of(c("IMild", "IAsymp", "ICase"))
 
-        if (infectious$size() > 0 | lambda_external > 0) {
+      # susceptible persons
+      susceptible <- variables$states$get_index_of("S")
 
-          # Group infection by age
+      if (susceptible$size() > 0) {
+
+        # FoI for each susceptible from external contacts
+        lambda <- rep(x = lambda_external, times = susceptible$size())
+
+        # FoI contribution from transmission
+        if (infectious$size() > 0) {
+
+          # group infectious persons by age
           ages <- variables$discrete_age$get_values(infectious)
           inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
 
-          # calculate FoI for each age group
+          # calculate FoI on each susceptible age group
           m <- get_contact_matrix(parameters)
-          lambda <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
+          lambda_age <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
 
-          # Transition from S to E
-          susceptible <- variables$states$get_index_of("S")
+          # group susceptible persons by age
           ages <- variables$discrete_age$get_values(susceptible)
 
-          # FoI for each susceptible person
-          lambda <- lambda[ages]
-
-          # infected
-          susceptible$sample(rate = pexp(q = (lambda + lambda_external) * dt))
-
-          # newly infecteds queue the exposure event
-          if (susceptible$size() > 0) {
-            events$exposure$schedule(susceptible, delay = 0)
-          }
+          # FoI on each susceptible person from infectives
+          lambda <- lambda + lambda_age[ages]
 
         }
-      }
 
-    )
+        # sample infection events in susceptible population
+        susceptible$sample(rate = pexp(q = lambda * dt))
+
+        # queue the exposure event
+        events$exposure$schedule(susceptible, delay = 0)
+
+      } # end if S > 0
+
+    } # end process fn
+
+  ) # return
 }
 
 
