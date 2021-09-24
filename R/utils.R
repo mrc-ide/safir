@@ -26,6 +26,7 @@
 #' @param max_date the maximum date of simulation (optional)
 #' @return a [list] with named elements `Rt` and `Rt_tt`, which can be provided
 #' to the [safir::get_parameters] function's arguments `R0` and `tt_R0`.
+#' @importFrom stats approx
 #' @export
 interpolate_rt <- function(dates, rt, max_date = NULL) {
   stopifnot(inherits(dates, "Date"))
