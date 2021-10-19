@@ -33,7 +33,7 @@ get_vaccine_ab_titre_parameters <- function(
                            mu_ab_d2 = c(223/94, 32/59, 28/164, 654/158))
 ) {
 
-  stopifnot(max_dose %in%  1:(ncol(mu_ab_list) - 1))
+  stopifnot(max_dose %in%  seq_len(ncol(mu_ab_list) - 1))
   stopifnot(is.logical(correlated))
   stopifnot(vaccine %in% mu_ab_list[, "name"])
 

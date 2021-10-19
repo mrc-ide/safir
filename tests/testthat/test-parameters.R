@@ -113,7 +113,7 @@ expect_equal(length(want), 11)
 test_that("test nimue parameters", {
 
   iso3c <- "AFG"
-  pop <- safir:::get_population(iso3c)
+  pop <- safir::get_population(iso3c)
   pop$n <- as.integer(pop$n / 1000)
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -150,3 +150,125 @@ test_that("test nimue parameters", {
   expect_equal(length(parameters$vaccine_set), time_period+1)
 
 })
+
+test_that("test vaccine titre parameters", {
+
+  ab_pars <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  expect_equal(attr(ab_pars, "type"), "ab_titre")
+
+  ab_pars <- get_vaccine_ab_titre_parameters(vaccine = "Moderna")
+  expect_equal(attr(ab_pars, "type"), "ab_titre")
+
+  ab_pars <- get_vaccine_ab_titre_parameters(vaccine = "Sinovac")
+  expect_equal(attr(ab_pars, "type"), "ab_titre")
+
+  ab_pars <- get_vaccine_ab_titre_parameters(vaccine = "AstraZeneca")
+  expect_equal(attr(ab_pars, "type"), "ab_titre")
+
+  expect_error(get_vaccine_ab_titre_parameters(vaccine = "not_a_vaccine"))
+
+})
+
+test_that("test safir parameters for vaccine (no voc)", {
+
+  iso3c <- "AFG"
+  pop <- safir::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1000)
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+
+  time_period <- 1000
+  R0 <- 2
+  dt <- 1
+
+  vaccine_doses <- 2
+  dose_period <- c(NaN, 28)
+  vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = time_period-1))
+  vaccine_set <- floor(vaccine_set)
+
+  parameters <- safir::get_parameters(
+    population = pop$n,
+    contact_matrix_set = contact_mat,
+    iso3c = iso3c,
+    R0 = R0,
+    time_period = time_period,
+    dt = dt
+  )
+
+  ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
+
+  next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
+  next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
+
+  # test single strategy matrix
+  vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
+
+  parameters <- make_vaccine_parameters(
+    safir_parameters = parameters,
+    vaccine_ab_parameters = ab_parameters,
+    vaccine_set = vaccine_set,
+    dose_period = dose_period,
+    strategy_matrix = vaccine_coverage_mat,
+    next_dose_priority_matrix = next_dose_priority
+  )
+
+  expect_equal(attr(parameters, "type"), "safir_vaccine_notype")
+  expect_equal(length(parameters$vaccine_coverage_mat), vaccine_doses)
+  expect_true(inherits(parameters$vaccine_coverage_mat, "list"))
+  expect_equal(parameters$dur_E, 4.6)
+  expect_equal(parameters$N_age, 17)
+  expect_equal(length(parameters$S_0), 17)
+  expect_equal(length(parameters$IAsymp_0), 17)
+  expect_equal(parameters$dur_IAsymp, 2.1)
+  expect_equal(parameters$prob_asymp[8], 0.2)
+  expect_equal(length(parameters$IRec1_0), 17)
+  expect_equal(parameters$time_period, 1000)
+
+  # test list of strategies
+  vaccine_coverage_list <- list(strategy_matrix(strategy = "Elderly",max_coverage = 0.5), strategy_matrix(strategy = "Working Elderly Children",max_coverage = 0.8))
+
+  parameters <- make_vaccine_parameters(
+    safir_parameters = parameters,
+    vaccine_ab_parameters = ab_parameters,
+    vaccine_set = vaccine_set,
+    dose_period = dose_period,
+    strategy_matrix = vaccine_coverage_list,
+    next_dose_priority_matrix = next_dose_priority
+  )
+
+  expect_equal(attr(parameters, "type"), "safir_vaccine_notype")
+  expect_equal(length(parameters$vaccine_coverage_mat), vaccine_doses)
+  expect_true(inherits(parameters$vaccine_coverage_mat, "list"))
+  expect_equal(parameters$vaccine_coverage_mat, vaccine_coverage_list)
+  expect_equal(parameters$dur_E, 4.6)
+  expect_equal(parameters$N_age, 17)
+  expect_equal(length(parameters$S_0), 17)
+  expect_equal(length(parameters$IAsymp_0), 17)
+  expect_equal(parameters$dur_IAsymp, 2.1)
+  expect_equal(parameters$prob_asymp[8], 0.2)
+  expect_equal(length(parameters$IRec1_0), 17)
+  expect_equal(parameters$time_period, 1000)
+
+  # failure
+  expect_error(
+    make_vaccine_parameters(
+      safir_parameters = parameters,
+      vaccine_ab_parameters = ab_parameters,
+      vaccine_set = vaccine_set,
+      dose_period = dose_period,
+      strategy_matrix = c(vaccine_coverage_list, vaccine_coverage_list),
+      next_dose_priority_matrix = next_dose_priority
+    )
+  )
+
+  expect_error(
+    make_vaccine_parameters(
+      safir_parameters = parameters,
+      vaccine_ab_parameters = ab_parameters,
+      vaccine_set = vaccine_set,
+      dose_period = dose_period,
+      strategy_matrix = matrix(0, nrow = 3, ncol = 3),
+      next_dose_priority_matrix = next_dose_priority
+    )
+  )
+})
+
