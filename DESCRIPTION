@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.2.6
+Version: 0.2.8
 Authors@R: c(
           person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
           person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
@@ -19,6 +19,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/mrc-ide/safir, https://mrc-ide.github.io/safir/
+BugReports: https://github.com/mrc-ide/safir/issues
 Remotes: 
     mrc-ide/individual,
     mrc-ide/squire,
@@ -41,6 +42,7 @@ Imports:
     magrittr
 VignetteBuilder: knitr
 NeedsCompilation: yes
+SystemRequirements: C++14
 Depends: 
     R (>= 2.10)
 LinkingTo: 

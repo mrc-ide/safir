@@ -33,61 +33,73 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
   // vectors we can build once
   std::vector<double> beta(17, 0.0);
-  std::vector<double> lambda(17, 0.0);
+  std::vector<double> lambda_age(17, 0.0);
 
   // parameters
   SEXP mix_mat_set = parameters["mix_mat_set"];
   SEXP beta_set = parameters["beta_set"];
-  SEXP lambda_external = parameters["lambda_external"];
+  SEXP lambda_external_vector = parameters["lambda_external"];
 
   // infection process fn
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, ab_titre, exposure, dt, inf_states, beta, lambda, mix_mat_set, beta_set, lambda_external](size_t t) mutable {
+    new process_t([parameters, states, discrete_age, ab_titre, exposure, dt, inf_states, beta, lambda_age, mix_mat_set, beta_set, lambda_external_vector](size_t t) mutable {
 
       // current day (subtract one for zero-based indexing)
       size_t tnow = std::ceil((double)t * dt) - 1.;
 
       // FoI from contact outside the population
-      double lambda_ext = get_vector_cpp(lambda_external, tnow);
+      double lambda_external = get_vector_cpp(lambda_external_vector, tnow);
 
       // infectious classes
       individual_index_t infectious = states->get_index_of(inf_states);
 
-      if (infectious.size() > 0 || lambda_ext > 0.0) {
+      // susceptible persons
+      individual_index_t susceptible = states->get_index_of("S");
 
-        // group infection by age
-        std::vector<int> ages = discrete_age->get_values(infectious);
-        std::vector<int> inf_ages = tab_bins(ages, 17);
+      if (susceptible.size() > 0) {
 
-        // calculate FoI for each age group
-        Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
-        std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
-        std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
-        std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda.begin(), std::multiplies<double>());
+        // FoI for each susceptible from external contacts
+        std::vector<double> lambda(susceptible.size(), lambda_external);
 
-        // transition from S to E
-        individual_index_t susceptible = states->get_index_of("S");
-        std::vector<int> sus_ages = discrete_age->get_values(susceptible);
+        // FoI contribution from transmission
+        if (infectious.size() > 0) {
 
-        // get efficacy
-        std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
-        std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters);
+          // group infectious persons by age
+          std::vector<int> ages = discrete_age->get_values(infectious);
+          std::vector<int> inf_ages = tab_bins(ages, 17);
 
-        // FoI for each susceptible person
-        std::vector<double> lambda_sus(sus_ages.size());
-        for (auto i = 0u; i < sus_ages.size(); ++i) {
-          lambda_sus[i] = ((lambda[sus_ages[i] - 1] * infection_efficacy[i]) + lambda_ext) * dt;
-          lambda_sus[i] = Rf_pexp(lambda_sus[i], 1.0, 1, 0);
+          // calculate FoI on each susceptible age group
+          Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
+          std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
+          std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
+          std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda_age.begin(), std::multiplies<double>());
+
+          // group susceptible persons by age
+          std::vector<int> sus_ages = discrete_age->get_values(susceptible);
+
+          // get vaccine efficacy
+          std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
+          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters);
+
+          // FoI on each susceptible person from infectives
+          for (auto i = 0u; i < sus_ages.size(); ++i) {
+            lambda[i] += lambda_age[sus_ages[i] - 1] * infection_efficacy[i];
+          }
+
         }
 
-        // infected
-        bitset_sample_multi_internal(susceptible, lambda_sus.begin(), lambda_sus.end());
+        // sample infection events in susceptible population
+        std::transform(lambda.begin(), lambda.end(), lambda.begin(), [dt](const double l) -> double {
+          return Rf_pexp(l * dt, 1.0, 1, 0);
+        });
+        bitset_sample_multi_internal(susceptible, lambda.begin(), lambda.end());
 
-        // newly infected queue the exposure event
+        // queue the exposure event
         if (susceptible.size() > 0) {
           exposure->schedule(susceptible, 0.0);
         }
-      }
+
+      } // end if S>0
 
     }),
     true

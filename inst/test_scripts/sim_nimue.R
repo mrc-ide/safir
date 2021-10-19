@@ -103,7 +103,7 @@ combined_dt <- rbind(nimue_dt,safir_dt)
 ggplot(data = combined_dt) +
   geom_line(aes(x=t,y=value,color=compartment,group=model,linetype=model)) +
   facet_wrap(.~compartment,scales="free_y")+
-  guides(color = FALSE)+
+  guides(color = "none")+
   theme_bw()+
   theme(strip.text.x = element_text(size=10,face = "bold"))
 
@@ -125,6 +125,6 @@ combined_vax_dt <- rbind(safir_vax_dt,nimue_vax_dt)
 ggplot(data = combined_vax_dt) +
   geom_line(aes(x=t,y=value,color=compartment,linetype=model,group=model)) +
   facet_wrap(.~compartment,scales="free_y") +
-  guides(color = FALSE)+
+  guides(color = "none")+
   theme_bw()+
   theme(strip.text.x = element_text(size=10,face = "bold"))
