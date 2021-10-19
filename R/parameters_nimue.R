@@ -103,6 +103,7 @@ get_parameters_nimue <- function(
     pars$lambda_external <- rep(0, time_period)
   }
 
+  attr(pars, "type") <- "safir_nimue"
   return(pars)
 }
 

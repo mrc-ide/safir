@@ -45,6 +45,7 @@ test_that("test get_parameters returns the correct values from SQUIRE", {
     dt = 1
   )
 
+  expect_equal(attr(psq, "type"), "safir_squire")
   expect_equal(psq$dur_E, 4.6)
   expect_equal(psq$N_age, 17)
   expect_equal(length(psq$S_0), 17)
@@ -105,5 +106,47 @@ end <- 20
 
 want <- interp_input_par(x, y)
 expect_equal(length(want), 11)
+
+})
+
+
+test_that("test nimue parameters", {
+
+  iso3c <- "AFG"
+  pop <- safir:::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1000)
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+
+  time_period <- 1000
+  R0 <- 2
+  dt <- 1
+
+  vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+  tt_vaccine <- c(0, 10:100)
+  max_vaccine <- c(0, seq(1e3, 5e4, length.out = length(tt_vaccine)-1))
+
+  parameters <- get_parameters_nimue(
+    population = pop$n,
+    contact_mat = contact_mat,
+    time_period = time_period,
+    R0 = R0,
+    max_vaccine = max_vaccine,
+    tt_vaccine = tt_vaccine,
+    vaccine_coverage_mat = vaccine_coverage_mat,
+    dt = dt
+  )
+
+  expect_equal(attr(parameters, "type"), "safir_nimue")
+  expect_equal(parameters$dur_E, 4.6)
+  expect_equal(parameters$N_age, 17)
+  expect_equal(ncol(parameters$S_0), 6)
+  expect_equal(ncol(parameters$S_0), 17)
+  expect_equal(length(parameters$IAsymp_0), 17)
+  expect_equal(parameters$dur_IAsymp, 2.1)
+  expect_equal(parameters$prob_asymp[8], 0.2)
+  expect_equal(ncol(parameters$IRec1_0), 6)
+  expect_equal(ncol(parameters$IRec1_0), 17)
+  expect_equal(parameters$time_period, 1000)
+  expect_equal(length(parameters$vaccine_set), time_period+1)
 
 })

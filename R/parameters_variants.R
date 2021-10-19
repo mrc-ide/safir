@@ -31,12 +31,12 @@ get_voc_parameters <- function(
 
   if (!is.null(attr(safir_parameters, "type"))) {
 
-    stopifnot(attr(safir_parameters, "type") == "base_squire")
+    stopifnot(attr(safir_parameters, "type") == "safir_squire")
     tmax <- safir_parameters$time_period
 
   } else if (length(safir_parameters) == parameters$voc_num) {
 
-    stopifnot( all(vapply(X = safir_parameters, FUN = function(l){attr(l, "type")}, FUN.VALUE = character(1)) == "base_squire") )
+    stopifnot( all(vapply(X = safir_parameters, FUN = function(l){attr(l, "type")}, FUN.VALUE = character(1)) == "safir_squire") )
     tmax <- safir_parameters[[1]]$time_period
 
   } else {
@@ -87,6 +87,6 @@ get_voc_parameters <- function(
     stop("invalid object passed for vaccine_parameters")
   }
 
-
+  attr(parameters, "type") <- "safir_vaccine_voc"
   return(parameters)
 }

@@ -86,7 +86,7 @@ get_parameters <- function(iso3c = NULL,
     pars$lambda_external <- rep(0, time_period)
   }
 
-  attr(pars, "type") <- "base_squire"
+  attr(pars, "type") <- "safir_squire"
   return(pars)
 }
 

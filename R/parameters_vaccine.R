@@ -64,6 +64,7 @@ get_vaccine_ab_titre_parameters <- function(
     k = k,
     correlated = correlated
   )
+
   attr(parameters, "type") <- "ab_titre"
   return(parameters)
 }
@@ -131,5 +132,6 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
 
   parameters <- c(parameters, vaccine_ab_parameters)
 
+  attr(parameters, "type") <- "safir_vaccine_notype"
   return(parameters)
 }
