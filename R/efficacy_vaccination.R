@@ -170,8 +170,8 @@ vaccine_efficacy_severe_voc <- function(ab_titre, ef_infection, parameters) {
     for (v in seq_len(parameters$voc_num)) {
       ef_severe_uncond <- 1 / (1 + exp(-parameters$k[v] * (log10(nt) - log10(parameters$ab_50_severe[v]))))
       ef_severe[v, finite_ab] <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection[v, finite_ab]))
+      ef_severe[v, finite_ab] <- 1 - ef_severe[v, finite_ab]
     }
-    ef_severe[v, finite_ab] <- 1 - ef_severe[v, finite_ab]
     return(ef_severe)
   } else {
     return(ef_severe)

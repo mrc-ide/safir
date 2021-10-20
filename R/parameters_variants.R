@@ -6,10 +6,12 @@
 
 
 #' @title Get variant of concern transmission parameters
+#' @description Some arguments
 #' @param safir_parameters either a single object from \code{\link{get_parameters}}
 #' or a list of objects from \code{\link{get_parameters}}
-#' @param voc_types character vector of variant names (must include "wt" and "none")
-#' @param voc_trajectory
+#' @param voc_types character vector of variant names (must include "wt", wild-type)
+#' @param voc_trajectory a matrix with number of columns equal to length of `voc_types` and number
+#' of rows equal to the number of days simulated
 #' @param vaccine_parameters either a single object from \code{\link{get_vaccine_ab_titre_parameters}}
 #' or a list of objects from \code{\link{get_vaccine_ab_titre_parameters}} giving efficacy parameters
 #' for each variant
@@ -47,13 +49,24 @@ get_voc_parameters <- function(
   stopifnot(tmax > 1)
 
   if (is.null(voc_trajectory)) {
-    voc_trajectory <- matrix(data = 0, nrow = tmax,ncol = length(voc_types),dimnames = list(NULL, voc_types))
+    voc_trajectory <- matrix(data = 0, nrow = tmax + 1,ncol = length(voc_types),dimnames = list(NULL, voc_types))
     voc_trajectory[, "wt"] <- 1
-  }
+  } else {
+    stopifnot(all(rowSums(voc_trajectory) == 1))
+    stopifnot(ncol(voc_trajectory) == parameters$voc_num)
 
-  stopifnot(all(rowSums(voc_trajectory) == 1))
-  stopifnot(ncol(voc_trajectory) == parameters$voc_num)
-  stopifnot(nrow(voc_trajectory) == tmax)
+    # if failing with out of bounds, uncomment the below
+    stopifnot(nrow(voc_trajectory) == tmax)
+
+
+    # # the matrix should have tmax+1 rows, because if dt < 1 we will use ceiling to find
+    # # nearest row to grab.
+    # if (nrow(voc_trajectory) == tmax) {
+    #   voc_trajectory <- cbind(voc_trajectory[1, ], voc_trajectory)
+    # }
+    # stopifnot(nrow(voc_trajectory) == (tmax + 1))
+
+  }
 
   parameters$voc_trajectory <- voc_trajectory
 

@@ -15,12 +15,15 @@ get_voc_parameters(
 \item{safir_parameters}{either a single object from \code{\link{get_parameters}}
 or a list of objects from \code{\link{get_parameters}}}
 
-\item{voc_types}{character vector of variant names (must include "wt" and "none")}
+\item{voc_types}{character vector of variant names (must include "wt", wild-type)}
+
+\item{voc_trajectory}{a matrix with number of columns equal to length of \code{voc_types} and number
+of rows equal to the number of days simulated}
 
 \item{vaccine_parameters}{either a single object from \code{\link{get_vaccine_ab_titre_parameters}}
 or a list of objects from \code{\link{get_vaccine_ab_titre_parameters}} giving efficacy parameters
 for each variant}
 }
 \description{
-Get variant of concern transmission parameters
+Some arguments
 }

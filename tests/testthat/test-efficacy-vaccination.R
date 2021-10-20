@@ -17,25 +17,6 @@ test_that("efficacy functions work in R and C++", {
 
 })
 
-test_that("efficacy functions (multiple variants) work in R and C++", {
-
-  # n <- 50
-  # vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
-  # ab_titre <- log(10^rnorm(n = n, mean = log10(vaccine_parameters$mu_ab[1]),sd = vaccine_parameters$std10))
-  # ab_titre[sample.int(n = n,size = 20,replace = FALSE)] <- -Inf
-  #
-  # ef_inf_R <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = vaccine_parameters)
-  # ef_inf_cpp <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = vaccine_parameters)
-  #
-  # expect_equal(ef_inf_R, ef_inf_cpp)
-  #
-  # ef_sev_R <- vaccine_efficacy_severe(ab_titre = ab_titre,ef_infection = ef_inf_R,parameters = vaccine_parameters)
-  # ef_sev_cpp <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = ef_inf_cpp,parameters = vaccine_parameters)
-  #
-  # expect_equal(ef_sev_R, ef_sev_cpp)
-
-})
-
 test_that("get_time_since_last_dose works", {
 
   n <- 100
