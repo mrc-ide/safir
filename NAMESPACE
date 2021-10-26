@@ -3,6 +3,7 @@
 export("%>%")
 export(assign_doses)
 export(attach_event_listeners)
+export(attach_event_listeners_natural_immunity)
 export(attach_event_listeners_nimue)
 export(attach_event_listeners_vaccination)
 export(attach_tracking_listener_incidence)

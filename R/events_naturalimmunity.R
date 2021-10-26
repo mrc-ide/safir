@@ -1,0 +1,58 @@
+# --------------------------------------------------
+#   events to handle modeling of natural immunity
+#   Sean L. Wu (slwood89@gmail.com)
+#   October 2021
+# --------------------------------------------------
+
+#' @title Attach event listeners for natural immunity events
+#' @param variables a named list of variables
+#' @param events a named list of events
+#' @param parameters the parameters
+#' @param dt size of time step
+#' @export
+attach_event_listeners_natural_immunity <- function(variables, events, parameters, dt) {
+
+  events$exposure$add_listener(
+    function(timestep, target) {
+      # inf_num is initialized to all 0
+      variables$inf_num$queue_update(values = variables$inf_num$get_values(target) + 1L, index = target)
+    }
+  )
+
+  if (length(events$recovery$.listeners) == 2) {
+    events$recovery$.listeners[[2]] <- NULL
+  }
+
+  # they go from R to S in 1 time step
+  events$recovery$add_listener(
+    function(timestep, target) {
+      events$immunity_loss$schedule(target = target, delay = rep(1, target$size()))
+    }
+  )
+
+  # boost antibody titre
+  events$recovery$add_listener(
+    function(timestep, target) {
+      inf <- variables$inf_num$get_values(target)
+      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
+      variables$ab_titre$queue_update(values = zdose, index = target)
+      # update dose_time (see note below)
+      variables$dose_time$queue_update(values = timestep, index = target)
+    }
+  )
+
+}
+
+# note that for Ab titre, the *only* parameter that is vaccine product specific
+# is the boost upon each dose. So the decay rates are fixed (just protein decay).
+# that's great.
+
+# new stuff:
+# 1. parameters$mu_ab_infection
+# 2. variables$inf_num
+
+# need to change:
+# 1. vaccine_ab_titre_process: needs to update ab titre for people who are
+# vaccinated OR infected. So do an AND with variables$inf_num > 0.
+# 2. in computation, variables$dose_time now will store either time of dose
+# or time of last infection...maybe rename to boost_time? ab_boost_time?

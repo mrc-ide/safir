@@ -72,10 +72,10 @@ create_vaccine_variables <- function(variables, parameters) {
   variables$phase$value <- 1L
 
   # ab dynamics
-  variables$ab_titre <- DoubleVariable$new(initial_values = rep(-Inf,n))
+  variables$ab_titre <- DoubleVariable$new(initial_values = rep(-Inf, n))
 
   if (correlated) {
-    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN,n))
+    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN, n))
   }
 
   return(variables)
