@@ -26,16 +26,15 @@ test_that("get_time_since_last_dose works", {
   dose_num_vec <- sample(x = 0:3,size = n,replace = TRUE)
   who <- vector("list",3)
   when <- vector("list",3)
-
   N_phase <- 3
 
   dose_num <- IntegerVariable$new(initial_values = dose_num_vec)
-  dose_time <- replicate(n = 3,expr = {IntegerVariable$new(initial_values = rep(-1,n))})
+  dose_time <- IntegerVariable$new(initial_values = rep(-1,n))
   for (d in 1:3) {
     who[[d]] <- which(dose_num_vec == d)
     when[[d]] <- sample.int(n = 25,size = length(who[[d]]),replace = TRUE)
-    dose_time[[d]]$queue_update(values = when[[d]],index = who[[d]])
-    dose_time[[d]]$.update()
+    dose_time$queue_update(values = when[[d]],index = who[[d]])
+    dose_time$.update()
   }
 
   vaccinated <- dose_num$get_index_of(set = 0)
@@ -116,7 +115,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   variables$ab_titre$queue_update(values = log(10^z1)) # make sure using the same set of RVs
   variables$ab_titre$.update()
   variables$dose_num$.update()
-  variables$dose_time[[1]]$.update()
+  variables$dose_time$.update()
 
   ab_titre <- vaccine_ab_titre_process(parameters = parameters,variables = variables,events = list(),dt = 1)
 

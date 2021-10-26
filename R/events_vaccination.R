@@ -37,7 +37,7 @@ create_events_vaccination <- function(events, parameters) {
 schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters) {
 
   variables$dose_num$queue_update(value = dose,index = target)
-  variables$dose_time[[dose]]$queue_update(values = timestep, index = target)
+  variables$dose_time$queue_update(values = timestep, index = target)
 
   if (inherits(target,"Bitset")) {
     n <- target$size()

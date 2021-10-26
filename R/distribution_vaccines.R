@@ -21,8 +21,7 @@ get_current_coverage <- function(variables, events, dose, parameters) {
 
   bsets <- vector("list", parameters$N_age)
 
-  vaccinated_bset <- variables$dose_time[[dose]]$get_index_of(set = -1) # haven't gotten this dose
-  vaccinated_bset$not(inplace = TRUE) # have gotten this dose
+  vaccinated_bset <- variables$dose_num$get_index_of(set = dose:parameters$N_phase) # have gotten this dose
   vaccinated_bset$or(events$scheduled_dose[[dose]]$get_scheduled()) # have gotten this dose OR are scheduled for it
 
   for (a in 1:parameters$N_age) {
@@ -78,8 +77,8 @@ get_current_eligible_from_coverage <- function(timestep, dt, coverage, variables
     # threshold past 0
     } else {
 
-      # who has gotten the previous dose in [0,threshold]?
-      previous_dose_in_threshold <- variables$dose_time[[dose - 1]]$get_index_of(set = 0:threshold)
+      previous_dose_in_threshold <- variables$dose_num$get_index_of(set = dose - 1)
+      previous_dose_in_threshold$and(variables$dose_time$get_index_of(a = 0, b = threshold))
       for (a in 1:parameters$N_age) {
         bsets[[a]]$and(previous_dose_in_threshold)
       }

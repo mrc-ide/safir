@@ -13,6 +13,7 @@ Useful links:
 \itemize{
   \item \url{https://github.com/mrc-ide/safir}
   \item \url{https://mrc-ide.github.io/safir/}
+  \item Report bugs at \url{https://github.com/mrc-ide/safir/issues}
 }
 
 }

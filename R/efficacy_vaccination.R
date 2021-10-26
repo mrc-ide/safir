@@ -65,13 +65,7 @@ get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_ti
 
   # output just for the vaccinated persons
   times <- rep(NaN, vaccinated$size())
-
-  for (d in 1:N_phase) {
-    dose_d_persons <- dose_num$get_index_of(set = d)
-    dose_d_persons$and(vaccinated)
-    times[which(vaccinated_dose_num == d)] <- timestep - dose_time[[d]]$get_values(index = dose_d_persons)
-  }
-
+  times <- timestep - dose_time$get_values(index = vaccinated)
   times <- times * dt
 
   return(times)
