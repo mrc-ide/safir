@@ -31,7 +31,7 @@ simulation_loop_nimue <- function(
   # sim loop
   for (t in seq_len(timesteps)) {
     for (process in processes) {
-      individual:::execute_any_process(process, t)
+      execute_any_process(process, t)
     }
     for (event in events) {
       event$.process()

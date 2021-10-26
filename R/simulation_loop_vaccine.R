@@ -36,7 +36,7 @@ simulation_loop_vaccine <- function(
 
     # call processes
     for (process in processes) {
-      individual:::execute_any_process(process, t)
+      execute_any_process(process, t)
     }
 
     # call events

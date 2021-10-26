@@ -39,7 +39,8 @@ Imports:
     squire,
     nimue,
     ggplot2,
-    magrittr
+    magrittr,
+    utils
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14

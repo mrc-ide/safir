@@ -163,7 +163,7 @@ call_nimue_pars <- function(
   seeding_cases = 20,
   seeding_age_order = NULL
 ) {
-  nimue:::parameters(
+  nimue_parameters(
     country = NULL,
     population = population,
     contact_matrix_set = contact_matrix_set,

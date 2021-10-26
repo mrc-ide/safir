@@ -7,6 +7,7 @@
 #' @name safir
 #'
 #' @importFrom stats setNames
+#' @importFrom utils getFromNamespace
 #'
 "_PACKAGE"
 
@@ -15,3 +16,6 @@
 #' @useDynLib safir
 ## usethis namespace: end
 NULL
+
+execute_any_process <- utils::getFromNamespace("execute_any_process", "individual")
+nimue_parameters <- utils::getFromNamespace("parameters", "nimue")
