@@ -4,14 +4,7 @@
 \alias{get_time_since_last_dose}
 \title{Calculate the time elapsed in days since each person's last dose}
 \usage{
-get_time_since_last_dose(
-  timestep,
-  dt,
-  vaccinated,
-  dose_num,
-  dose_time,
-  N_phase
-)
+get_time_since_last_dose(timestep, dt, vaccinated, dose_time)
 }
 \arguments{
 \item{timestep}{current time step}
@@ -20,11 +13,7 @@ get_time_since_last_dose(
 
 \item{vaccinated}{bitset of vaccinated persons}
 
-\item{dose_num}{\code{\link[individual]{IntegerVariable}}}
-
 \item{dose_time}{a list of \code{\link[individual]{IntegerVariable}} objects}
-
-\item{N_phase}{total number of doses}
 }
 \description{
 Calculate the time elapsed in days since each person's last dose

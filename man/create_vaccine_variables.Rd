@@ -15,5 +15,5 @@ create_vaccine_variables(variables, parameters)
 named list of individual::Variable
 }
 \description{
-Create all individual variables for humans
+Create vaccination variables (multi-dose, no types)
 }

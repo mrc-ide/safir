@@ -52,8 +52,6 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 # --------------------------------------------------
 
 #' @title Create vaccination variables (multi-dose, no types)
-#' @description Create all individual variables for humans
-#'
 #' @param variables a list
 #' @param parameters list of model parameters
 #' @importFrom individual IntegerVariable

@@ -12,13 +12,7 @@
 #' @export
 attach_event_listeners_natural_immunity <- function(variables, events, parameters, dt) {
 
-  events$exposure$add_listener(
-    function(timestep, target) {
-      # inf_num is initialized to all 0
-      variables$inf_num$queue_update(values = variables$inf_num$get_values(target) + 1L, index = target)
-    }
-  )
-
+  # recovery: handle 1 timestep R->S and update ab titre for immune response
   if (length(events$recovery$.listeners) == 2) {
     events$recovery$.listeners[[2]] <- NULL
   }
@@ -33,11 +27,14 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   # boost antibody titre
   events$recovery$add_listener(
     function(timestep, target) {
+      # update inf_num
+      variables$inf_num$queue_update(values = variables$inf_num$get_values(target) + 1L, index = target)
+      # draw ab titre value
       inf <- variables$inf_num$get_values(target)
       zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
       variables$ab_titre$queue_update(values = zdose, index = target)
-      # update dose_time (see note below)
-      variables$dose_time$queue_update(values = timestep, index = target)
+      # update last time of infection
+      variables$inf_time$queue_update(values = timestep, index = target)
     }
   )
 
@@ -48,7 +45,8 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 # that's great.
 
 # We really need to check that using variables$dose_time like this wont screw
-# anything up. I don't think it will.
+# anything up. It will, because its used in distribution_vaccines.R to
+# check if people are past the threshold. So we have to use something new.
 
 # new stuff:
 # 1. parameters$mu_ab_infection
