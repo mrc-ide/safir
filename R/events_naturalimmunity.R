@@ -47,6 +47,9 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 # is the boost upon each dose. So the decay rates are fixed (just protein decay).
 # that's great.
 
+# We really need to check that using variables$dose_time like this wont screw
+# anything up. I don't think it will.
+
 # new stuff:
 # 1. parameters$mu_ab_infection
 # 2. variables$inf_num
@@ -56,3 +59,5 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 # vaccinated OR infected. So do an AND with variables$inf_num > 0.
 # 2. in computation, variables$dose_time now will store either time of dose
 # or time of last infection...maybe rename to boost_time? ab_boost_time?
+
+
