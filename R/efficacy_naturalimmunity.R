@@ -58,8 +58,6 @@ natural_immunity_ab_titre_process <- function(parameters, variables, events, dt)
 #' @export
 get_time_since_last_dose_or_infection <- function(timestep, dt, vaccinated_or_infected, dose_time, inf_time) {
 
-  times <- rep(NaN, vaccinated_or_infected$size())
-
   last_dose_tt <- dose_time$get_values(vaccinated_or_infected)
   last_inf_tt <- inf_time$get_values(vaccinated_or_infected)
 
