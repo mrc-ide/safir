@@ -1,16 +1,45 @@
-# --------------------------------------------------------------------------------
-#   model with ab dynamics and natural immunity
-# --------------------------------------------------------------------------------
+---
+title: "Natural Immunity"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{natural_immunity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-rm(list=ls());gc()
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(safir)
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(safir)
 library(individual)
+library(nimue)
 library(data.table)
 library(ggplot2)
-library(safir)
-library(nimue)
+```
 
+# Setup
+
+This vignette is essentially identical to the one titled "Vaccine model with multiple doses", but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the `parameters` list is `parameters$mu_ab_infection`, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone's first infection, 2nd from someone's second subsequent infection, and so on.
+
+```{r}
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -21,11 +50,11 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
+vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
+vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -36,12 +65,11 @@ parameters <- safir::get_parameters(
   iso3c = iso3c,
   R0 = R0,
   time_period = tmax,
-  dt = dt,
-  seeding_cases = 50
+  dt = dt
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -53,9 +81,22 @@ parameters <- make_vaccine_parameters(
   next_dose_priority_matrix = next_dose_priority
 )
 
-# ab boost for each infection...assumes someone will not get infected more than 51 times.
+# ab boost for each infection (maxes out at 51 infections)
 parameters$mu_ab_infection <- rep(ab_parameters$mu_ab, times = c(1, 50))
+```
 
+# Run **safir**
+
+This part is also exactly the same as the "Vaccine model with multiple doses" except the following places:
+
+  1. `create_natural_immunity_variables` is called to attach additional variables to the `variables` list needed to model multiple infections
+  2. `attach_event_listeners_natural_immunity` is called to add additional event listeners to `events` list needd to antibody boosting
+  3. We use another render object, `inf_renderer` which will plot the number of cumulative infections the population has. Rendering adds more computation,
+  increasing model run time, so for actual use, please don't add this and its associated process function `integer_count_render_process_daily` unless you are interested
+  in tracking this information.
+  4. `natural_immunity_ab_titre_process` is added to the `processes` list to update antibody titre from vaccines or natural immunity.
+
+```{r}
 # create variables
 timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
@@ -73,7 +114,6 @@ attach_event_listeners_natural_immunity(variables = variables, events = events, 
 renderer <- Render$new(parameters$time_period)
 ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
 dose_renderer <- Render$new(parameters$time_period)
-inf_renderer <- Render$new(parameters$time_period)
 
 double_count_render_process_daily <- function(variable, dt) {
   stopifnot(inherits(variable, "DoubleVariable"))
@@ -84,9 +124,11 @@ double_count_render_process_daily <- function(variable, dt) {
   }
 }
 
+inf_renderer <- Render$new(parameters$time_period)
+
 # processes
 processes <- list(
-  natural_immunity_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
@@ -96,28 +138,31 @@ processes <- list(
 )
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
+```
 
-# # stuff we'd like to check
-# debug(processes[[1]])
-# debugonce(events$recovery$.listeners[[2]])
-# debug(events$recovery$.listeners[[3]])
+Run the simulation.
 
+```{r}
 system.time(simulation_loop_safir(
-  variables = variables,
-  events = events,
-  processes = processes,
-  timesteps = timesteps,
-  variables_dont_update = c("discrete_age", "phase"),
-  progress = TRUE
+    variables = variables,
+    events = events,
+    processes = processes,
+    timesteps = timesteps,
+    variables_dont_update = c("discrete_age", "phase"),
+    progress = FALSE
 ))
+```
 
+## Plot Results
 
+### Antibody titre
 
-# diagnostic plots ------------------------------------------------------------
+This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won't look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.
 
+```{r}
 # plot: ab titre
 vaccinated <- variables$dose_num$get_index_of(set = 0)
-vaccinated$not(inplace = TRUE)
+vaccinated <- vaccinated$not(inplace = TRUE)
 
 ab_titre <- ab_renderer[, vaccinated$to_vector()]
 ab_titre[which(!is.finite(ab_titre))] <- NaN
@@ -140,18 +185,28 @@ ggplot(data = ab_titre_quant_dt) +
   geom_ribbon(aes(x=t,ymin=lo,ymax=hi),alpha=0.5) +
   theme_bw()
 
-# plot: vaccinations
+```
+
+### Proportion of population with each dose
+
+We also want to plot the number of people with each dose over time to check it's working.
+
+```{r}
 dose_out <- dose_renderer$to_dataframe()
 colnames(dose_out)[2:(vaccine_doses+2)] <- as.character(0:vaccine_doses)
-dose_out <- as.data.table(dose_out)
-dose_out <- melt(dose_out, id.vars="timestep")
+dose_out <- melt(as.data.table(dose_out),id.vars="timestep")
 setnames(dose_out, "variable", "dose")
 
 ggplot(data = dose_out) +
   geom_line(aes(x=timestep,y=value,color=dose)) +
   theme_bw()
+```
 
-# states
+### Infection states
+
+The compartmental states of the model.
+
+```{r}
 saf_dt <- as.data.table(renderer$to_dataframe())
 saf_dt[, IMild_count := IMild_count + IAsymp_count]
 saf_dt[, IAsymp_count := NULL]
@@ -161,8 +216,15 @@ setnames(x = saf_dt,old = c("timestep","name","value"),new = c("t","compartment"
 
 ggplot(data = saf_dt, aes(t,y,color = compartment)) +
   geom_line() +
+  geom_line() +
   facet_wrap(~compartment, scales = "free")
+```
 
+### Cumulative infections
+
+Here we plot how many people in the population have had 0,1,2,... infections.
+
+```{R}
 # infections
 inf_out <- inf_renderer$to_dataframe()
 inf_out <- inf_out[, -which(sapply(inf_out, function(x){all(x == 0)}, USE.NAMES = FALSE))]
@@ -174,10 +236,12 @@ inf_out[, timestep := NULL]
 
 ggplot(data = inf_out, aes(t,value,color = infections)) +
   geom_line(size = 1.25, alpha = 0.75)
+```
 
+# Code design
 
+The new code is in:
 
-# gut check
-
-not_inf_or_vaccinated <- variables$inf_num$get_index_of(set = 0)$and(variables$dose_num$get_index_of(set = 0))
-all(!is.finite(variables$ab_titre$get_values(not_inf_or_vaccinated)))
+  1. R/efficacy_naturalimmunity.R: contains `natural_immunity_ab_titre_process`, `get_time_since_last_dose_or_infection` (helper function)
+  2. R/events_naturalimmunity.R: contains `attach_event_listeners_natural_immunity`
+  3. R/variables_naturalimmunity.R:  contains `create_natural_immunity_variables`

@@ -97,11 +97,12 @@ processes <- list(
 setup_events_nimue(parameters = parameters,events = events,variables = variables,dt = dt)
 
 system.time(
-  simulation_loop_nimue(
+  simulation_loop_safir(
     variables = variables,
     events = events,
     processes = processes,
     timesteps = timesteps,
+    variables_dont_update = c("discrete_age", "eligible", "vaccinated", "empty"),
     progress = FALSE
   )
 )
@@ -215,9 +216,3 @@ R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.
 Likewise the vaccination process has the R version `vaccination_process_nimue`
 and `vaccination_process_nimue_cpp`, in R/process_vaccination_nimue.R and
 src/process_vaccination_nimue.cpp, respectively.
-
-## Simulation
-
-Because the variables list used for the simulation contains some bitset objects
-which are not variables, the function `simulation_loop_nimue` is used to run
-the simulation to handle variable updating correctly. It can be found in r/simulation_loop_nimue.R.

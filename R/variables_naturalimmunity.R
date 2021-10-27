@@ -13,16 +13,3 @@ create_natural_immunity_variables <- function(variables, parameters) {
 
   return(variables)
 }
-
-
-#' @title Update natural immunity variables
-#' @description This should be called from the simulation loop. It does not
-#' update disease state.
-#' @param variables a list
-#' @export
-update_vaccine_variables <- function(variables) {
-
-  variables$inf_num$.update()
-  variables$inf_time$.update()
-
-}

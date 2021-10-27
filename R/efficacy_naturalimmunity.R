@@ -1,7 +1,3 @@
-
-
-
-
 #' @title Process that updates the antibody (Ab) titre each time step for model vaccine model with natural immunity
 #' @description The values in \code{ab_titre} are calculated on the log scale.
 #' @param parameters a list of model parameters

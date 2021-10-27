@@ -41,20 +41,3 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   )
 
 }
-
-# note that for Ab titre, the *only* parameter that is vaccine product specific
-# is the boost upon each dose. So the decay rates are fixed (just protein decay).
-# that's great.
-
-# We really need to check that using variables$dose_time like this wont screw
-# anything up. It will, because its used in distribution_vaccines.R to
-# check if people are past the threshold. So we have to use something new.
-
-# new stuff:
-# 1. parameters$mu_ab_infection
-# 2. variables$inf_num
-
-# need to change:
-# 1. vaccine_ab_titre_process: needs to update ab titre for people who are
-# vaccinated OR infected. So do an AND with variables$inf_num > 0.
-

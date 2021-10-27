@@ -89,12 +89,13 @@ processes <- list(
 
 setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
 
-system.time(simulation_loop_vaccine(
+system.time(simulation_loop_safir(
   variables = variables,
   events = events,
   processes = processes,
   timesteps = timesteps,
-  TRUE
+  variables_dont_update = c("discrete_age", "phase"),
+  progress = TRUE
 ))
 
 
