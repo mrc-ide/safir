@@ -52,8 +52,6 @@ get_proportion_vaccinated_nimue <- function(variables, age) {
 # --------------------------------------------------
 
 #' @title Create vaccination variables (multi-dose, no types)
-#' @description Create all individual variables for humans
-#'
 #' @param variables a list
 #' @param parameters list of model parameters
 #' @importFrom individual IntegerVariable
@@ -67,15 +65,15 @@ create_vaccine_variables <- function(variables, parameters) {
   correlated <- parameters$correlated
 
   variables$dose_num <- IntegerVariable$new(initial_values = rep(0,n))
-  variables$dose_time <- replicate(n = max_dose,expr = IntegerVariable$new(initial_values = rep(-1,n)),simplify = FALSE)
+  variables$dose_time <- IntegerVariable$new(initial_values = rep(-1, n))
   variables$phase <- new.env(hash = FALSE)
   variables$phase$value <- 1L
 
   # ab dynamics
-  variables$ab_titre <- DoubleVariable$new(initial_values = rep(-Inf,n))
+  variables$ab_titre <- DoubleVariable$new(initial_values = rep(-Inf, n))
 
   if (correlated) {
-    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN,n))
+    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN, n))
   }
 
   return(variables)
@@ -89,15 +87,15 @@ create_vaccine_variables <- function(variables, parameters) {
 #' @param dose_num_init vector of initial doses (must be self-consistent with \code{dose_time_init})
 #' @export
 initialize_vaccine_variables <- function(variables, dose_time_init, dose_num_init) {
-  # stop("doesn't yet account for Ab dynamics and efficacy")
   stopifnot(inherits(dose_time_init, "list"))
   stopifnot(length(dose_time_init) > 0)
   stopifnot(length(dose_time_init[[1]]) == length(dose_num_init))
   # if you haven't gotten the first dose, you are at dose 0
   stopifnot(all(which(dose_time_init[[1]] < 0) == which(dose_num_init == 0)))
   for (d in seq_along(dose_time_init)) {
-    variables$dose_time[[d]]$queue_update(values = dose_time_init[[d]])
-    variables$dose_time[[d]]$.update()
+    dose_times <- dose_time_init[[d]]
+    variables$dose_time$queue_update(values = dose_times[which(dose_times >= 0)], index = which(dose_times >= 0))
+    variables$dose_time$.update()
   }
   variables$dose_num$queue_update(value = dose_num_init)
   variables$dose_num$.update()
@@ -111,9 +109,7 @@ initialize_vaccine_variables <- function(variables, dose_time_init, dose_num_ini
 #' @export
 update_vaccine_variables <- function(variables) {
 
-  for (dose in variables$dose_time) {
-    dose$.update()
-  }
+  variables$dose_time$.update()
   variables$dose_num$.update()
   variables$ab_titre$.update()
 

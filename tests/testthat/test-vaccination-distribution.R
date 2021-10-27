@@ -14,16 +14,16 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
   dose_num <- ifelse(dose_1 == -1, 0, 1)
   dose_num[which(dose_2 > -1)] <- 2
 
-  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE, N_age = 3)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1))))
-  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
+  variables <- create_vaccine_variables(variables = variables, parameters = parameters)
   initialize_vaccine_variables(variables = variables,dose_time_init = list(dose_1,dose_2),dose_num_init = dose_num)
 
   events <- list(scheduled_dose = replicate(n = 2,expr = {TargetedEvent$new(sum(vapply(dose_times,nrow,integer(1))))}))
 
-  cov_safir <- get_current_coverage(variables = variables,events = events,dose = 1,parameters = list(N_age = 3))
+  cov_safir <- get_current_coverage(variables = variables,events = events,dose = 1,parameters = parameters)
   cov_safir <- vapply(cov_safir,function(b){b$size()},numeric(1))
 
   expect_equal(
@@ -31,7 +31,7 @@ test_that("coverage and get_proportion_vaccinated are giving the same results", 
     c(2,2,3)
   )
 
-  cov_safir <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = list(N_age = 3))
+  cov_safir <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   cov_safir <- vapply(cov_safir,function(b){b$size()},numeric(1))
 
   expect_equal(
@@ -59,7 +59,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
   ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
+  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE, N_age = 3)
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -74,6 +74,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   t <- 1
   parameters <- list(
     dose_period = c(NaN, 14),
+    N_phase = 2,
     N_age = 3,
     population = tab_bins(ages,3)
   )
@@ -143,7 +144,13 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
   ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
+  parameters <- list(
+    dose_period = c(NaN, 14),
+    N_phase = 2,
+    N_age = 3,
+    population = tab_bins(ages,3),
+    correlated = FALSE
+  )
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -154,11 +161,6 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
 
   t <- 1 # current day
   tdt <- t/dt # current time step
-  parameters <- list(
-    dose_period = c(NaN, 14),
-    N_age = 3,
-    population = tab_bins(ages,3)
-  )
 
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
@@ -219,7 +221,13 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
 
   ages <- rep(seq_len(length(dose_times)),times=vapply(dose_times,nrow,integer(1)))
 
-  parameters <- list(population=vapply(dose_times,nrow,integer(1)), N_phase = 2, correlated = FALSE)
+  parameters <- list(
+    dose_period = c(NaN, 14),
+    N_age = 3,
+    N_phase = 2,
+    correlated = FALSE,
+    population = tab_bins(ages,3)
+  )
 
   variables <- list()
   variables$discrete_age <- IntegerVariable$new(ages)
@@ -230,11 +238,6 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
 
   t <- 1
   dt <- 1
-  parameters <- list(
-    dose_period = c(NaN, 14),
-    N_age = 3,
-    population = tab_bins(ages,3)
-  )
 
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
@@ -411,9 +414,18 @@ test_that("target_pop is working in general case", {
     c(5,5,0)
   )
 
-  # phase 2 vaccinate group 3 at t = 9, they are prioritized for phase 3
-  variables$dose_time[[2]] <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
-  variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("0",10),rep("1",5)))
+  # # phase 2 vaccinate group 3 at t = 9, they are prioritized for phase 3
+  # variables$dose_time[[2]] <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
+  # variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("0",10),rep("1",5)))
+
+  variables$dose_time$queue_update(values = 9, index = 11:15)
+  variables$dose_num$queue_update(values = 2, index = 11:15)
+  variables$dose_time$.update()
+  variables$dose_num$.update()
+
+  # variables$dose_time <- IntegerVariable$new(c(rep(-1,5), rep(-1,5), rep(9,5)))
+  # variables$dose_num <- CategoricalVariable$new(categories = c("0","1","2"),initial_values = c(rep("0",10),rep("1",5)))
+
   # should be up for phase 3 if t =13
   p2_nt <- safir::target_pop(
     dose = 3,variables = variables,events = events,parameters = parameters,timestep = 13,dt = 1,strategy_matrix_step = rep(1,3),next_dose_priority = c(0,0,1)

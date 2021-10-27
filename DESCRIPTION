@@ -1,13 +1,13 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.2.8
+Version: 0.3.0
 Authors@R: c(
-          person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut", "cre")),
+          person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut")),
           person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
             person(
                 given = "Sean L.",
                 family = "Wu",
-                role = c('aut'),
+                role = c('aut', 'cre'),
                 comment = c(ORCID = "0000-0002-5781-9493"),
                 email = 'slwood89@gmail.com'
             ),
@@ -39,7 +39,8 @@ Imports:
     squire,
     nimue,
     ggplot2,
-    magrittr
+    magrittr,
+    utils
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14

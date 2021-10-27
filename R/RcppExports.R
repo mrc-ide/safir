@@ -187,14 +187,3 @@ get_proportion_vaccinated_nimue_internal <- function(discrete_age, vaccinated, a
     .Call('_safir_get_proportion_vaccinated_nimue_internal', PACKAGE = 'safir', discrete_age, vaccinated, age)
 }
 
-#' @title Get proportion of an age group that is vaccinated (multi-dose, no types)
-#' @description Get proportion all age groups that have received a particular vaccine dose
-#' by this timestep. This is similar to the function \code{\link[nimue]{coverage}} in the nimue package.
-#' @param variables a list
-#' @param N_age number of age groups
-#' @param dose which dose to get proportion of age group who has received it (NOT 0-indexed)
-#' @export
-get_proportion_vaccinated_all_ages_cpp <- function(variables, N_age, dose) {
-    .Call('_safir_get_proportion_vaccinated_all_ages_cpp', PACKAGE = 'safir', variables, N_age, dose)
-}
-

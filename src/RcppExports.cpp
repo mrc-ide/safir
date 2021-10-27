@@ -241,19 +241,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_proportion_vaccinated_all_ages_cpp
-std::vector<double> get_proportion_vaccinated_all_ages_cpp(const Rcpp::List variables, const int N_age, const int dose);
-RcppExport SEXP _safir_get_proportion_vaccinated_all_ages_cpp(SEXP variablesSEXP, SEXP N_ageSEXP, SEXP doseSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::List >::type variables(variablesSEXP);
-    Rcpp::traits::input_parameter< const int >::type N_age(N_ageSEXP);
-    Rcpp::traits::input_parameter< const int >::type dose(doseSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_proportion_vaccinated_all_ages_cpp(variables, N_age, dose));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 2},
@@ -273,7 +260,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_matrix_2vec_mult_cpp", (DL_FUNC) &_safir_matrix_2vec_mult_cpp, 3},
     {"_safir_mult_2matrix_rowsum", (DL_FUNC) &_safir_mult_2matrix_rowsum, 2},
     {"_safir_get_proportion_vaccinated_nimue_internal", (DL_FUNC) &_safir_get_proportion_vaccinated_nimue_internal, 3},
-    {"_safir_get_proportion_vaccinated_all_ages_cpp", (DL_FUNC) &_safir_get_proportion_vaccinated_all_ages_cpp, 3},
     {NULL, NULL, 0}
 };
 

@@ -67,11 +67,12 @@ processes <- list(
 setup_events_nimue(parameters = parameters,events = events,variables = variables,dt = dt)
 
 system.time(
-  simulation_loop_nimue(
+  simulation_loop_safir(
     variables = variables,
     events = events,
     processes = processes,
     timesteps = timesteps,
+    variables_dont_update = c("discrete_age", "eligible", "vaccinated", "empty"),
     progress = TRUE
   )
 )

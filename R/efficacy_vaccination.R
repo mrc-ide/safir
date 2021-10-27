@@ -25,9 +25,7 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
       if (vaccinated$size() > 0) {
 
         # for each person we need to know the time since their last dose
-        time_since_last_dose <- get_time_since_last_dose(
-          timestep = timestep,dt = dt,vaccinated = vaccinated,dose_num = variables$dose_num,dose_time = variables$dose_time,N_phase = parameters$N_phase
-        )
+        time_since_last_dose <- get_time_since_last_dose(timestep = timestep, dt = dt, vaccinated = vaccinated, dose_time = variables$dose_time)
 
         # ceiling to go to next integer day and do not exceed the end of decay rate vector
         time_since_last_dose <- ceiling(time_since_last_dose)
@@ -54,24 +52,13 @@ vaccine_ab_titre_process <- function(parameters, variables, events, dt) {
 #' @param timestep current time step
 #' @param dt size of time step
 #' @param vaccinated bitset of vaccinated persons
-#' @param dose_num \code{\link[individual]{IntegerVariable}}
 #' @param dose_time a list of \code{\link[individual]{IntegerVariable}} objects
-#' @param N_phase total number of doses
 #' @export
-get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_num, dose_time, N_phase) {
-
-  # which dose everybody is on
-  vaccinated_dose_num <- dose_num$get_values(vaccinated)
+get_time_since_last_dose <- function(timestep, dt, vaccinated, dose_time) {
 
   # output just for the vaccinated persons
   times <- rep(NaN, vaccinated$size())
-
-  for (d in 1:N_phase) {
-    dose_d_persons <- dose_num$get_index_of(set = d)
-    dose_d_persons$and(vaccinated)
-    times[which(vaccinated_dose_num == d)] <- timestep - dose_time[[d]]$get_values(index = dose_d_persons)
-  }
-
+  times <- timestep - dose_time$get_values(index = vaccinated)
   times <- times * dt
 
   return(times)

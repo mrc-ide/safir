@@ -119,11 +119,13 @@ setup_events_vaccine(parameters = parameters,events = events,variables = variabl
 Run the simulation.
 
 ```{r}
-system.time(simulation_loop_vaccine(
-  variables = variables,
-  events = events,
-  processes = processes,
-  timesteps = timesteps
+system.time(simulation_loop_safir(
+    variables = variables,
+    events = events,
+    processes = processes,
+    timesteps = timesteps,
+    variables_dont_update = c("discrete_age", "phase"),
+    progress = FALSE
 ))
 ```
 
@@ -243,10 +245,3 @@ R/process_infection_vaccine.R and the C++ one in src/process_infection_vaccine.c
 list to schedule doses for eligible individuals. `attach_event_listeners_vaccination` and
 `setup_events_vaccine` attach listeners and initialize the initial model state,
 respectively. These functions can be round in R/events_vaccination.R.
-
-## Simulation
-
-Because the variables list used for the simulation contains some objects
-which are not variables, the function `simulation_loop_vaccine` is used to run
-the simulation to handle variable updating correctly. It can be found in r/simulation_loop_vaccine.R.
-
