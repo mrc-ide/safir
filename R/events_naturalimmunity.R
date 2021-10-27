@@ -28,10 +28,10 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   events$recovery$add_listener(
     function(timestep, target) {
       # update inf_num
-      variables$inf_num$queue_update(values = variables$inf_num$get_values(target) + 1L, index = target)
+      inf <- variables$inf_num$get_values(target) + 1L
+      variables$inf_num$queue_update(values = inf, index = target)
       # draw ab titre value
-      inf <- variables$inf_num$get_values(target)
-      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
+      zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
       variables$ab_titre$queue_update(values = zdose, index = target)
       # update last time of infection
       variables$inf_time$queue_update(values = timestep, index = target)
@@ -55,7 +55,4 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 # need to change:
 # 1. vaccine_ab_titre_process: needs to update ab titre for people who are
 # vaccinated OR infected. So do an AND with variables$inf_num > 0.
-# 2. in computation, variables$dose_time now will store either time of dose
-# or time of last infection...maybe rename to boost_time? ab_boost_time?
-
 
