@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -176,6 +176,7 @@
 <li>
 <code>natural_immunity_ab_titre_process</code> is added to the <code>processes</code> list to update antibody titre from vaccines or natural immunity.</li>
 </ol>
+<p>As usual, for actual use, please use only the minimum number of output/rendering needed for your analysis, as it increases run time. In particular, <code>double_count_render_process_daily</code> to output the antibody titre for each person each day is time consuming.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create variables</span>
 <span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">/</span><span class="va">dt</span>
@@ -229,7 +230,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  12.653   0.229  12.891</span></code></pre></div>
+<span class="co">#&gt;  13.372   0.314  13.767</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>
@@ -342,7 +343,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by OJ Watson, Peter Winskill, Sean L. Wu.</p>
+  <p>Developed by Sean L. Wu, OJ Watson, Peter Winskill.</p>
 </div>
 
 <div class="pkgdown">
