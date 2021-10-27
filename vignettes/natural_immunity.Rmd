@@ -96,6 +96,9 @@ This part is also exactly the same as the "Vaccine model with multiple doses" ex
   in tracking this information.
   4. `natural_immunity_ab_titre_process` is added to the `processes` list to update antibody titre from vaccines or natural immunity.
 
+As usual, for actual use, please use only the minimum number of output/rendering needed for your analysis, as it increases run time. In
+particular, `double_count_render_process_daily` to output the antibody titre for each person each day is time consuming.
+
 ```{r}
 # create variables
 timesteps <- parameters$time_period/dt

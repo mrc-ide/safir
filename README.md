@@ -46,7 +46,10 @@ This includes the following vignettes:
     [`{nimue}`](https://github.com/mrc-ide/nimue).
 -   **`Vaccine model with multiple doses`**: runs the model for
     explicit tracking of antibody titre for a 2 dose vaccine.
-
+-   **`Natural Immunity`**: demonstrates how to modify the vaccine model
+    to also include mechanistic incorporation of natural immunity
+    from infection, as opposed to a generic R (recovered) class.
+    
 ## License
 
 MIT © Imperial College of Science, Technology and Medicine
