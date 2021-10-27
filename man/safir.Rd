@@ -18,12 +18,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: OJ Watson \email{o.watson15@imperial.ac.uk}
+\strong{Maintainer}: Sean L. Wu \email{slwood89@gmail.com} (\href{https://orcid.org/0000-0002-5781-9493}{ORCID})
 
 Authors:
 \itemize{
+  \item OJ Watson \email{o.watson15@imperial.ac.uk}
   \item Peter Winskill \email{p.winskill@imperial.ac.uk}
-  \item Sean L. Wu \email{slwood89@gmail.com} (\href{https://orcid.org/0000-0002-5781-9493}{ORCID})
 }
 
 Other contributors:

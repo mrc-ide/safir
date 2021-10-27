@@ -82,7 +82,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue, function(x){sum(x)}, numeric(1)),
@@ -95,7 +95,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
 
   vapply(cov,function(b){b$size()},numeric(1))
@@ -111,7 +111,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -165,7 +165,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -179,7 +179,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -193,7 +193,7 @@ test_that('eligable_for_second and eligible_for_dose_vaccine give equivalent res
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -242,7 +242,7 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -255,7 +255,7 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -268,7 +268,7 @@ test_that('eligable_for_second and age_group_eligible_for_dose_vaccine give equi
   cov <- get_current_coverage(variables = variables,events = events,dose = 2,parameters = parameters)
   eligible <- get_current_eligible_from_coverage(timestep = t,dt = dt,coverage = cov,variables = variables,dose = 2,parameters = parameters)
 
-  eligible_nimue <- nimue:::eligable_for_second(dose_times, t, parameters$dose_period[2])
+  eligible_nimue <- nimue_eligable_for_second(dose_times, t, parameters$dose_period[2])
 
   expect_equal(
     vapply(eligible_nimue,function(x){sum(x)},numeric(1)),
@@ -313,8 +313,9 @@ test_that("target_pop is giving the same results as nimue", {
   )
 
   # Dose 1
-  d1_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = rep(1, 3),
-                     t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+  d1_n <- nimue_target_pop(dose_number = 1, dose_times, prioritisation = rep(1, 3),
+                             t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
+
 
   d1_s <- target_pop(
     dose = 1,variables = variables,events = events,parameters = parameters,timestep = 1,dt = 1,strategy_matrix_step = rep(1,3)
@@ -325,7 +326,7 @@ test_that("target_pop is giving the same results as nimue", {
   expect_equal(d1_n, d1_s_out)
 
   # Dose 1 as a function of prioritisation matrix
-  d1_pri_n <- nimue:::target_pop(dose_number = 1, dose_times, prioritisation = c(0, 1, 0),
+  d1_pri_n <- nimue_target_pop(dose_number = 1, dose_times, prioritisation = c(0, 1, 0),
                          t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
 
   d1_pri_s <- target_pop(
@@ -337,7 +338,7 @@ test_that("target_pop is giving the same results as nimue", {
   expect_equal(d1_pri_n, d1_pri_s_out)
 
   # Dose 2 - none as all d2_prioritise set to FALSE
-  d2_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+  d2_n <- nimue_target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
                      t = 1, dose_period = 14, d2_prioritise = rep(FALSE, 3))
 
   d2_s <- safir::target_pop(
@@ -349,7 +350,7 @@ test_that("target_pop is giving the same results as nimue", {
   expect_equal(d2_n, d2_s_out)
 
   # Dose 2 - none as too soon after dose 1
-  d2_t_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+  d2_t_n <- nimue_target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
              t = 1, dose_period = 14, d2_prioritise = rep(TRUE, 3))
 
   d2_t_s <- safir::target_pop(
@@ -361,7 +362,7 @@ test_that("target_pop is giving the same results as nimue", {
   expect_equal(d2_t_n ,d2_t_s_out)
 
   # Dose 2
-  d2_ok_n <- nimue:::target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
+  d2_ok_n <- nimue_target_pop(dose_number = 2, dose_times, prioritisation = c(1, 1, 1),
                         t = 15, dose_period = 14, d2_prioritise = rep(TRUE, 3))
 
   d2_ok_s <- safir::target_pop(

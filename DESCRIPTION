@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
             person(
                 given = "Sean L.",
@@ -28,7 +28,7 @@ RoxygenNote: 7.1.1
 Suggests:
     testthat,
     mockery,
-    tidyverse,
+    ggplot2,
     knitr,
     rmarkdown,
     data.table
@@ -37,8 +37,6 @@ Imports:
     Rcpp,
     squire,
     nimue,
-    ggplot2,
-    magrittr,
     utils
 VignetteBuilder: knitr
 NeedsCompilation: yes

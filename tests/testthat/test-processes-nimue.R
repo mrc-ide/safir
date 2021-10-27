@@ -48,7 +48,7 @@ test_that("c++ infection process (nimue vaccine model) returns identical results
 
   set.seed(5436L)
   inf_proc_Cpp <- infection_process_nimue_cpp(parameters = parameters,variables = list(states=states1,vaccine_states=vaccine_states1,discrete_age=discrete_age1),events = list(exposure=exposure1),dt =dt)
-  individual:::execute_process(process = inf_proc_Cpp,timestep = 100)
+  execute_process(process = inf_proc_Cpp,timestep = 100)
 
   sched_Cpp <- exposure1$get_scheduled()$to_vector()
 
@@ -135,7 +135,7 @@ test_that("c++ vaccination process (nimue vaccine model) returns identical resul
     events = list(v0_to_v1v2=v0_to_v1v21),
     dt =dt
   )
-  individual:::execute_process(process = inf_proc_Cpp,timestep = 120)
+  execute_process(process = inf_proc_Cpp,timestep = 120)
 
   sched_Cpp <- v0_to_v1v21$get_scheduled()$to_vector()
 
