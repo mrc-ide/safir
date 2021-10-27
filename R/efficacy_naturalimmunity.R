@@ -33,13 +33,13 @@ natural_immunity_ab_titre_process <- function(parameters, variables, events, dt)
         time_since_last_dose_or_infection[time_since_last_dose_or_infection > length(parameters$dr_vec)] <- length(parameters$dr_vec)
 
         # current Ab titre
-        current_ab_titre <- variables$ab_titre$get_values(index = ab_calculate)
+        current_ab_titre <- variables$ab_titre$get_values(index = vaccinated_or_infected)
 
         # new Ab titre
         new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose_or_infection]
 
         # schedule an update
-        variables$ab_titre$queue_update(values = new_ab_titre, index = ab_calculate)
+        variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated_or_infected)
 
       }
 

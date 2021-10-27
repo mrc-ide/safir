@@ -20,6 +20,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   # they go from R to S in 1 time step
   events$recovery$add_listener(
     function(timestep, target) {
+      # cat("recovery queueing immunity loss on t: ", timestep, " with n: ", target$size(), " --- ")
       events$immunity_loss$schedule(target = target, delay = rep(1, target$size()))
     }
   )
@@ -27,6 +28,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   # boost antibody titre
   events$recovery$add_listener(
     function(timestep, target) {
+      # cat("recovery boosting antibody on t: ", timestep, " with n: ", target$size(), "\n")
       # update inf_num
       inf <- variables$inf_num$get_values(target) + 1L
       variables$inf_num$queue_update(values = inf, index = target)
