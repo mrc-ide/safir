@@ -3,7 +3,7 @@ library(nimue)
 tmax <- 100
 
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 

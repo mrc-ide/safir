@@ -47,7 +47,7 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
 
   set.seed(5436L)
   inf_proc_Cpp <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states1,discrete_age=discrete_age1,ab_titre=ab_titre1),events = list(exposure=exposure1),dt =dt)
-  individual:::execute_process(process = inf_proc_Cpp,timestep = 100)
+  execute_process(process = inf_proc_Cpp,timestep = 100)
 
   sched_Cpp <- exposure1$get_scheduled()$to_vector()
 

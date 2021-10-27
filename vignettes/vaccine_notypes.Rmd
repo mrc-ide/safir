@@ -77,6 +77,9 @@ parameters <- make_vaccine_parameters(
 
 Now we make the variables, events, and processes used in the model. In order to track the antibody titre for each vaccinated person, we use a custom function `double_count_render_process_daily` to write to the output matrix; this is because currently **individual** does not support renderers that track `DoubleVariable` objects. Unless the antibody titres are a direct object of analysis, it is recommended to not output them, as it slows down the simulation.
 
+As usual, for actual use, please use only the minimum number of output/rendering needed for your analysis, as it increases run time. In
+particular, `double_count_render_process_daily` to output the antibody titre for each person each day is time consuming.
+
 ```{r}
 # create variables
 timesteps <- parameters$time_period/dt

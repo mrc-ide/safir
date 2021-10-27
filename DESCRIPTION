@@ -1,9 +1,7 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
-          person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut")),
-          person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
             person(
                 given = "Sean L.",
                 family = "Wu",
@@ -11,8 +9,9 @@ Authors@R: c(
                 comment = c(ORCID = "0000-0002-5781-9493"),
                 email = 'slwood89@gmail.com'
             ),
-             person("Imperial College of Science, Technology and Medicine",
-                    role = "cph"))
+            person("OJ", "Watson", email = "o.watson15@imperial.ac.uk", role = c("aut")),
+            person("Peter", "Winskill", email = "p.winskill@imperial.ac.uk", role = c("aut")),
+            person("Imperial College of Science, Technology and Medicine",role = "cph"))
 Description: Implements an individual-based model of COVID-19 transmission.
     Derives from previous work in 'squire'.
 License: MIT + file LICENSE
@@ -29,7 +28,7 @@ RoxygenNote: 7.1.1
 Suggests:
     testthat,
     mockery,
-    tidyverse,
+    ggplot2,
     knitr,
     rmarkdown,
     data.table
@@ -38,8 +37,6 @@ Imports:
     Rcpp,
     squire,
     nimue,
-    ggplot2,
-    magrittr,
     utils
 VignetteBuilder: knitr
 NeedsCompilation: yes

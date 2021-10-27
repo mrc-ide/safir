@@ -1,7 +1,7 @@
 test_that("float equality works", {
 
-  expect_true(safir:::compare_floats(1,1.0))
-  expect_false(safir:::compare_floats(1,0.9999))
+  expect_true(compare_floats(1,1.0))
+  expect_false(compare_floats(1,0.9999))
 
 })
 

@@ -1,12 +1,13 @@
 library(individual)
 library(nimue)
+library(squire)
 
 tmax <- 100
 
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
-contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+contact_mat <- get_mixing_matrix(iso3c = iso3c)
 
 n <- 17 * 100
 ages <- rep(1:17, each = 100)
