@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -58,6 +58,9 @@
     </li>
     <li>
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
+    </li>
+    <li>
+      <a href="../articles/natural_immunity.html">Natural Immunity</a>
     </li>
     <li>
       <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
@@ -177,16 +180,17 @@
 <span class="fu"><a href="../reference/setup_events_nimue.html">setup_events_nimue</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span>
-  <span class="fu"><a href="../reference/simulation_loop_nimue.html">simulation_loop_nimue</a></span><span class="op">(</span>
+  <span class="fu"><a href="../reference/simulation_loop_safir.html">simulation_loop_safir</a></span><span class="op">(</span>
     variables <span class="op">=</span> <span class="va">variables</span>,
     events <span class="op">=</span> <span class="va">events</span>,
     processes <span class="op">=</span> <span class="va">processes</span>,
     timesteps <span class="op">=</span> <span class="va">timesteps</span>,
+    variables_dont_update <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"discrete_age"</span>, <span class="st">"eligible"</span>, <span class="st">"vaccinated"</span>, <span class="st">"empty"</span><span class="op">)</span>,
     progress <span class="op">=</span> <span class="cn">FALSE</span>
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  53.150   2.394  55.724</span></code></pre></div>
+<span class="co">#&gt;  53.212   2.915  56.196</span></code></pre></div>
 <div id="plot-vaccinations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-vaccinations" class="anchor"></a>Plot vaccinations</h2>
@@ -285,11 +289,6 @@
 <p><code>setup_events_nimue</code> initializes event scheduling based on the initial state of the model. This is needed so that the model can be initialized from any valid state, instead of just <strong>S</strong> and <strong>E</strong> persons who are unvaccinated. It can be found in R/initialize_events_nimue.R.</p>
 <p>The infection process can either use an R implementation <code>infection_process_nimue</code> or C++ implementation <code>infection_process_nimue_cpp</code>. The R version is in R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.</p>
 <p>Likewise the vaccination process has the R version <code>vaccination_process_nimue</code> and <code>vaccination_process_nimue_cpp</code>, in R/process_vaccination_nimue.R and src/process_vaccination_nimue.cpp, respectively.</p>
-</div>
-<div id="simulation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#simulation" class="anchor"></a>Simulation</h2>
-<p>Because the variables list used for the simulation contains some bitset objects which are not variables, the function <code>simulation_loop_nimue</code> is used to run the simulation to handle variable updating correctly. It can be found in r/simulation_loop_nimue.R.</p>
 </div>
 </div>
   </div>

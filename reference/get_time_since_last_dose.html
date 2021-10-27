@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -99,6 +99,9 @@
     </li>
     <li>
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
+    </li>
+    <li>
+      <a href="../articles/natural_immunity.html">Natural Immunity</a>
     </li>
     <li>
       <a href="../articles/vaccine_notypes.html">Vaccine model with multiple doses</a>
@@ -135,14 +138,7 @@
     <p>Calculate the time elapsed in days since each person's last dose</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_time_since_last_dose</span><span class='op'>(</span>
-  <span class='va'>timestep</span>,
-  <span class='va'>dt</span>,
-  <span class='va'>vaccinated</span>,
-  <span class='va'>dose_num</span>,
-  <span class='va'>dose_time</span>,
-  <span class='va'>N_phase</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_time_since_last_dose</span><span class='op'>(</span><span class='va'>timestep</span>, <span class='va'>dt</span>, <span class='va'>vaccinated</span>, <span class='va'>dose_time</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,16 +156,8 @@
       <td><p>bitset of vaccinated persons</p></td>
     </tr>
     <tr>
-      <th>dose_num</th>
-      <td><p><code><a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>IntegerVariable</a></code></p></td>
-    </tr>
-    <tr>
       <th>dose_time</th>
       <td><p>a list of <code><a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>IntegerVariable</a></code> objects</p></td>
-    </tr>
-    <tr>
-      <th>N_phase</th>
-      <td><p>total number of doses</p></td>
     </tr>
     </table>
 
