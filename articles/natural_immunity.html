@@ -114,7 +114,7 @@
 <div id="setup" class="section level1">
 <h1 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h1>
-<p>This vignette is essentially identical to the one titled “Vaccine model with multiple doses”, but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the <code>parameters</code> list is <code>parameters$mu_ab_infection</code>, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone’s first infection, 2nd from someone’s second subsequent infection, and so on.</p>
+<p>This vignette is essentially identical to the one titled “Vaccine model with multiple doses”, but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the <code>parameters</code> list is <code>parameters$mu_ab_infection</code>, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone’s first infection, 2nd from someone’s second subsequent infection, and so on. If an individual is getting reinfected a number of times greater than the length of the vector, the last element of the vector is used as their antibody titre associated with that reinfection event.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
 <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
@@ -132,7 +132,7 @@
 <span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">floor</a></span><span class="op">(</span><span class="va">vaccine_set</span><span class="op">)</span>
 
 <span class="co"># vaccine strategy</span>
-<span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html">strategy_matrix</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"Elderly"</span>,max_coverage <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
+<span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="fu">nimue</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html">strategy_matrix</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"Elderly"</span>,max_coverage <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
 <span class="va">next_dose_priority</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fl">0</span>, nrow <span class="op">=</span> <span class="va">vaccine_doses</span> <span class="op">-</span> <span class="fl">1</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">vaccine_coverage_mat</span><span class="op">)</span><span class="op">)</span>
 <span class="va">next_dose_priority</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">15</span><span class="op">:</span><span class="fl">17</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># prioritize 3 oldest age groups for next dose</span>
 
@@ -159,8 +159,8 @@
   next_dose_priority_matrix <span class="op">=</span> <span class="va">next_dose_priority</span>
 <span class="op">)</span>
 
-<span class="co"># ab boost for each infection (maxes out at 51 infections)</span>
-<span class="va">parameters</span><span class="op">$</span><span class="va">mu_ab_infection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="va">ab_parameters</span><span class="op">$</span><span class="va">mu_ab</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="co"># ab boost for each infection</span>
+<span class="va">parameters</span><span class="op">$</span><span class="va">mu_ab_infection</span> <span class="op">&lt;-</span> <span class="va">ab_parameters</span><span class="op">$</span><span class="va">mu_ab</span></code></pre></div>
 </div>
 <div id="run-safir" class="section level1">
 <h1 class="hasAnchor">
@@ -230,7 +230,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  12.966   0.347  13.833</span></code></pre></div>
+<span class="co">#&gt;  13.065   0.302  13.596</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>
@@ -260,7 +260,6 @@
 <span class="co">#&gt;     size: function () </span>
 <span class="co">#&gt;     to_vector: function () </span>
 <span class="co">#&gt;     xor: function (other)</span>
-
 <span class="va">vaccinated_or_infected</span><span class="op">$</span><span class="fu">or</span><span class="op">(</span><span class="va">variables</span><span class="op">$</span><span class="va">inf_num</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>set <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="fu">not</span><span class="op">(</span>inplace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;Bitset&gt;</span>
 <span class="co">#&gt;   Public:</span>
@@ -283,6 +282,10 @@
 
 <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="va">ab_renderer</span><span class="op">[</span>, <span class="va">vaccinated_or_infected</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span><span class="op">]</span>
 <span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html">is.finite</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>
+<span class="va">cols_2_drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html">is.nan</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cols_2_drop</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="va">ab_titre</span><span class="op">[</span>, <span class="op">-</span><span class="va">cols_2_drop</span><span class="op">]</span>
+<span class="op">}</span>
 <span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2e-7</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">}</span><span class="op">)</span>
 
 <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>,FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
