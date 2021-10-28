@@ -14,8 +14,6 @@ make_rexp(mu, dt, shift = 0L)
 \item{shift}{number of time steps to add to sampled value}
 }
 \description{
-Random draws from a geometric distribution
-which approximates a continuous time exponential distribution.
-See \href{https://kingaa.github.io/pomp/vignettes/C_API.html#exponentialgeometric-rate-conversion}{pomp documentation}
-for details on the approximation.
+Make geometric approximation to
+continuous time exponential distribution.
 }

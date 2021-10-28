@@ -122,7 +122,7 @@ attach_event_listeners <- function(
         create_event_scheduler_listener(
             event = events$recovery,
             duration = parameters$dur_IMild,
-            func = make_rexp_simple,
+            func = make_rexp,
             shift = shift,
             dt = dt
         )
@@ -141,7 +141,7 @@ attach_event_listeners <- function(
         create_event_scheduler_listener(
             event = events$recovery,
             duration = parameters$dur_IAsymp,
-            func = make_rexp_simple,
+            func = make_rexp,
             shift = shift,
             dt = dt
         )

@@ -1,0 +1,24 @@
+---
+title: "Modeling of antibody titre and immunity"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modeling of antibody titre and immunity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette will explain how antibody titre dynamics are modeled in **safir**, and how they
+are affected by vaccination and (optionally) natural immunity from infection bouts. Furthermore
+it will explain how protective efficacy against infection and severe disease is calculated
+from an individual's antibody titre.
+
+# Antibody dynamics
+
+

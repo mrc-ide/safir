@@ -97,35 +97,13 @@ make_rerlang <- function(mu, dt, shape = 2, shift = 0L) {
 
 
 #' @title Make discretized exponential waiting time distribution
-#'
-#' @description Random draws from a geometric distribution
-#' which approximates a continuous time exponential distribution.
-#' See [pomp documentation](https://kingaa.github.io/pomp/vignettes/C_API.html#exponentialgeometric-rate-conversion)
-#' for details on the approximation.
-#' @param mu Mean duration
-#' @param dt Size of time step
-#' @param shift number of time steps to add to sampled value
-#' @importFrom stats rgeom pexp
-make_rexp <- function(mu, dt, shift = 0L) {
-  assert_pos(mu, zero_allowed = FALSE)
-  assert_pos(dt, zero_allowed = FALSE)
-  R <- 1 / mu
-  r <- log(1 + (R*dt)) / dt
-  p <- pexp(q = r * dt)
-  function(n) {
-    rgeom(n = n, prob = p) + shift
-  }
-}
-
-
-#' @title Make discretized exponential waiting time distribution (simple)
-#' @description Make simple geometric approximation to
+#' @description Make geometric approximation to
 #' continuous time exponential distribution.
 #' @param mu Mean duration
 #' @param dt Size of time step
 #' @param shift number of time steps to add to sampled value
 #' @importFrom stats rgeom pexp
-make_rexp_simple <- function(mu, dt, shift = 0L) {
+make_rexp <- function(mu, dt, shift = 0L) {
   assert_pos(mu, zero_allowed = FALSE)
   assert_pos(dt, zero_allowed = FALSE)
   r <- 1 / mu
