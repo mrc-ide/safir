@@ -21,4 +21,129 @@ from an individual's antibody titre.
 
 # Antibody dynamics
 
+The variables needed to store antibody titre are created in `create_vaccine_variables`, in R/variables_vaccines.R,
+attached to the variable list `variables$ab_titre`. The antibody titre decays
+and that process is `vaccine_ab_titre_process` (R/efficacy_vaccination.R) or `natural_immunity_ab_titre_process`
+(R/ efficacy_naturalimmunity.R), depending on if you are modeling natural immunity
+or not.
 
+Each day, an individual's antibody titre decays at a rate given by the vector `parameters$dr_vec$,
+giving the daily rate of decay since last vaccine dose (or recovery from infection bout, for natural immunity).
+If the person's time since last dose (or infection) is greater than the length of the vector,
+the last value is used. The vector is set in `get_vaccine_ab_titre_parameters` (R/parameters_vaccine.R).
+
+# Titre associated with dose or infection
+
+The only way that antibody titre can increase is through a vaccine dose or, optionally,
+natural infection. For vaccination, the mean titre associated with each dose is 
+associated with the particular vaccine product, and is chosen in `get_vaccine_ab_titre_parameters`.
+At this point we note that there are two ways to model the actual titre drawn for
+each individual receiving a dose. By default the value in `mu_ab_list` for the
+chosen vaccine product is used. However if `correlated = TRUE` is used, then
+the individual's antibody titre sampled from the previous dose is multiplied by
+the ratio of the current to previous dose mean titre values.
+
+The function which samples antibody titre for each dose is `schedule_dose_vaccine` and
+is in R/events_vaccination.R. Note that if `correlated = TRUE` was selected then
+there is an additional variable `zdose` which holds the previous antibody titre
+associated with the last vaccine dose for each individual.
+
+Using correlated doses increases memory requirements for the model, and produces nearly
+identical population level trajectories of antibody titre as uncorrelated, so
+its use should be weighed against other computational factors.
+
+```{R, eval=FALSE}
+schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters) {
+
+  variables$dose_num$queue_update(value = dose,index = target)
+  variables$dose_time$queue_update(values = timestep, index = target)
+
+  if (inherits(target,"Bitset")) {
+    n <- target$size()
+  } else {
+    n <- length(target)
+  }
+
+  if (parameters$correlated) {
+
+    if (dose > 1) {
+      # correlated doses > 1; use ratio of mean titre
+      zdose_prev <- variables$zdose$get_values(index = target)
+      zdose_prev <- log10(exp(zdose_prev)) # transform back to log scale
+      zdose <- log(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
+      variables$zdose$queue_update(values = zdose, index = target)
+    } else {
+      # initial dose
+      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+      variables$zdose$queue_update(values = zdose, index = target)
+    }
+
+  } else {
+    # uncorrelated doses (also use for dose 1 of correlated dose titre)
+    zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+  }
+
+  variables$ab_titre$queue_update(values = zdose, index = target)
+
+}
+```
+
+For antibody titre driven by natural immunity, the recovered (R) class of completely
+immune individuals used in the compartmental model to simulated complete immunity
+with Exponential or Erlang distributed wait time before transition back to susceptible (S)
+is now simply used as a state from which to compute the antibody titre associated
+with that individual's natural immune response to infection.
+
+This requires two additional variable objects, `num_inf` which tracks how many infections
+each individual has experienced, and `inf_time`, the time since last infection. 
+These variables are made in `create_natural_immunity_variables` (R/variables_naturalimmunity.R).
+
+Upon entering the R compartment, individuals will transition back to S on the next time step
+(as time steps are usually much less than one day, this is not a problem). During that
+time event listeners are called which draw the antibody titre associated with this
+infection bout and update `ab_titre`. Of note is that the vector `parameters$mu_ab_infection`
+controls the mean antibody titre associated with each re-infection event, in case
+antibody respose varies from the first to subsequent re-infections, and can be set
+by the user. The function `attach_event_listeners_natural_immunity` does this and is
+in R/events_naturalimmunity.R.
+
+```{R, eval=FALSE}
+attach_event_listeners_natural_immunity <- function(variables, events, parameters, dt) {
+  
+  stopifnot(!is.null(parameters$mu_ab_infection))
+  stopifnot(is.finite(parameters$mu_ab_infection))
+
+  # recovery: handle 1 timestep R->S and update ab titre for immune response
+  if (length(events$recovery$.listeners) == 2) {
+    events$recovery$.listeners[[2]] <- NULL
+  }
+
+  # they go from R to S in 1 time step
+  events$recovery$add_listener(
+    function(timestep, target) {
+      events$immunity_loss$schedule(target = target, delay = rep(1, target$size()))
+    }
+  )
+
+  # boost antibody titre
+  events$recovery$add_listener(
+    function(timestep, target) {
+      # update inf_num
+      inf <- variables$inf_num$get_values(target) + 1L
+      variables$inf_num$queue_update(values = inf, index = target)
+      # draw ab titre value
+      inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
+      zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
+      variables$ab_titre$queue_update(values = zdose, index = target)
+      # update last time of infection
+      variables$inf_time$queue_update(values = timestep, index = target)
+    }
+  )
+
+}
+
+```
+
+# Efficacy against infection
+
+# Efficacy against severe disease
