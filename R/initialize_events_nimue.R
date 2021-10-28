@@ -37,7 +37,7 @@ setup_events_nimue <- function(
         init_fn <- create_event_scheduler_listener(
             event = events$recovery,
             duration = parameters$dur_IMild,
-            func = make_rexp_simple,
+            func = make_rexp,
             shift = 1L,
             dt = dt
         )
@@ -50,7 +50,7 @@ setup_events_nimue <- function(
         init_fn <- create_event_scheduler_listener(
             event = events$recovery,
             duration = parameters$dur_IAsymp,
-            func = make_rexp_simple,
+            func = make_rexp,
             shift = 1L,
             dt = dt
         )

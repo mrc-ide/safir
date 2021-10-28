@@ -99,12 +99,12 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters) {
   ef_severe <- rep(1, length(ab_titre))
   if (any(is.finite(ab_titre))) {
     # input is on "hazard reduction" scale, convert to efficacy
-    ef_infection <- 1 - ef_infection
+    # ef_infection <- 1 - ef_infection
     # if some vaccinated individuals with ab titre, calc efficacy for them
     finite_ab <- which(is.finite(ab_titre))
     nt <- exp(ab_titre[finite_ab])
     ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
-    ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection[finite_ab]))
+    ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/ef_infection[finite_ab]) # 1 - (1 - ef_infection) goes from hazard reduction scale to efficacy, simplifies to ef_infection
     ef_severe[finite_ab] <- 1 - ef_severe[finite_ab]
     return(ef_severe)
   } else {

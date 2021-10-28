@@ -23,7 +23,7 @@
 #' Models infectious contacts the population has with external (unmodeled) populations.
 #' @param dt size of time step
 #' @param ... Other parameters for [squire::parameters_explicit_SEEIR]
-#'
+#' @importFrom squire parameters_explicit_SEEIR get_mixing_matrix
 #' @return squire model parameters
 #' @export
 get_parameters <- function(iso3c = NULL,
@@ -39,13 +39,13 @@ get_parameters <- function(iso3c = NULL,
 
   # if missing a contact matrix but have iso3c then use that
   if (!is.null(iso3c) && is.null(contact_matrix_set)) {
-    contact_matrix_set <- squire::get_mixing_matrix(iso3c = iso3c)
+    contact_matrix_set <- get_mixing_matrix(iso3c = iso3c)
   }
 
   country <- get_country(iso3c)
 
   # Get squire parameters
-  pars <- squire::parameters_explicit_SEEIR(
+  pars <- parameters_explicit_SEEIR(
         population = population,
         country = country,
         contact_matrix_set = contact_matrix_set,
@@ -93,8 +93,8 @@ get_parameters <- function(iso3c = NULL,
 
 #' @title Get population from SQUIRE model
 #' @description rounds population sizes to discrete numbers
-#'
 #' @param iso3c three letter code for your country of interest
+#' @importFrom squire get_population
 #' @export
 get_population <- function(iso3c) {
   squire::get_population(iso3c = iso3c, simple_SEIR = FALSE)
@@ -108,7 +108,7 @@ get_country <- function(iso3c) {
 
 
 #' Function to add asymptomatic information
-#'
+#' @importFrom squire default_durations
 #' @return list of asymptomatic parameters
 get_asymptomatic <- function() {
 
@@ -116,7 +116,7 @@ get_asymptomatic <- function() {
   # will be supplied later
   prob_asymp <- c(0.3, 0.3, rep(0.2, 15))
   IAsymp_0 <- c(rep(0L, 17))
-  dur_IAsymp <- squire::default_durations()$dur_IMild
+  dur_IAsymp <- default_durations()$dur_IMild
 
   list(
     prob_asymp = prob_asymp,
@@ -127,6 +127,7 @@ get_asymptomatic <- function() {
 }
 
 
+#' @importFrom stats approx
 #' @noRd
 interp_vector_constant <- function(x, y, by = 1, end = max(x)) {
 
@@ -134,12 +135,12 @@ interp_vector_constant <- function(x, y, by = 1, end = max(x)) {
   xout <- seq(min(x), end, 1)
 
   # constant interpolation
-  yout <- stats::approx(x,
-                        y,
-                        xout = xout,
-                        method = "constant",
-                        yright = tail(y, 1),
-                        ties = "ordered")
+  yout <- approx(x,
+                 y,
+                 xout = xout,
+                 method = "constant",
+                 yright = tail(y, 1),
+                 ties = "ordered")
 
   return(yout$y)
 
