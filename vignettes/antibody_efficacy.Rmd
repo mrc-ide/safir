@@ -146,4 +146,75 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 
 # Efficacy against infection
 
+Efficacy against infection is used to adjust the per-capita force of infection in
+the function `infection_process_vaccine` (R/process_infection_vaccine.R). The
+relevant code snippet is here:
+
+```{R, eval=FALSE}
+# get infection modifier and ages
+ab_titre <- variables$ab_titre$get_values(susceptible)
+infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters)
+ages <- variables$discrete_age$get_values(susceptible)
+
+# FoI for each susceptible based on their age group
+lambda <- lambda + (lambda_age[ages] * infection_efficacy)
+```
+
+The function that computes efficacy against infection is `vaccine_efficacy_infection` (R/efficacy_vaccination.R)
+but for speed we use `vaccine_efficacy_infection_cpp` (src/efficacy_vaccination.cpp).
+
+The relevant (R) code is here:
+
+```{R, eval=FALSE}
+nt <- exp(ab_titre[finite_ab])
+ef_infection[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50)))) # reported efficacy in trials
+ef_infection[finite_ab] <- 1 - ef_infection[finite_ab]
+```
+
+`nt` is the antibody titre of each person converted back to the linear scale. The
+trial efficacy is $\frac{1}{1 + e^{-k(\log_{10}(nt) - \log_{10}(ab_{50}))}}$. The
+protective efficacy is $1$ minus this.
+
+Note that we only compute this for individuals with finite antibody titre, **safir**
+uses `-Inf` as a null placeholder for persons who do not yet have antibodies.
+
 # Efficacy against severe disease
+
+Efficacy against severe disease adjusts the probability of a person once infected
+to experience a severe disease outcome. It is used in `create_exposure_scheduler_listener_vaccine` (R/events_exposure_vaccine.R),
+and the relevant code snippet is here. Note that we first need to compute efficacy
+against infection, because efficacy against severe disease is conditional upon this.
+
+```{R, eval=FALSE}
+# vaccine efficacy against severe disease
+ab_titre <- variables$ab_titre$get_values(hosp)
+infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters)
+severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = infection_efficacy,parameters = parameters)
+
+# sample those with severe disease
+hosp$sample(prob_hosp * severe_efficacy)
+```
+
+The function that computes efficacy against infection is `vaccine_efficacy_severe` (R/efficacy_vaccination.R)
+but for speed we use `vaccine_efficacy_severe_cpp` (src/efficacy_vaccination.cpp).
+
+The relevant (R) code is here:
+
+```{R, eval=FALSE}
+finite_ab <- which(is.finite(ab_titre))
+nt <- exp(ab_titre[finite_ab])
+ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
+ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/ef_infection[finite_ab]) # 1 - (1 - ef_infection) goes from hazard reduction scale to efficacy, simplifies to ef_infection
+ef_severe[finite_ab] <- 1 - ef_severe[finite_ab]
+```
+
+`nt` is the linear scale antibody
+titre. Unconditional protection against severe disease is computed as
+$\frac{1}{1 + e^{-k(\log_{10}(nt) - \log_{10}(ab\:\text{severe}_{50}))}}$. Because
+this is computing for individuals who _have been infected_ we need to make it conditional
+on being infected, which we do by `1 - ((1 - ef_severe_uncond)/(1 - (1 - ef_infection)))`
+where `1 - ef_infection` goes from hazard reduction scale to trial efficiency scale, and it
+simplifies to `ef_infection`.
+
+Finally we set `ef_severe <- 1 - ef_severe` so we are on the proper hazard reduction scale
+for efficacy against severe disease.
