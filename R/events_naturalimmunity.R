@@ -33,6 +33,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
       inf <- variables$inf_num$get_values(target) + 1L
       variables$inf_num$queue_update(values = inf, index = target)
       # draw ab titre value
+      inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
       zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
       variables$ab_titre$queue_update(values = zdose, index = target)
       # update last time of infection

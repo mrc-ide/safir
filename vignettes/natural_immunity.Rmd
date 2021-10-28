@@ -35,7 +35,7 @@ library(ggplot2)
 
 # Setup
 
-This vignette is essentially identical to the one titled "Vaccine model with multiple doses", but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the `parameters` list is `parameters$mu_ab_infection`, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone's first infection, 2nd from someone's second subsequent infection, and so on.
+This vignette is essentially identical to the one titled "Vaccine model with multiple doses", but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the `parameters` list is `parameters$mu_ab_infection`, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone's first infection, 2nd from someone's second subsequent infection, and so on. If an individual is getting reinfected a number of times greater than the length of the vector, the last element of the vector is used as their antibody titre associated with that reinfection event. 
 
 ```{r}
 iso3c <- "GBR"
@@ -54,7 +54,7 @@ vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -81,8 +81,8 @@ parameters <- make_vaccine_parameters(
   next_dose_priority_matrix = next_dose_priority
 )
 
-# ab boost for each infection (maxes out at 51 infections)
-parameters$mu_ab_infection <- rep(ab_parameters$mu_ab, times = c(1, 50))
+# ab boost for each infection
+parameters$mu_ab_infection <- ab_parameters$mu_ab
 ```
 
 # Run **safir**
@@ -166,11 +166,14 @@ This lets us check if people are getting vaccinated; Ab titre, averaged over the
 # plot: ab titre
 vaccinated_or_infected <- variables$dose_num$get_index_of(set = 0)
 vaccinated_or_infected$not(inplace = TRUE)
-
 vaccinated_or_infected$or(variables$inf_num$get_index_of(set = 0)$not(inplace = TRUE))
 
 ab_titre <- ab_renderer[, vaccinated_or_infected$to_vector()]
 ab_titre[which(!is.finite(ab_titre))] <- NaN
+cols_2_drop <- which(is.nan(ab_titre[nrow(ab_titre), ]))
+if (length(cols_2_drop) > 0) {
+  ab_titre <- ab_titre[, -cols_2_drop]
+}
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
 ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){

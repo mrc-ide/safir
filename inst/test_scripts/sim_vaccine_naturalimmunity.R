@@ -10,7 +10,7 @@ library(safir)
 library(nimue)
 
 iso3c <- "GBR"
-pop <- safir:::get_population(iso3c)
+pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 1e3)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -21,12 +21,11 @@ R0 <- 4
 # vaccine dosing
 vaccine_doses <- 2
 dose_period <- c(NaN, 28)
-vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
+vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
-vaccine_set <- vaccine_set*0
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
+vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
 next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 
@@ -37,12 +36,11 @@ parameters <- safir::get_parameters(
   iso3c = iso3c,
   R0 = R0,
   time_period = tmax,
-  dt = dt,
-  seeding_cases = 50
+  dt = dt
 )
 
 # vaccine parameters
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -54,8 +52,8 @@ parameters <- make_vaccine_parameters(
   next_dose_priority_matrix = next_dose_priority
 )
 
-# ab boost for each infection...assumes someone will not get infected more than 51 times.
-parameters$mu_ab_infection <- rep(ab_parameters$mu_ab, times = c(1, 50))
+# ab boost for each infection
+parameters$mu_ab_infection <- ab_parameters$mu_ab
 
 # create variables
 timesteps <- parameters$time_period/dt
@@ -119,11 +117,14 @@ system.time(simulation_loop_safir(
 # plot: ab titre
 vaccinated_or_infected <- variables$dose_num$get_index_of(set = 0)
 vaccinated_or_infected$not(inplace = TRUE)
-
 vaccinated_or_infected$or(variables$inf_num$get_index_of(set = 0)$not(inplace = TRUE))
 
 ab_titre <- ab_renderer[, vaccinated_or_infected$to_vector()]
 ab_titre[which(!is.finite(ab_titre))] <- NaN
+cols_2_drop <- which(is.nan(ab_titre[nrow(ab_titre), ]))
+if (length(cols_2_drop) > 0) {
+  ab_titre <- ab_titre[, -cols_2_drop]
+}
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
 ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){
