@@ -19,7 +19,6 @@ NULL
 
 execute_any_process <- utils::getFromNamespace("execute_any_process", "individual")
 execute_process <- utils::getFromNamespace("execute_process", "individual")
-individual_double_variable_get_size <- utils::getFromNamespace("double_variable_get_size", "individual")
 
 nimue_parameters <- utils::getFromNamespace("parameters", "nimue")
 nimue_probs <- utils::getFromNamespace("probs", "nimue")
