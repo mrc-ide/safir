@@ -49,6 +49,8 @@ This includes the following vignettes:
 -   **`Natural Immunity`**: demonstrates how to modify the vaccine model
     to also include mechanistic incorporation of natural immunity
     from infection, as opposed to a generic R (recovered) class.
+-   **`Modeling of antibody titre and immunity`**: describes how antibody
+    titre and protection against infection and severe disease is modeled.
     
 ## License
 
