@@ -23,6 +23,7 @@ vaccine_doses <- 2
 dose_period <- c(NaN, 28)
 vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
+vaccine_set <- vaccine_set*0
 
 # vaccine strategy
 vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.5)
@@ -116,10 +117,12 @@ system.time(simulation_loop_safir(
 # diagnostic plots ------------------------------------------------------------
 
 # plot: ab titre
-vaccinated <- variables$dose_num$get_index_of(set = 0)
-vaccinated$not(inplace = TRUE)
+vaccinated_or_infected <- variables$dose_num$get_index_of(set = 0)
+vaccinated_or_infected$not(inplace = TRUE)
 
-ab_titre <- ab_renderer[, vaccinated$to_vector()]
+vaccinated_or_infected$or(variables$inf_num$get_index_of(set = 0)$not(inplace = TRUE))
+
+ab_titre <- ab_renderer[, vaccinated_or_infected$to_vector()]
 ab_titre[which(!is.finite(ab_titre))] <- NaN
 start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
 
