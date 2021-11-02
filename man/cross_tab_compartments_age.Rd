@@ -7,13 +7,13 @@
 cross_tab_compartments_age(compartments, age, num_ages, compartment_names)
 }
 \arguments{
+\item{compartments}{a \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
+
 \item{age}{a \link[individual:IntegerVariable]{individual::IntegerVariable}}
 
 \item{num_ages}{number of age groups}
 
 \item{compartment_names}{a vector giving category names of the \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
-
-\item{doses}{a \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
 }
 \description{
 Cross tabulate compartments and age

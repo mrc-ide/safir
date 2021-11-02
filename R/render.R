@@ -145,14 +145,14 @@ categorical_count_renderer_process_daily <- function(renderer, variable, categor
 #' @param dt size of time step
 #' @examples
 #' \dontrun{
-#' # if the renderer object is called dose_age_renderer
-#' tmp <- as.data.table(dose_age_renderer$to_dataframe())
+#' # if the renderer object is called comp_render
+#' tmp <- as.data.table(comp_render$to_dataframe())
 #' tmp <- melt(tmp,id.vars="timestep")
 #' tmp1 <- tmp[, tstrsplit(variable, "_", keep = c(2, 4))]
 #' tmp[ , variable := NULL]
 #' tmp <- cbind(tmp, tmp1)
-#' setnames(x = tmp,old = c("V1", "V2"),new = c("dose","age"))
-#' dose_dt <- tmp[, .(value = sum(value)), by = .(dose, timestep)]
+#' setnames(x = tmp,old = c("V1", "V2"),new = c("compartment","age"))
+#' compartment_dt <- tmp[, .(value = sum(value)), by = .(compartment, timestep)]
 #' }
 #' @export
 compartments_age_render_process_daily <- function(renderer, age, compartments, parameters, dt) {

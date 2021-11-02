@@ -119,7 +119,7 @@ cross_tab_doses_age <- function(doses, age, num_doses, num_ages) {
 }
 
 #' @title Cross tabulate compartments and age
-#' @param doses a [individual::CategoricalVariable]
+#' @param compartments a [individual::CategoricalVariable]
 #' @param age a [individual::IntegerVariable]
 #' @param num_ages number of age groups
 #' @param compartment_names a vector giving category names of the [individual::CategoricalVariable]

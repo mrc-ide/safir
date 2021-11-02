@@ -33,7 +33,7 @@ pop <- safir::get_population(iso3c)
 pop$n <- as.integer(pop$n / 2e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 150
+tmax <- 130
 R0 <- 4
 
 # nimue run
