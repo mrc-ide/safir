@@ -135,11 +135,8 @@ categorical_count_renderer_process_daily <- function(renderer, variable, categor
 }
 
 
-
 #' @title Render categories by age every day
-#' @description Renders the number of individuals with each dose in each age bin
-#' (cross tabulated doses and ages).
-#' This only renders output on timesteps that correspond to a day.
+#' @description This only renders output on timesteps that correspond to a day.
 #' See examples for how to quickly summarize the output.
 #' @param renderer a [individual::Render] object
 #' @param age a [individual::IntegerVariable] object
@@ -158,7 +155,7 @@ categorical_count_renderer_process_daily <- function(renderer, variable, categor
 #' dose_dt <- tmp[, .(value = sum(value)), by = .(dose, timestep)]
 #' }
 #' @export
-dose_age_render_process_daily <- function(renderer, age, compartments, parameters, dt) {
+compartments_age_render_process_daily <- function(renderer, age, compartments, parameters, dt) {
   stopifnot(inherits(age, "IntegerVariable"))
   stopifnot(inherits(compartments, "CategoricalVariable"))
   stopifnot(inherits(renderer, "Render"))
@@ -167,10 +164,10 @@ dose_age_render_process_daily <- function(renderer, age, compartments, parameter
   function(t) {
     if ((t * dt) %% 1 == 0) {
       day <- as.integer(t * dt)
-      dose_age_tab <- cross_tab_doses_age(doses = dose$.variable, age = age$.variable, num_doses = num_dose, num_ages = num_age)
-      for (d in seq_len(nrow(dose_age_tab))) {
-        for (a in seq_len(ncol(dose_age_tab))) {
-          renderer$render(paste0("dose_", d-1, "_age_", a, "_count"), dose_age_tab[d, a], day)
+      comp_age_tab <- cross_tab_compartments_age(compartments = compartments$.variable, age = age$.variable, compartment_names = compartment_names, num_ages = num_age)
+      for (c in seq_len(ncol(comp_age_tab))) {
+        for (a in seq_len(nrow(comp_age_tab))) {
+          renderer$render(paste0("compartment_", compartment_names[c], "_age_", a, "_count"), comp_age_tab[a, c], day)
         }
       }
     }

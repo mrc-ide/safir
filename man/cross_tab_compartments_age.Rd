@@ -11,18 +11,10 @@ cross_tab_compartments_age(compartments, age, num_ages, compartment_names)
 
 \item{num_ages}{number of age groups}
 
-\item{doses}{a \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
+\item{compartment_names}{a vector giving category names of the \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
 
-\item{num_doses}{number of doses}
+\item{doses}{a \link[individual:CategoricalVariable]{individual::CategoricalVariable}}
 }
 \description{
 Cross tabulate compartments and age
-}
-\examples{
-\dontrun{
-a <- IntegerVariable$new(0:4)
-b <- IntegerVariable$new(c(1,2,3,1,2))
-cross_tab_doses_age(a$.variable,b$.variable,4,3)
-table(a$get_values(), b$get_values())
-}
 }

@@ -78,16 +78,8 @@ Rcpp::IntegerMatrix cross_tab_doses_age(
 //' @title Cross tabulate compartments and age
 //' @param doses a [individual::CategoricalVariable]
 //' @param age a [individual::IntegerVariable]
-//' @param num_doses number of doses
 //' @param num_ages number of age groups
-//' @examples
-//' \dontrun{
-//' a <- IntegerVariable$new(0:4)
-//' b <- IntegerVariable$new(c(1,2,3,1,2))
-//' cross_tab_doses_age(a$.variable,b$.variable,4,3)
-//' table(a$get_values(), b$get_values())
-//' }
-//' @export
+//' @param compartment_names a vector giving category names of the [individual::CategoricalVariable]
 // [[Rcpp::export]]
 Rcpp::IntegerMatrix cross_tab_compartments_age(
     Rcpp::XPtr<CategoricalVariable> compartments,
@@ -95,17 +87,17 @@ Rcpp::IntegerMatrix cross_tab_compartments_age(
     const size_t num_ages,
     const std::vector<std::string>& compartment_names
 ) {
-  Rcpp::IntegerMatrix out(num_ages, compartment_names.size());
+  size_t ncompartment{compartment_names.size()};
+  Rcpp::IntegerMatrix out(num_ages, ncompartment);
 
-  // for (auto i = 0u; i < age->size; ++i) {
-  //   for (auto j = 0u; j < compartment_names.size(); ++j) {
-  //     out(age->values[i], compartments->get_size_of(compartment_names[j])) += 1;
-  //   }
-  // }
-
-  // 1st, iterate over compartment names, grab a bitset of those folks in that compartment
-  // 2nd iterate over ages, finding the people that age AND that comparrment
-  // 3rd put that size into the matrix
+  for (auto j = 0u; j < ncompartment; ++j) {
+    individual_index_t comp_bset = compartments->get_index_of(compartment_names[j]);
+    for (auto i = 1; i <= num_ages; ++i) {
+      individual_index_t age_bset = age->get_index_of_set(i);
+      age_bset &= comp_bset;
+      out(i - 1, j) = age_bset.size();
+    }
+  }
 
   return out;
 };
