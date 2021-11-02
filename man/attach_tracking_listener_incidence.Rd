@@ -19,6 +19,6 @@ simulation begins.
 \examples{
 \dontrun{
 incidence_renderer <- individual::Render$new(timesteps)
-attach_tracking_listener_incidence(events = events,renderer = incidence_renderer)
+attach_tracking_listener_incidence(events = events, renderer = incidence_renderer)
 }
 }

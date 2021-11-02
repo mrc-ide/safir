@@ -75,6 +75,33 @@ Rcpp::IntegerMatrix cross_tab_doses_age(
   return out;
 };
 
+//' @title Cross tabulate compartments and age
+//' @param compartments a [individual::CategoricalVariable]
+//' @param age a [individual::IntegerVariable]
+//' @param num_ages number of age groups
+//' @param compartment_names a vector giving category names of the [individual::CategoricalVariable]
+// [[Rcpp::export]]
+Rcpp::IntegerMatrix cross_tab_compartments_age(
+    Rcpp::XPtr<CategoricalVariable> compartments,
+    Rcpp::XPtr<IntegerVariable> age,
+    const size_t num_ages,
+    const std::vector<std::string>& compartment_names
+) {
+  size_t ncompartment{compartment_names.size()};
+  Rcpp::IntegerMatrix out(num_ages, ncompartment);
+
+  for (auto j = 0u; j < ncompartment; ++j) {
+    individual_index_t comp_bset = compartments->get_index_of(compartment_names[j]);
+    for (auto i = 1; i <= num_ages; ++i) {
+      individual_index_t age_bset = age->get_index_of_set(i);
+      age_bset &= comp_bset;
+      out(i - 1, j) = age_bset.size();
+    }
+  }
+
+  return out;
+};
+
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix cross_tab_margins_internal(

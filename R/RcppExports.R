@@ -118,6 +118,15 @@ cross_tab_doses_age <- function(doses, age, num_doses, num_ages) {
     .Call('_safir_cross_tab_doses_age', PACKAGE = 'safir', doses, age, num_doses, num_ages)
 }
 
+#' @title Cross tabulate compartments and age
+#' @param compartments a [individual::CategoricalVariable]
+#' @param age a [individual::IntegerVariable]
+#' @param num_ages number of age groups
+#' @param compartment_names a vector giving category names of the [individual::CategoricalVariable]
+cross_tab_compartments_age <- function(compartments, age, num_ages, compartment_names) {
+    .Call('_safir_cross_tab_compartments_age', PACKAGE = 'safir', compartments, age, num_ages, compartment_names)
+}
+
 cross_tab_margins_internal <- function(a, b, a_margin, b_margin) {
     .Call('_safir_cross_tab_margins_internal', PACKAGE = 'safir', a, b, a_margin, b_margin)
 }
