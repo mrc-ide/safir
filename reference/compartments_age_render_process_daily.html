@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Attach listener to track incidence — attach_tracking_listener_incidence • safir</title>
+<title>Render categories by age every day — compartments_age_render_process_daily • safir</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Attach listener to track incidence — attach_tracking_listener_incidence" />
-<meta property="og:description" content="To use incidence tracking, run the lines in examples
-anytime after all events have been made and initialized and before
-simulation begins." />
+<meta property="og:title" content="Render categories by age every day — compartments_age_render_process_daily" />
+<meta property="og:description" content="This only renders output on timesteps that correspond to a day.
+See examples for how to quickly summarize the output." />
 
 
 
@@ -134,37 +133,60 @@ simulation begins." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Attach listener to track incidence</h1>
+    <h1>Render categories by age every day</h1>
     <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/render.R'><code>R/render.R</code></a></small>
-    <div class="hidden name"><code>attach_tracking_listener_incidence.Rd</code></div>
+    <div class="hidden name"><code>compartments_age_render_process_daily.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>To use incidence tracking, run the lines in examples
-anytime after all events have been made and initialized and before
-simulation begins.</p>
+    <p>This only renders output on timesteps that correspond to a day.
+See examples for how to quickly summarize the output.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>attach_tracking_listener_incidence</span><span class='op'>(</span><span class='va'>events</span>, <span class='va'>renderer</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>compartments_age_render_process_daily</span><span class='op'>(</span>
+  <span class='va'>renderer</span>,
+  <span class='va'>age</span>,
+  <span class='va'>compartments</span>,
+  <span class='va'>parameters</span>,
+  <span class='va'>dt</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>events</th>
-      <td><p>a list of events</p></td>
+      <th>renderer</th>
+      <td><p>a <a href='https://mrc-ide.github.io/individual/reference/Render.html'>individual::Render</a> object</p></td>
     </tr>
     <tr>
-      <th>renderer</th>
-      <td><p>a <code><a href='https://mrc-ide.github.io/individual/reference/Render.html'>Render</a></code> object</p></td>
+      <th>age</th>
+      <td><p>a <a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>individual::IntegerVariable</a> object</p></td>
+    </tr>
+    <tr>
+      <th>compartments</th>
+      <td><p>a <a href='https://mrc-ide.github.io/individual/reference/CategoricalVariable.html'>individual::CategoricalVariable</a> object</p></td>
+    </tr>
+    <tr>
+      <th>parameters</th>
+      <td><p>model parameters</p></td>
+    </tr>
+    <tr>
+      <th>dt</th>
+      <td><p>size of time step</p></td>
     </tr>
     </table>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='va'>incidence_renderer</span> <span class='op'>&lt;-</span> <span class='fu'>individual</span><span class='fu'>::</span><span class='va'><a href='https://mrc-ide.github.io/individual/reference/Render.html'>Render</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>timesteps</span><span class='op'>)</span>
-<span class='fu'>attach_tracking_listener_incidence</span><span class='op'>(</span>events <span class='op'>=</span> <span class='va'>events</span>, renderer <span class='op'>=</span> <span class='va'>incidence_renderer</span><span class='op'>)</span>
+<span class='co'># if the renderer object is called comp_render</span>
+<span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'>as.data.table</span><span class='op'>(</span><span class='va'>comp_render</span><span class='op'>$</span><span class='fu'>to_dataframe</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'>melt</span><span class='op'>(</span><span class='va'>tmp</span>,id.vars<span class='op'>=</span><span class='st'>"timestep"</span><span class='op'>)</span>
+<span class='va'>tmp1</span> <span class='op'>&lt;-</span> <span class='va'>tmp</span><span class='op'>[</span>, <span class='fu'>tstrsplit</span><span class='op'>(</span><span class='va'>variable</span>, <span class='st'>"_"</span>, keep <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>tmp</span><span class='op'>[</span> , <span class='va'>variable</span> <span class='op'>:=</span> <span class='cn'>NULL</span><span class='op'>]</span>
+<span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>tmp</span>, <span class='va'>tmp1</span><span class='op'>)</span>
+<span class='fu'>setnames</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>tmp</span>,old <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"V1"</span>, <span class='st'>"V2"</span><span class='op'>)</span>,new <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"compartment"</span>,<span class='st'>"age"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>compartment_dt</span> <span class='op'>&lt;-</span> <span class='va'>tmp</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span>value <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>value</span><span class='op'>)</span><span class='op'>)</span>, by <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>compartment</span>, <span class='va'>timestep</span><span class='op'>)</span><span class='op'>]</span>
 <span class='op'>}</span>
 </div></pre>
   </div>
