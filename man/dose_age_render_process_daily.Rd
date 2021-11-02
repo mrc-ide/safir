@@ -4,26 +4,45 @@
 \alias{dose_age_render_process_daily}
 \title{Render doses by age every day}
 \usage{
-dose_age_render_process_daily(renderer, age, dose, parameters, dt)
+dose_age_render_process_daily(renderer, age, compartments, parameters, dt)
+
+dose_age_render_process_daily(renderer, age, compartments, parameters, dt)
 }
 \arguments{
-\item{renderer}{a \code{\link[individual]{Render}} object}
+\item{renderer}{a \link[individual:Render]{individual::Render} object}
 
-\item{age}{a \code{\link[individual]{IntegerVariable}} object}
+\item{age}{a \link[individual:IntegerVariable]{individual::IntegerVariable} object}
 
-\item{dose}{a \code{\link[individual]{IntegerVariable}} object}
+\item{compartments}{a \link[individual:CategoricalVariable]{individual::CategoricalVariable} object}
 
 \item{parameters}{model parameters}
 
 \item{dt}{size of time step}
+
+\item{dose}{a \code{\link[individual]{IntegerVariable}} object}
 }
 \description{
 Renders the number of individuals with each dose in each age bin
 (cross tabulated doses and ages).
 This only renders output on timesteps that correspond to a day.
 See examples for how to quickly summarize the output.
+
+Renders the number of individuals with each dose in each age bin
+(cross tabulated doses and ages).
+This only renders output on timesteps that correspond to a day.
+See examples for how to quickly summarize the output.
 }
 \examples{
+\dontrun{
+# if the renderer object is called dose_age_renderer
+tmp <- as.data.table(dose_age_renderer$to_dataframe())
+tmp <- melt(tmp,id.vars="timestep")
+tmp1 <- tmp[, tstrsplit(variable, "_", keep = c(2, 4))]
+tmp[ , variable := NULL]
+tmp <- cbind(tmp, tmp1)
+setnames(x = tmp,old = c("V1", "V2"),new = c("dose","age"))
+dose_dt <- tmp[, .(value = sum(value)), by = .(dose, timestep)]
+}
 \dontrun{
 # if the renderer object is called dose_age_renderer
 tmp <- as.data.table(dose_age_renderer$to_dataframe())

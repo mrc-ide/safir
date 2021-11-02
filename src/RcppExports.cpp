@@ -141,6 +141,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cross_tab_compartments_age
+Rcpp::IntegerMatrix cross_tab_compartments_age(Rcpp::XPtr<CategoricalVariable> compartments, Rcpp::XPtr<IntegerVariable> age, const size_t num_ages, const std::vector<std::string>& compartment_names);
+RcppExport SEXP _safir_cross_tab_compartments_age(SEXP compartmentsSEXP, SEXP ageSEXP, SEXP num_agesSEXP, SEXP compartment_namesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type compartments(compartmentsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type age(ageSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type num_ages(num_agesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type compartment_names(compartment_namesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cross_tab_compartments_age(compartments, age, num_ages, compartment_names));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cross_tab_margins_internal
 Rcpp::NumericMatrix cross_tab_margins_internal(const std::vector<int>& a, const std::vector<int>& b, const int a_margin, const int b_margin);
 RcppExport SEXP _safir_cross_tab_margins_internal(SEXP aSEXP, SEXP bSEXP, SEXP a_marginSEXP, SEXP b_marginSEXP) {
@@ -252,6 +266,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_compare_floats", (DL_FUNC) &_safir_compare_floats, 2},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
     {"_safir_cross_tab_doses_age", (DL_FUNC) &_safir_cross_tab_doses_age, 4},
+    {"_safir_cross_tab_compartments_age", (DL_FUNC) &_safir_cross_tab_compartments_age, 4},
     {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},

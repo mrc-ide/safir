@@ -47,6 +47,31 @@ test_that("cross tab for dose/age works", {
   expect_equal(comp1, comp2)
 })
 
+test_that("cross tab for compartments/age works", {
+
+  SIR <- c("S", "I", "R")
+
+  ages <- sample.int(n = 6, size = 100, replace = TRUE)
+  compartments <- sample(x = SIR, size = 100, replace = TRUE)
+  sir_to_int <- c("S" = 1, "I" = 2, "R" = 3)
+
+  comp1 <- matrix(data = 0, nrow = 6, ncol = 3)
+  for (i in 1:100) {
+    comp1[ages[i], sir_to_int[[compartments[i]]]] <- comp1[ages[i], sir_to_int[[compartments[i]]]] + 1
+  }
+
+  expect_equal(colSums(comp1), as.vector(table(compartments)[SIR]))
+  expect_equal(rowSums(comp1), as.vector(table(ages)[as.character(1:6)]))
+
+  comp_variable <- CategoricalVariable$new(categories = SIR, initial_values = compartments)
+  age_variable <- IntegerVariable$new(initial_values = ages)
+
+  comp2 <- cross_tab_compartments_age(compartments = comp_variable$.variable, age = age_variable$.variable, num_ages = 6, compartment_names = SIR)
+
+  expect_equal(comp1, comp2)
+
+})
+
 
 test_that("tab_bins works", {
 
