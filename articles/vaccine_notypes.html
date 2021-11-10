@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
       </span>
     </div>
 
@@ -187,7 +187,7 @@
 <span class="va">double_count_render_process_daily</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">variable</span>, <span class="va">dt</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">inherits</a></span><span class="op">(</span><span class="va">variable</span>, <span class="st">"DoubleVariable"</span><span class="op">)</span><span class="op">)</span>
   <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op">%%</span> <span class="fl">1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></span> <span class="fl">1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
       <span class="va">ab_renderer</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span>, <span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">variable</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span>
     <span class="op">}</span>
   <span class="op">}</span>
@@ -215,7 +215,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  11.723   0.236  12.028</span></code></pre></div>
+<span class="co">#&gt;  10.886   0.199  11.097</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>

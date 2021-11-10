@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
       </span>
     </div>
 
@@ -153,6 +153,7 @@
   ab_50_severe <span class='op'>=</span> <span class='fl'>0.03</span>,
   std10 <span class='op'>=</span> <span class='fl'>0.44</span>,
   k <span class='op'>=</span> <span class='fl'>2.94</span>,
+  max_ab <span class='op'>=</span> <span class='fl'>1</span>,
   mu_ab_list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Pfizer"</span>, <span class='st'>"AstraZeneca"</span>, <span class='st'>"Sinovac"</span>, <span class='st'>"Moderna"</span><span class='op'>)</span>,
     mu_ab_d1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>13</span><span class='op'>/</span><span class='fl'>94</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>59</span>, <span class='fl'>28</span><span class='op'>/</span><span class='fl'>164</span>, <span class='op'>(</span><span class='op'>(</span><span class='fl'>185</span> <span class='op'>+</span> <span class='fl'>273</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>321</span><span class='op'>)</span>, mu_ab_d2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>223</span><span class='op'>/</span><span class='fl'>94</span>, <span class='fl'>32</span><span class='op'>/</span><span class='fl'>59</span>,
     <span class='fl'>28</span><span class='op'>/</span><span class='fl'>164</span>, <span class='fl'>654</span><span class='op'>/</span><span class='fl'>158</span><span class='op'>)</span><span class='op'>)</span>
@@ -204,6 +205,10 @@
     <tr>
       <th>k</th>
       <td><p>shape parameter of efficacy curve</p></td>
+    </tr>
+    <tr>
+      <th>max_ab</th>
+      <td><p>maximum allowable antibody titre draw (on natural log scale)</p></td>
     </tr>
     <tr>
       <th>mu_ab_list</th>
