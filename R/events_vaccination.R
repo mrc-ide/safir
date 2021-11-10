@@ -52,16 +52,19 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
       zdose_prev <- variables$zdose$get_values(index = target)
       zdose_prev <- log10(exp(zdose_prev)) # transform back to log scale
       zdose <- log(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
+      zdose <- pmin(zdose, parameters$max_ab)
       variables$zdose$queue_update(values = zdose, index = target)
     } else {
       # initial dose
       zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+      zdose <- pmin(zdose, parameters$max_ab)
       variables$zdose$queue_update(values = zdose, index = target)
     }
 
   } else {
     # uncorrelated doses (also use for dose 1 of correlated dose titre)
     zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
+    zdose <- pmin(zdose, parameters$max_ab)
   }
 
   variables$ab_titre$queue_update(values = zdose, index = target)
