@@ -54,6 +54,8 @@ parameters <- make_vaccine_parameters(
 
 # ab boost for each infection
 parameters$mu_ab_infection <- ab_parameters$mu_ab
+# parameters$mu_ab_infection <- rep(3,5)
+# parameters$nt_efficacy_transmission <- TRUE
 
 # create variables
 timesteps <- parameters$time_period/dt
