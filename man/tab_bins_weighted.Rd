@@ -7,7 +7,9 @@
 tab_bins_weighted(a, wt, nbins)
 }
 \arguments{
-\item{a}{a set of weights}
+\item{a}{a set of observations}
+
+\item{wt}{a set of weights}
 
 \item{nbins}{number of bins}
 }

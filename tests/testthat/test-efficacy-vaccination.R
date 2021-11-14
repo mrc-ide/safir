@@ -15,6 +15,11 @@ test_that("efficacy functions work in R and C++", {
 
   expect_equal(ef_sev_R, ef_sev_cpp)
 
+  ef_trans_R <- vaccine_efficacy_transmission(ab_titre = ab_titre, parameters = vaccine_parameters)
+  ef_trans_cpp <- vaccine_efficacy_transmission_cpp(ab_titre = ab_titre, parameters = vaccine_parameters)
+
+  expect_equal(ef_sev_R, ef_sev_cpp)
+
 })
 
 test_that("get_time_since_last_dose works", {

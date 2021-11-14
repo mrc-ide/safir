@@ -17,6 +17,8 @@
 #' @param ab_50_severe titre relative to convalescent required to provide 50% protection from severe disease, on linear scale
 #' @param std10 Pooled standard deviation of antibody level on log10 data
 #' @param k shape parameter of efficacy curve
+#' @param nt_transmission_factor used by [safir::vaccine_efficacy_transmission] to compute the effect of antibody titre on onward transmission
+#' @param nt_efficacy_transmission a logical variable, specify if antibody titre should affect onward transmission
 #' @param max_ab maximum allowable antibody titre draw (on natural log scale)
 #' @param mu_ab_list a data.frame
 #' @description Get parameters for vaccine efficacy and antibody titre decay rate.
@@ -29,7 +31,9 @@ get_vaccine_ab_titre_parameters <- function(
   ab_50_severe = 0.03,
   std10 = 0.44,
   k = 2.94,
-  max_ab = 1,
+  nt_transmission_factor = 12,
+  nt_efficacy_transmission = FALSE,
+  max_ab = 2,
   mu_ab_list = data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
                            mu_ab_d1 = c(13/94, 1/59, 28/164, ((185+273)/2)/321),
                            mu_ab_d2 = c(223/94, 32/59, 28/164, 654/158))
@@ -38,6 +42,12 @@ get_vaccine_ab_titre_parameters <- function(
   stopifnot(max_dose %in%  1:(ncol(mu_ab_list) - 1))
   stopifnot(is.logical(correlated))
   stopifnot(vaccine %in% mu_ab_list[, "name"])
+
+  stopifnot(is.finite(nt_transmission_factor))
+  stopifnot(nt_transmission_factor > 0)
+
+  stopifnot(is.finite(max_ab))
+  stopifnot(max_ab > 0)
 
   stopifnot(all(is.finite(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k))))
   stopifnot(all(c(hl_s, hl_l, period_s, t_period_l, ab_50, ab_50_severe, std10, k) > 0))
@@ -64,6 +74,8 @@ get_vaccine_ab_titre_parameters <- function(
     ab_50 = ab_50,
     ab_50_severe = ab_50_severe,
     k = k,
+    nt_transmission_factor = nt_transmission_factor,
+    nt_efficacy_transmission = as.logical(nt_efficacy_transmission),
     max_ab = max_ab,
     correlated = correlated
   )

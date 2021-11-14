@@ -81,7 +81,7 @@ test_that("tab_bins works", {
   tabR <- tabulate(bin = a,nbins = nbin)
   tabC <- tab_bins(a = a,nbins = nbin)
 
-  expect_identical(tabR,tabC)
+  expect_equal(tabR,tabC)
 
 })
 

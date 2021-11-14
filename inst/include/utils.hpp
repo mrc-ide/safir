@@ -37,7 +37,7 @@ Rcpp::NumericMatrix cross_tab_margins_internal(
         const int b_margin
 );
 
-std::vector<int> tab_bins(
+std::vector<double> tab_bins(
     const std::vector<int>& a,
     const int nbins
 );
@@ -60,7 +60,7 @@ double get_vector_cpp(
 
 std::vector<double> matrix_vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int>& a
+    const std::vector<double>& a
 );
 
 std::vector<double> matrix_2vec_mult_cpp(

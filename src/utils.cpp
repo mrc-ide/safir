@@ -132,14 +132,14 @@ Rcpp::NumericMatrix cross_tab_margins_internal(
 //' tab_bins(a = a,nbins = nbin)
 //' @export
 // [[Rcpp::export]]
-std::vector<int> tab_bins(
+std::vector<double> tab_bins(
     const std::vector<int>& a,
     const int nbins
 ) {
-  std::vector<int> out(nbins, 0);
+  std::vector<double> out(nbins, 0);
 
   for (auto i = 0u; i < a.size(); ++i) {
-    out[a[i]-1] += 1;
+    out[a[i]-1] += 1.0;
   }
 
   return out;
@@ -149,7 +149,7 @@ std::vector<int> tab_bins(
 //' @description Similar to [safir::tab_bins] but instead of each observation
 //' being implicitly given weight 1, it now has weight given by `wt[i]`.
 //' @param a a set of observations
-//' @param a a set of weights
+//' @param wt a set of weights
 //' @param nbins number of bins
 //' @export
 // [[Rcpp::export]]
@@ -223,13 +223,13 @@ double get_vector_cpp(
 // [[Rcpp::export]]
 std::vector<double> matrix_vec_mult_cpp(
     const Rcpp::NumericMatrix& m,
-    const std::vector<int>& a
+    const std::vector<double>& a
 ) {
   std::vector<double> out(a.size(), 0.);
 
   for (auto j = 0u; j < m.ncol(); ++j) {
     for (auto i = 0u; i < m.ncol(); ++i) {
-      out[i] += m(i,j) * (double)a[j];
+      out[i] += m(i,j) * a[j];
     }
   }
 

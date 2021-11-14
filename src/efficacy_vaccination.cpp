@@ -67,3 +67,32 @@ std::vector<double> vaccine_efficacy_severe_cpp(
   // efficacy against severe disease
   return ef_severe;
 };
+
+//' @title Compute vaccine efficacy against onward transmission from Ab titre (C++)
+//' @param ab_titre a vector of Ab titres
+//' @param parameters model parameters.
+//' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
+//' @export
+// [[Rcpp::export]]
+std::vector<double> vaccine_efficacy_transmission_cpp(
+    const std::vector<double>& ab_titre,
+    const Rcpp::List& parameters
+) {
+  double k = Rcpp::as<double>(parameters["k"]);
+  double ab_50 = Rcpp::as<double>(parameters["ab_50"]);
+  double nt_transmission_factor = Rcpp::as<double>(parameters["nt_transmission_factor"]);
+
+  std::vector<double> ef_transmission(ab_titre.size(), 1.0);
+
+  for (auto i = 0u; i < ab_titre.size(); ++i) {
+    if (std::isfinite(ab_titre[i])) {
+      double nt = std::exp(ab_titre[i]);
+      ef_transmission[i] = 1.0 - (1.0 / (1.0 + std::exp(-k * (std::log10(nt / nt_transmission_factor) - std::log10(ab_50)))));
+    } else {
+      continue;
+    }
+  }
+
+  // efficacy against infection
+  return ef_transmission;
+};

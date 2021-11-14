@@ -29,8 +29,9 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
   // vectors we can build once
-  std::vector<double> beta(17, 0.0);
-  std::vector<double> lambda_age(17, 0.0);
+  int N_age = Rcpp::as<int>(parameters["N_age"]);
+  std::vector<double> beta(N_age, 0.0);
+  std::vector<double> lambda_age(N_age, 0.0);
 
   // parameters
   SEXP mix_mat_set = parameters["mix_mat_set"];
@@ -39,7 +40,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
   // infection process fn
   return Rcpp::XPtr<process_t>(
-    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda_age, mix_mat_set, beta_set, lambda_external_vector](size_t t) mutable {
+    new process_t([parameters, states, discrete_age, exposure, dt, inf_states, beta, lambda_age, mix_mat_set, beta_set, lambda_external_vector, N_age](size_t t) mutable {
 
       // current day (subtract one for zero-based indexing)
       size_t tnow = std::ceil((double)t * dt) - 1.;
@@ -63,7 +64,7 @@ Rcpp::XPtr<process_t> infection_process_cpp_internal(
 
           // group infectious persons by age
           std::vector<int> ages = discrete_age->get_values(infectious);
-          std::vector<int> inf_ages = tab_bins(ages, 17);
+          std::vector<double> inf_ages = tab_bins(ages, N_age);
 
           // calculate FoI on each susceptible age group
           Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
