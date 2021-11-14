@@ -63,3 +63,24 @@ get_time_since_last_dose_or_infection <- function(timestep, dt, vaccinated_or_in
 
   return(times)
 }
+
+
+#' @title Compute vaccine efficacy against onward transmission from Ab titre
+#' @param ab_titre a vector of Ab titres
+#' @param parameters model parameters.
+#' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
+#' @export
+vaccine_efficacy_transmission <- function(ab_titre, parameters) {
+  # null value is 1
+  ef_transmission <- rep(1, length(ab_titre))
+  if (any(is.finite(ab_titre))) {
+    # if some vaccinated individuals with ab titre, calc efficacy for them
+    finite_ab <- which(is.finite(ab_titre))
+    nt <- exp(ab_titre[finite_ab])
+    ef_transmission[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt / parameters$nt_transmission_factor) - log10(parameters$ab_50)))) # reported efficacy in trials
+    ef_transmission[finite_ab] <- 1 - ef_transmission[finite_ab]
+    return(ef_transmission)
+  } else {
+    return(ef_transmission)
+  }
+}

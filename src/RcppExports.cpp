@@ -36,6 +36,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// vaccine_efficacy_transmission_cpp
+std::vector<double> vaccine_efficacy_transmission_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters);
+RcppExport SEXP _safir_vaccine_efficacy_transmission_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_transmission_cpp(ab_titre, parameters));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vaccination_process_nimue_cpp_internal
 Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
 RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
@@ -170,7 +182,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // tab_bins
-std::vector<int> tab_bins(const std::vector<int>& a, const int nbins);
+std::vector<double> tab_bins(const std::vector<int>& a, const int nbins);
 RcppExport SEXP _safir_tab_bins(SEXP aSEXP, SEXP nbinsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -178,6 +190,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
     Rcpp::traits::input_parameter< const int >::type nbins(nbinsSEXP);
     rcpp_result_gen = Rcpp::wrap(tab_bins(a, nbins));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tab_bins_weighted
+std::vector<double> tab_bins_weighted(const std::vector<int>& a, const std::vector<double>& wt, const int nbins);
+RcppExport SEXP _safir_tab_bins_weighted(SEXP aSEXP, SEXP wtSEXP, SEXP nbinsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type wt(wtSEXP);
+    Rcpp::traits::input_parameter< const int >::type nbins(nbinsSEXP);
+    rcpp_result_gen = Rcpp::wrap(tab_bins_weighted(a, wt, nbins));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -206,13 +231,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // matrix_vec_mult_cpp
-std::vector<double> matrix_vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<int>& a);
+std::vector<double> matrix_vec_mult_cpp(const Rcpp::NumericMatrix& m, const std::vector<double>& a);
 RcppExport SEXP _safir_matrix_vec_mult_cpp(SEXP mSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type m(mSEXP);
-    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type a(aSEXP);
     rcpp_result_gen = Rcpp::wrap(matrix_vec_mult_cpp(m, a));
     return rcpp_result_gen;
 END_RCPP
@@ -259,6 +284,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 2},
     {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 3},
+    {"_safir_vaccine_efficacy_transmission_cpp", (DL_FUNC) &_safir_vaccine_efficacy_transmission_cpp, 2},
     {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
@@ -269,6 +295,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_cross_tab_compartments_age", (DL_FUNC) &_safir_cross_tab_compartments_age, 4},
     {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
+    {"_safir_tab_bins_weighted", (DL_FUNC) &_safir_tab_bins_weighted, 3},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {"_safir_get_vector_cpp", (DL_FUNC) &_safir_get_vector_cpp, 2},
     {"_safir_matrix_vec_mult_cpp", (DL_FUNC) &_safir_matrix_vec_mult_cpp, 2},

@@ -22,6 +22,15 @@ vaccine_efficacy_severe_cpp <- function(ab_titre, ef_infection, parameters) {
     .Call('_safir_vaccine_efficacy_severe_cpp', PACKAGE = 'safir', ab_titre, ef_infection, parameters)
 }
 
+#' @title Compute vaccine efficacy against onward transmission from Ab titre (C++)
+#' @param ab_titre a vector of Ab titres
+#' @param parameters model parameters.
+#' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
+#' @export
+vaccine_efficacy_transmission_cpp <- function(ab_titre, parameters) {
+    .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', ab_titre, parameters)
+}
+
 #' @title C++ infection process (nimue vaccine model)
 #' @description this is an internal function, you should use the R interface
 #' for type checking, \code{\link{infection_process_cpp}}
@@ -145,6 +154,17 @@ cross_tab_margins_internal <- function(a, b, a_margin, b_margin) {
 #' @export
 tab_bins <- function(a, nbins) {
     .Call('_safir_tab_bins', PACKAGE = 'safir', a, nbins)
+}
+
+#' @title Tabulate a weighted vector of observations
+#' @description Similar to [safir::tab_bins] but instead of each observation
+#' being implicitly given weight 1, it now has weight given by `wt[i]`.
+#' @param a a set of observations
+#' @param wt a set of weights
+#' @param nbins number of bins
+#' @export
+tab_bins_weighted <- function(a, wt, nbins) {
+    .Call('_safir_tab_bins_weighted', PACKAGE = 'safir', a, wt, nbins)
 }
 
 #' @title Get contact matrix

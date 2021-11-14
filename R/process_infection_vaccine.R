@@ -17,6 +17,22 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("states","discrete_age") %in% names(variables)))
 
+  if (parameters$nt_efficacy_transmission) {
+    get_inf_ages <- function(infection_bset, variables, parameters) {
+      ages <- variables$discrete_age$get_values(infection_bset)
+      nat_values <- variables$ab_titre$get_values(infection_bset)
+      inf_wt <- vaccine_efficacy_transmission_cpp(ab_titre = nat_values, parameters = parameters)
+      inf_ages <- tab_bins_weighted(a = ages, wt = inf_wt,  nbins = parameters$N_age)
+      return(inf_ages)
+    }
+  } else {
+    get_inf_ages <- function(infection_bset, variables, parameters) {
+      ages <- variables$discrete_age$get_values(infection_bset)
+      inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
+      return(inf_ages)
+    }
+  }
+
   return(
 
     # process without vaccination
@@ -43,8 +59,7 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
         if (infectious$size() > 0) {
 
           # group infectious persons by age
-          ages <- variables$discrete_age$get_values(infectious)
-          inf_ages <- tab_bins(a = ages, nbins = parameters$N_age)
+          inf_ages <- get_inf_ages(infection_bset = infectious, variables = variables, parameters = parameters)
 
           # calculate FoI on each susceptible age group
           m <- get_contact_matrix(parameters)
@@ -71,6 +86,7 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
     } # end process fn
 
   ) # end return
+
 }
 
 

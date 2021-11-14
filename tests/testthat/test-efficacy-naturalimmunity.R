@@ -137,3 +137,17 @@ test_that("get_time_since_last_dose_or_infection works with both prior infected 
   expect_equal(safir_out, hand_out)
 
 })
+
+test_that("efficacy functions work in R and C++", {
+
+  n <- 50
+  vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  ab_titre <- log(10^rnorm(n = n, mean = log10(vaccine_parameters$mu_ab[1]),sd = vaccine_parameters$std10))
+  ab_titre[sample.int(n = n,size = 20,replace = FALSE)] <- -Inf
+
+  ef_transmission_R <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = vaccine_parameters)
+  ef_transmission_cpp <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = vaccine_parameters)
+
+  expect_equal(ef_transmission_R, ef_transmission_cpp)
+
+})
