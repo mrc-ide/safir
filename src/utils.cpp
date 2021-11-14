@@ -145,6 +145,31 @@ std::vector<int> tab_bins(
   return out;
 };
 
+//' @title Tabulate a weighted vector of observations
+//' @description Similar to [safir::tab_bins] but instead of each observation
+//' being implicitly given weight 1, it now has weight given by `wt[i]`.
+//' @param a a set of observations
+//' @param a a set of weights
+//' @param nbins number of bins
+//' @export
+// [[Rcpp::export]]
+std::vector<double> tab_bins_weighted(
+    const std::vector<int>& a,
+    const std::vector<double>& wt,
+    const int nbins
+) {
+  std::vector<double> out(nbins, 0);
+  if (a.size() != wt.size()) {
+    Rcpp::stop("vectors 'a' and 'wt' must be the same length!");
+  }
+
+  for (auto i = 0u; i < a.size(); ++i) {
+    out[a[i]-1] += wt[i];
+  }
+
+  return out;
+};
+
 //' @title Get contact matrix
 //' @description Get the contact matrix at some specific day (1st dimension of array).
 //' @param array the mixing matrix array (days x age x age)

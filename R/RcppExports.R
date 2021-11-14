@@ -147,6 +147,17 @@ tab_bins <- function(a, nbins) {
     .Call('_safir_tab_bins', PACKAGE = 'safir', a, nbins)
 }
 
+#' @title Tabulate a weighted vector of observations
+#' @description Similar to [safir::tab_bins] but instead of each observation
+#' being implicitly given weight 1, it now has weight given by `wt[i]`.
+#' @param a a set of observations
+#' @param a a set of weights
+#' @param nbins number of bins
+#' @export
+tab_bins_weighted <- function(a, wt, nbins) {
+    .Call('_safir_tab_bins_weighted', PACKAGE = 'safir', a, wt, nbins)
+}
+
 #' @title Get contact matrix
 #' @description Get the contact matrix at some specific day (1st dimension of array).
 #' @param array the mixing matrix array (days x age x age)

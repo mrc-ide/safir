@@ -42,6 +42,12 @@ std::vector<int> tab_bins(
     const int nbins
 );
 
+std::vector<double> tab_bins_weighted(
+        const std::vector<int>& a,
+        const std::vector<double>& wt,
+        const int nbins
+);
+
 Rcpp::NumericMatrix get_contact_matrix_cpp(
     SEXP array,
     const int i

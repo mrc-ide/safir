@@ -85,6 +85,22 @@ test_that("tab_bins works", {
 
 })
 
+test_that("tab_bins_weighted works", {
+
+  nbin <- 10
+  a <- sample.int(n = nbin,size = 100,replace = TRUE)
+
+  tabR <- tabulate(bin = a, nbins = nbin)
+  tabC <- tab_bins_weighted(a = a, wt = rep(1, 100), nbins = nbin)
+
+  expect_equal(tabR, tabC)
+
+  a <- c(1, 1, 1, 2, 2)
+  wt <- c(0.2, 0.3, 0.6, 1.5, 0.1)
+  tab <- tab_bins_weighted(a = a, wt = wt, nbins = 2)
+  expect_equal(tab, c(1.1, 1.6))
+})
+
 test_that("get contact matrix works", {
 
   iso3c <- "GBR"

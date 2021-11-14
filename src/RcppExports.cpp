@@ -181,6 +181,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tab_bins_weighted
+std::vector<double> tab_bins_weighted(const std::vector<int>& a, const std::vector<double>& wt, const int nbins);
+RcppExport SEXP _safir_tab_bins_weighted(SEXP aSEXP, SEXP wtSEXP, SEXP nbinsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type wt(wtSEXP);
+    Rcpp::traits::input_parameter< const int >::type nbins(nbinsSEXP);
+    rcpp_result_gen = Rcpp::wrap(tab_bins_weighted(a, wt, nbins));
+    return rcpp_result_gen;
+END_RCPP
+}
 // get_contact_matrix_cpp
 Rcpp::NumericMatrix get_contact_matrix_cpp(SEXP array, const int i);
 RcppExport SEXP _safir_get_contact_matrix_cpp(SEXP arraySEXP, SEXP iSEXP) {
@@ -269,6 +282,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_cross_tab_compartments_age", (DL_FUNC) &_safir_cross_tab_compartments_age, 4},
     {"_safir_cross_tab_margins_internal", (DL_FUNC) &_safir_cross_tab_margins_internal, 4},
     {"_safir_tab_bins", (DL_FUNC) &_safir_tab_bins, 2},
+    {"_safir_tab_bins_weighted", (DL_FUNC) &_safir_tab_bins_weighted, 3},
     {"_safir_get_contact_matrix_cpp", (DL_FUNC) &_safir_get_contact_matrix_cpp, 2},
     {"_safir_get_vector_cpp", (DL_FUNC) &_safir_get_vector_cpp, 2},
     {"_safir_matrix_vec_mult_cpp", (DL_FUNC) &_safir_matrix_vec_mult_cpp, 2},
