@@ -22,12 +22,21 @@ setup_events <- function(
     # E individuals
     bset_E <- variables$states$get_index_of("E")
     if (bset_E$size() > 0) {
-        init_fn <- create_exposure_scheduler_listener(
-            events = events,
-            variables = variables,
-            parameters = parameters,
-            dt = dt
-        )
+        if (!is.null(variables$ab_titre)) {
+            init_fn <- create_exposure_scheduler_listener_vaccine(
+                events = events,
+                variables = variables,
+                parameters = parameters,
+                dt = dt
+            )
+        } else {
+            init_fn <- create_exposure_scheduler_listener(
+                events = events,
+                variables = variables,
+                parameters = parameters,
+                dt = dt
+            )
+        }
         init_fn(timestep = 1, target = bset_E)
     }
 

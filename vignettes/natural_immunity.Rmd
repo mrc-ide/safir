@@ -94,7 +94,7 @@ This part is also exactly the same as the "Vaccine model with multiple doses" ex
   3. We use another render object, `inf_renderer` which will plot the number of cumulative infections the population has. Rendering adds more computation,
   increasing model run time, so for actual use, please don't add this and its associated process function `integer_count_render_process_daily` unless you are interested
   in tracking this information.
-  4. `natural_immunity_ab_titre_process` is added to the `processes` list to update antibody titre from vaccines or natural immunity.
+  4. `natural_immunity_ab_titre_process` is added to the `processes` list to update antibody titre from vaccines or natural immunity (replaces `vaccine_ab_titre_process`).
 
 As usual, for actual use, please use only the minimum number of output/rendering needed for your analysis, as it increases run time. In
 particular, `double_count_render_process_daily` to output the antibody titre for each person each day is time consuming.
@@ -131,7 +131,7 @@ inf_renderer <- Render$new(parameters$time_period)
 
 # processes
 processes <- list(
-  vaccine_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  natural_immunity_ab_titre_process(parameters = parameters,variables = variables, dt = dt),
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
@@ -140,7 +140,7 @@ processes <- list(
   integer_count_render_process_daily(renderer = inf_renderer,variable = variables$inf_num,margin = 0:51,dt = dt)
 )
 
-setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
+setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
 ```
 
 Run the simulation.

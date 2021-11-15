@@ -122,7 +122,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   variables$dose_num$.update()
   variables$dose_time$.update()
 
-  ab_titre <- vaccine_ab_titre_process(parameters = parameters,variables = variables,events = list(),dt = 1)
+  ab_titre <- vaccine_ab_titre_process(parameters = parameters,variables = variables, dt = 1)
 
   safir_out <- matrix(data = NaN,nrow = tmax + 1,ncol = n)
   safir_out[1, ] <- variables$ab_titre$get_values()

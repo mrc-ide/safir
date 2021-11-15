@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
             person(
                 given = "Sean L.",

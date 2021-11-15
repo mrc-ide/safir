@@ -87,7 +87,7 @@ double_count_render_process_daily <- function(variable, dt) {
 
 # processes
 processes <- list(
-  natural_immunity_ab_titre_process(parameters = parameters,variables = variables,events = events,dt = dt),
+  natural_immunity_ab_titre_process(parameters = parameters,variables = variables,dt = dt),
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
@@ -96,7 +96,7 @@ processes <- list(
   integer_count_render_process_daily(renderer = inf_renderer,variable = variables$inf_num,margin = 0:51,dt = dt)
 )
 
-setup_events_vaccine(parameters = parameters,events = events,variables = variables,dt = dt)
+setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
 
 # # stuff we'd like to check
 # debug(processes[[1]])
