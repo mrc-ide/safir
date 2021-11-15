@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
       </span>
     </div>
 
@@ -177,7 +177,7 @@
 <code>attach_event_listeners_natural_immunity</code> is called to add additional event listeners to <code>events</code> list needd to antibody boosting</li>
 <li>We use another render object, <code>inf_renderer</code> which will plot the number of cumulative infections the population has. Rendering adds more computation, increasing model run time, so for actual use, please don’t add this and its associated process function <code>integer_count_render_process_daily</code> unless you are interested in tracking this information.</li>
 <li>
-<code>natural_immunity_ab_titre_process</code> is added to the <code>processes</code> list to update antibody titre from vaccines or natural immunity.</li>
+<code>natural_immunity_ab_titre_process</code> is added to the <code>processes</code> list to update antibody titre from vaccines or natural immunity (replaces <code>vaccine_ab_titre_process</code>).</li>
 </ol>
 <p>As usual, for actual use, please use only the minimum number of output/rendering needed for your analysis, as it increases run time. In particular, <code>double_count_render_process_daily</code> to output the antibody titre for each person each day is time consuming.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -212,7 +212,7 @@
 
 <span class="co"># processes</span>
 <span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-  <span class="fu"><a href="../reference/vaccine_ab_titre_process.html">vaccine_ab_titre_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
+  <span class="fu"><a href="../reference/natural_immunity_ab_titre_process.html">natural_immunity_ab_titre_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>, dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/vaccination_process.html">vaccination_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/infection_process_vaccine_cpp.html">infection_process_vaccine_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/categorical_count_renderer_process_daily.html">categorical_count_renderer_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span>,categories <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
@@ -221,7 +221,7 @@
   <span class="fu"><a href="../reference/integer_count_render_process_daily.html">integer_count_render_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">inf_renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">inf_num</span>,margin <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">51</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="fu"><a href="../reference/setup_events_vaccine.html">setup_events_vaccine</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/setup_events.html">setup_events</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
 <p>Run the simulation.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="fu"><a href="../reference/simulation_loop_safir.html">simulation_loop_safir</a></span><span class="op">(</span>
@@ -233,7 +233,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  13.295   0.271  14.818</span></code></pre></div>
+<span class="co">#&gt;  13.945   0.407  14.797</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>

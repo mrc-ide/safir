@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
       </span>
     </div>
 
@@ -195,7 +195,7 @@
 
 <span class="co"># processes</span>
 <span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-  <span class="fu"><a href="../reference/vaccine_ab_titre_process.html">vaccine_ab_titre_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
+  <span class="fu"><a href="../reference/vaccine_ab_titre_process.html">vaccine_ab_titre_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/vaccination_process.html">vaccination_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/infection_process_vaccine_cpp.html">infection_process_vaccine_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/categorical_count_renderer_process_daily.html">categorical_count_renderer_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span>,categories <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">states</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
@@ -203,7 +203,7 @@
   <span class="fu"><a href="../reference/integer_count_render_process_daily.html">integer_count_render_process_daily</a></span><span class="op">(</span>renderer <span class="op">=</span> <span class="va">dose_renderer</span>,variable <span class="op">=</span> <span class="va">variables</span><span class="op">$</span><span class="va">dose_num</span>,margin <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="va">vaccine_doses</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="fu"><a href="../reference/setup_events_vaccine.html">setup_events_vaccine</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/setup_events.html">setup_events</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
 <p>Run the simulation.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="fu"><a href="../reference/simulation_loop_safir.html">simulation_loop_safir</a></span><span class="op">(</span>
@@ -215,7 +215,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  11.793   0.260  13.696</span></code></pre></div>
+<span class="co">#&gt;  11.487   0.310  11.971</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>

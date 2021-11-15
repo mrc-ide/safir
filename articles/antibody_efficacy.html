@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
 
     
     
-<p>This vignette will explain how antibody titre dynamics are modeled in <strong>safir</strong>, and how they are affected by vaccination and (optionally) natural immunity from infection bouts. Furthermore it will explain how protective efficacy against infection and severe disease is calculated from an individual’s antibody titre.</p>
+<p>This vignette will explain how antibody titre dynamics are modeled in <strong>safir</strong>, and how they are affected by vaccination and (optionally) natural immunity from infection bouts. Furthermore it will explain how protective efficacy against infection and severe disease, and the effect on infectiousness is calculated from an individual’s antibody titre.</p>
 <div id="antibody-dynamics" class="section level1">
 <h1 class="hasAnchor">
 <a href="#antibody-dynamics" class="anchor"></a>Antibody dynamics</h1>
@@ -229,6 +229,21 @@
 <span class="va">ef_severe</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">-</span> <span class="va">ef_severe</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span></code></pre></div>
 <p><code>nt</code> is the linear scale antibody titre. Unconditional protection against severe disease is computed as <span class="math inline">\(\frac{1}{1 + e^{-k(\log_{10}(nt) - \log_{10}(ab\:\text{severe}_{50}))}}\)</span>. Because this is computing for individuals who <em>have been infected</em> we need to make it conditional on being infected, which we do by <code>1 - ((1 - ef_severe_uncond)/(1 - (1 - ef_infection)))</code> where <code>1 - ef_infection</code> goes from hazard reduction scale to trial efficiency scale, and it simplifies to <code>ef_infection</code>.</p>
 <p>Finally we set <code>ef_severe &lt;- 1 - ef_severe</code> so we are on the proper hazard reduction scale for efficacy against severe disease.</p>
+</div>
+<div id="efficacy-against-onward-infection" class="section level1">
+<h1 class="hasAnchor">
+<a href="#efficacy-against-onward-infection" class="anchor"></a>Efficacy against onward infection</h1>
+<p>Antibody titre can (optionally) be used to adjust the contribution of each infectious person to the overall force of infection on susceptible persons. It can be turned on or off, and strength of the effect controlled with parameters set in <code>get_vaccine_ab_titre_parameters</code>.</p>
+<p>It affects the computation of the number of infectious persons by age group in <code>infection_process_vaccine</code> (R/process_infection_vaccine.R):</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># group infectious persons by age</span>
+<span class="va">inf_ages</span> <span class="op">&lt;-</span> <span class="fu">get_inf_ages</span><span class="op">(</span>infection_bset <span class="op">=</span> <span class="va">infectious</span>, variables <span class="op">=</span> <span class="va">variables</span>, parameters <span class="op">=</span> <span class="va">parameters</span><span class="op">)</span></code></pre></div>
+<p>The relevant (R) code is here:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">nt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span><span class="op">)</span>
+<span class="va">ef_transmission</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">parameters</span><span class="op">$</span><span class="va">k</span> <span class="op">*</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">nt</span> <span class="op">/</span> <span class="va">parameters</span><span class="op">$</span><span class="va">nt_transmission_factor</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">ab_50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># reported efficacy in trials</span>
+<span class="va">ef_transmission</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">-</span> <span class="va">ef_transmission</span><span class="op">[</span><span class="va">finite_ab</span><span class="op">]</span></code></pre></div>
+<p><code>nt</code> is the antibody titre of each person converted back to the linear scale. The trial efficacy is <span class="math inline">\(\frac{1}{1 + e^{-k(\log_{10}(nt/\text{nt_transmission_factor}) - \log_{10}(ab_{50}))}}\)</span>. The effect on each person’s onward contribution of infectiousness is <code>1 - ef_transmission</code>.</p>
 </div>
   </div>
 
