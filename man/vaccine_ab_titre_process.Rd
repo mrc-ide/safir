@@ -4,14 +4,12 @@
 \alias{vaccine_ab_titre_process}
 \title{Process that updates the antibody (Ab) titre each time step}
 \usage{
-vaccine_ab_titre_process(parameters, variables, events, dt)
+vaccine_ab_titre_process(parameters, variables, dt)
 }
 \arguments{
 \item{parameters}{a list of model parameters}
 
 \item{variables}{a list of model variables}
-
-\item{events}{a list of model events}
 
 \item{dt}{time step size}
 }

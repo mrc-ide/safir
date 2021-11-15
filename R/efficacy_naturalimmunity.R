@@ -2,10 +2,9 @@
 #' @description The values in \code{ab_titre} are calculated on the log scale.
 #' @param parameters a list of model parameters
 #' @param variables a list of model variables
-#' @param events a list of model events
 #' @param dt time step size
 #' @export
-natural_immunity_ab_titre_process <- function(parameters, variables, events, dt) {
+natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
 
   return(
     function(timestep) {

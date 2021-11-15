@@ -21,8 +21,12 @@ test_that("cross tab for compartments/age works", {
   comp_render <- Render$new(timesteps = 1)
 
   render_proc <- compartments_age_render_process_daily(renderer = comp_render, age = age_variable, compartments = comp_variable, parameters = parameters, dt = 1)
-  render_proc(t = 1)
+  render_proc(t = 0.25) # no effect unless it hits one day
+  render_out <- comp_render$to_dataframe()
 
+  expect_equal(ncol(render_out), 1)
+
+  render_proc(t = 1)
   render_out <- comp_render$to_dataframe()
   render_out <- render_out[, -1]
 

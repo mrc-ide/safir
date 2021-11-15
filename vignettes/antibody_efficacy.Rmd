@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
 
 This vignette will explain how antibody titre dynamics are modeled in **safir**, and how they
 are affected by vaccination and (optionally) natural immunity from infection bouts. Furthermore
-it will explain how protective efficacy against infection and severe disease is calculated
-from an individual's antibody titre.
+it will explain how protective efficacy against infection and severe disease, and
+the effect on infectiousness is calculated from an individual's antibody titre.
 
 # Antibody dynamics
 
@@ -218,3 +218,30 @@ simplifies to `ef_infection`.
 
 Finally we set `ef_severe <- 1 - ef_severe` so we are on the proper hazard reduction scale
 for efficacy against severe disease.
+
+# Efficacy against onward infection
+
+Antibody titre can (optionally) be used to adjust the contribution of each infectious
+person to the overall force of infection on susceptible persons. It can be
+turned on or off, and strength of the effect controlled with parameters set
+in `get_vaccine_ab_titre_parameters`.
+
+It affects the computation of the number of infectious persons by age group in
+`infection_process_vaccine` (R/process_infection_vaccine.R):
+
+```{R, eval = FALSE}
+# group infectious persons by age
+inf_ages <- get_inf_ages(infection_bset = infectious, variables = variables, parameters = parameters)
+```
+
+The relevant (R) code is here:
+
+```{R, eval=FALSE}
+nt <- exp(ab_titre[finite_ab])
+ef_transmission[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt / parameters$nt_transmission_factor) - log10(parameters$ab_50)))) # reported efficacy in trials
+ef_transmission[finite_ab] <- 1 - ef_transmission[finite_ab]
+```
+
+`nt` is the antibody titre of each person converted back to the linear scale. The
+trial efficacy is $\frac{1}{1 + e^{-k(\log_{10}(nt/\text{nt_transmission_factor}) - \log_{10}(ab_{50}))}}$. The
+effect on each person's onward contribution of infectiousness is `1 - ef_transmission`.
