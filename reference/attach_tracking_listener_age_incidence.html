@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create natural immunity variables — create_natural_immunity_variables • safir</title>
+<title>Attach listener to track age-stratified incidence — attach_tracking_listener_age_incidence • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Create natural immunity variables — create_natural_immunity_variables" />
-<meta property="og:description" content="Create natural immunity variables" />
+<meta property="og:title" content="Attach listener to track age-stratified incidence — attach_tracking_listener_age_incidence" />
+<meta property="og:description" content="To use age-stratified incidence tracking, run the lines in examples
+anytime after all events have been made and initialized but before
+simulation begins." />
 
 
 
@@ -132,34 +134,47 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create natural immunity variables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables_naturalimmunity.R'><code>R/variables_naturalimmunity.R</code></a></small>
-    <div class="hidden name"><code>create_natural_immunity_variables.Rd</code></div>
+    <h1>Attach listener to track age-stratified incidence</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/render.R'><code>R/render.R</code></a></small>
+    <div class="hidden name"><code>attach_tracking_listener_age_incidence.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create natural immunity variables</p>
+    <p>To use age-stratified incidence tracking, run the lines in examples
+anytime after all events have been made and initialized but before
+simulation begins.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_natural_immunity_variables</span><span class='op'>(</span><span class='va'>variables</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>attach_tracking_listener_age_incidence</span><span class='op'>(</span><span class='va'>events</span>, <span class='va'>renderer</span>, <span class='va'>age</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>variables</th>
-      <td><p>a list</p></td>
+      <th>events</th>
+      <td><p>a list of events</p></td>
+    </tr>
+    <tr>
+      <th>renderer</th>
+      <td><p>a <a href='https://mrc-ide.github.io/individual/reference/Render.html'>individual::Render</a> object</p></td>
+    </tr>
+    <tr>
+      <th>age</th>
+      <td><p>an <a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>individual::IntegerVariable</a> object</p></td>
     </tr>
     <tr>
       <th>parameters</th>
-      <td><p>list of model parameters</p></td>
+      <td><p>model parameters (<a href='get_parameters.html'>get_parameters</a>)</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>named list of individual::Variable</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='va'>incidence_renderer</span> <span class='op'>&lt;-</span> <span class='fu'>individual</span><span class='fu'>::</span><span class='va'><a href='https://mrc-ide.github.io/individual/reference/Render.html'>Render</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>timesteps</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='attach_tracking_listener_incidence.html'>attach_tracking_listener_incidence</a></span><span class='op'>(</span>events <span class='op'>=</span> <span class='va'>events</span>, renderer <span class='op'>=</span> <span class='va'>incidence_renderer</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

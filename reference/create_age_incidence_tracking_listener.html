@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create natural immunity variables — create_natural_immunity_variables • safir</title>
+<title>Create listener to track age-stratified incidence — create_age_incidence_tracking_listener • safir</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Create natural immunity variables — create_natural_immunity_variables" />
-<meta property="og:description" content="Create natural immunity variables" />
+<meta property="og:title" content="Create listener to track age-stratified incidence — create_age_incidence_tracking_listener" />
+<meta property="og:description" content="Create listener to track age-stratified incidence" />
 
 
 
@@ -132,33 +132,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create natural immunity variables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables_naturalimmunity.R'><code>R/variables_naturalimmunity.R</code></a></small>
-    <div class="hidden name"><code>create_natural_immunity_variables.Rd</code></div>
+    <h1>Create listener to track age-stratified incidence</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/render.R'><code>R/render.R</code></a></small>
+    <div class="hidden name"><code>create_age_incidence_tracking_listener.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create natural immunity variables</p>
+    <p>Create listener to track age-stratified incidence</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_natural_immunity_variables</span><span class='op'>(</span><span class='va'>variables</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>create_age_incidence_tracking_listener</span><span class='op'>(</span><span class='va'>renderer</span>, <span class='va'>age</span>, <span class='va'>parameters</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>variables</th>
-      <td><p>a list</p></td>
+      <th>renderer</th>
+      <td><p>a <a href='https://mrc-ide.github.io/individual/reference/Render.html'>individual::Render</a> object</p></td>
+    </tr>
+    <tr>
+      <th>age</th>
+      <td><p>an <a href='https://mrc-ide.github.io/individual/reference/IntegerVariable.html'>individual::IntegerVariable</a> object</p></td>
     </tr>
     <tr>
       <th>parameters</th>
-      <td><p>list of model parameters</p></td>
+      <td><p>model parameters (<a href='get_parameters.html'>get_parameters</a>)</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>named list of individual::Variable</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
