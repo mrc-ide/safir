@@ -106,7 +106,7 @@
 <h1 class="hasAnchor">
 <a href="#antibody-dynamics" class="anchor"></a>Antibody dynamics</h1>
 <p>The variables needed to store antibody titre are created in <code>create_vaccine_variables</code>, in R/variables_vaccines.R, attached to the variable list <code>variables$ab_titre</code>. The antibody titre decays and that process is <code>vaccine_ab_titre_process</code> (R/efficacy_vaccination.R) or <code>natural_immunity_ab_titre_process</code> (R/ efficacy_naturalimmunity.R), depending on if you are modeling natural immunity or not.</p>
-<p>Each day, an individual’s antibody titre decays at a rate given by the vector <code>parameters$dr_vec$, giving the daily rate of decay since last vaccine dose (or recovery from infection bout, for natural immunity). If the person's time since last dose (or infection) is greater than the length of the vector, the last value is used. The vector is set in</code>get_vaccine_ab_titre_parameters` (R/parameters_vaccine.R).</p>
+<p>Each day, an individual’s antibody titre decays at a rate given by the vector <code>parameters$dr_vec</code>, giving the daily rate of decay since last vaccine dose (or recovery from infection bout, for natural immunity). If the person’s time since last dose (or infection) is greater than the length of the vector, the last value is used. The vector is set in <code>get_vaccine_ab_titre_parameters</code> (R/parameters_vaccine.R).</p>
 </div>
 <div id="titre-associated-with-dose-or-infection" class="section level1">
 <h1 class="hasAnchor">
