@@ -40,3 +40,51 @@ test_that("cross tab for compartments/age works", {
 
   expect_equal(comp1, comp2)
 })
+
+
+test_that("incidence output is working correctly", {
+
+  R0 <- 15
+  time_period <- 2
+  dt <- 1
+
+  pop <- get_population("GBR")
+  pop$n <- rep(1e3, 17) + rep(50, 17)
+
+  parameters <- safir::get_parameters(
+    population = pop$n,
+    seeding_cases = 0,
+    iso3c = "GBR",
+    R0 = R0,
+    time_period = time_period,
+    dt = dt
+  )
+  parameters$S_0 <- parameters$S_0 - rep(50, 17)
+  parameters$ICase1_0 <- rep(50, 17)
+
+  timesteps <- parameters$time_period/dt
+  variables <- create_variables(pop = pop, parameters = parameters)
+  events <- create_events(parameters = parameters)
+  attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
+  renderer <- individual::Render$new(timesteps)
+  processes <- list(
+    infection_process_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+    individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
+  )
+  setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
+
+  # incidence render
+  incidence_renderer <- individual::Render$new(timesteps)
+  attach_tracking_listener_incidence(events = events, renderer = incidence_renderer)
+
+  individual::simulation_loop(
+    variables = variables,
+    events = events,
+    processes = processes,
+    timesteps = timesteps
+  )
+  out_compartment <- renderer$to_dataframe()
+  out_inc <- incidence_renderer$to_dataframe()
+
+  expect_equal(out_compartment[2, "E_count"], out_inc[1, "incidence"])
+})
