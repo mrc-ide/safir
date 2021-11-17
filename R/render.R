@@ -9,6 +9,7 @@
 #' @param renderer a \code{\link[individual]{Render}} object
 #' @export
 create_incidence_tracking_listener <- function(renderer) {
+  stopifnot(inherits(renderer, "Render"))
   function(timestep, target) {
     renderer$render(name = "incidence", value = target$size(), timestep = timestep)
   }
@@ -31,6 +32,47 @@ attach_tracking_listener_incidence <- function(events, renderer) {
     create_incidence_tracking_listener(renderer = renderer)
   )
 }
+
+#' @title Create listener to track age-stratified incidence
+#'
+#' @param renderer a [individual::Render] object
+#' @param age an [individual::IntegerVariable] object
+#' @param parameters model parameters ([safir::get_parameters])
+#' @export
+create_age_incidence_tracking_listener <- function(renderer, age, parameters) {
+  stopifnot(inherits(parameters, "list"))
+  stopifnot(inherits(renderer, "Render"))
+  stopifnot(inherits(age, "IntegerVariable"))
+  N_age <- parameters$N_age
+  function(timestep, target) {
+    for (a in seq_len(N_age)) {
+      age_bset <- age$get_index_of(a)
+      age_bset$and(target)
+      renderer$render(name = paste0("incidence_age_", a), value = age_bset$size(), timestep = timestep)
+    }
+  }
+}
+
+#' @title Attach listener to track age-stratified incidence
+#' @description To use age-stratified incidence tracking, run the lines in examples
+#' anytime after all events have been made and initialized but before
+#' simulation begins.
+#' @param events a list of events
+#' @param renderer a [individual::Render] object
+#' @param age an [individual::IntegerVariable] object
+#' @param parameters model parameters ([safir::get_parameters])
+#' @examples
+#' \dontrun{
+#' incidence_renderer <- individual::Render$new(timesteps)
+#' attach_tracking_listener_incidence(events = events, renderer = incidence_renderer)
+#' }
+#' @export
+attach_tracking_listener_age_incidence <- function(events, renderer, age, parameters) {
+  events$exposure$add_listener(
+    create_age_incidence_tracking_listener(renderer = renderer, age = age, parameters = parameters)
+  )
+}
+
 
 #' @title Render integer variables
 #' @description Renders the number of individuals in each integer count. Should only be used

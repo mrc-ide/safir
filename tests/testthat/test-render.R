@@ -77,14 +77,20 @@ test_that("incidence output is working correctly", {
   incidence_renderer <- individual::Render$new(timesteps)
   attach_tracking_listener_incidence(events = events, renderer = incidence_renderer)
 
+  # age-stratified incidence render
+  age_incidence_renderer <- individual::Render$new(timesteps)
+  attach_tracking_listener_age_incidence(events = events, renderer = age_incidence_renderer, age = variables$discrete_age, parameters = parameters)
+
   individual::simulation_loop(
     variables = variables,
     events = events,
     processes = processes,
     timesteps = timesteps
   )
+
   out_compartment <- renderer$to_dataframe()
   out_inc <- incidence_renderer$to_dataframe()
+  out_age_inc <- age_incidence_renderer$to_dataframe()
 
-  expect_equal(out_compartment[2, "E_count"], out_inc[1, "incidence"])
+  expect_true(all.equal(out_compartment[2, "E_count"], out_inc[1, "incidence"], sum(out_age_inc[1, -1])))
 })
