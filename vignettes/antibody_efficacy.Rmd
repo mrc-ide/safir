@@ -27,7 +27,7 @@ and that process is `vaccine_ab_titre_process` (R/efficacy_vaccination.R) or `na
 (R/ efficacy_naturalimmunity.R), depending on if you are modeling natural immunity
 or not.
 
-Each day, an individual's antibody titre decays at a rate given by the vector `parameters$dr_vec$,
+Each day, an individual's antibody titre decays at a rate given by the vector `parameters$dr_vec`,
 giving the daily rate of decay since last vaccine dose (or recovery from infection bout, for natural immunity).
 If the person's time since last dose (or infection) is greater than the length of the vector,
 the last value is used. The vector is set in `get_vaccine_ab_titre_parameters` (R/parameters_vaccine.R).
