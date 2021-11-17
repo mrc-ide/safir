@@ -64,7 +64,7 @@ create_age_incidence_tracking_listener <- function(renderer, age, parameters) {
 #' @examples
 #' \dontrun{
 #' incidence_renderer <- individual::Render$new(timesteps)
-#' attach_tracking_listener_incidence(events = events, renderer = incidence_renderer)
+#' attach_tracking_listener_age_incidence(events = events, renderer = age_incidence_renderer, age = variables$discrete_age, parameters = parameters)
 #' }
 #' @export
 attach_tracking_listener_age_incidence <- function(events, renderer, age, parameters) {
