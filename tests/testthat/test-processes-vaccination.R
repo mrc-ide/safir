@@ -198,7 +198,7 @@ test_that("infection process with vaccines: infection_efficacy prevents transmis
 
   expect_equal(variables$dose_num$get_size_of(set = 0), sum(parameters$population))
 
-  # tests
+  # tests: more incidence in the run with no vaccines
   expect_true(all(no_vaccine_run_incidence[-1, "incidence"] > vaccine_run_incidence[-1, "incidence"]))
 
 })
