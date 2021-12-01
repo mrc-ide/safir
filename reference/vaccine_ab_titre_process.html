@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Process that updates the antibody (Ab) titre each time step — vaccine_ab_titre_process" />
-<meta property="og:description" content="The values in ab_titre are calculated on the log scale." />
+<meta property="og:description" content="The values in ab_titre are calculated on the log scale.
+This process will not calculate decay correctly for dt &amp;gt; 1 so that is disallowed." />
 
 
 
@@ -138,7 +139,8 @@
     </div>
 
     <div class="ref-description">
-    <p>The values in <code>ab_titre</code> are calculated on the log scale.</p>
+    <p>The values in <code>ab_titre</code> are calculated on the log scale.
+This process will not calculate decay correctly for <code>dt &gt; 1</code> so that is disallowed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>vaccine_ab_titre_process</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
