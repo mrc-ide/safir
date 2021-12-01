@@ -92,6 +92,8 @@ test_that("test VFR decay with NAT from vaccination working with dt = 1", {
   variables <- create_vaccine_variables(variables = list(), parameters = parameters)
   ef_infection <- matrix(0, nrow = timesteps + 1, ncol = n)
   ef_severe <- matrix(0, nrow = timesteps + 1, ncol = n)
+  ef_infection_cpp <- matrix(0, nrow = timesteps + 1, ncol = n)
+  ef_severe_cpp <- matrix(0, nrow = timesteps + 1, ncol = n)
 
   vfr_vector <- variant_fold_reduction_vector(parameters = parameters, dt = dt, vfr = vfr_val, vfr_time_1 = vfr_time_1, vfr_time_2 = vfr_time_2)
   parameters <- make_immune_parameters(parameters = parameters, vfr = vfr_vector)
@@ -109,6 +111,9 @@ test_that("test VFR decay with NAT from vaccination working with dt = 1", {
   safir_out[1, ] <- variables$ab_titre$get_values()
   ef_infection[1, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 1)
   ef_severe[1, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[1, ], parameters = parameters, timestep = 1)
+  ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 0)
+  ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, timestep = 0)
+
 
   for (t in 1:timesteps) {
     ab_titre(timestep = t)
@@ -116,12 +121,17 @@ test_that("test VFR decay with NAT from vaccination working with dt = 1", {
     safir_out[t + 1L, ] <- variables$ab_titre$get_values()
     ef_infection[t + 1L, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t)
     ef_severe[t + 1L, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[t + 1L, ], parameters = parameters, timestep = t)
+    ef_infection_cpp[t + 1L, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t - 1)
+    ef_severe_cpp[t + 1L, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[t + 1L, ], parameters = parameters, timestep = t - 1)
+
   }
 
   # test ln scale NAT same
   expect_equal(safir_out, nt)
   expect_equal(1 - ef_infection, compare_nt$ef_infection)
   expect_equal(1 - ef_severe, compare_nt$ef_severe)
+  expect_equal(1 - ef_infection_cpp, compare_nt$ef_infection)
+  expect_equal(1 - ef_severe_cpp, compare_nt$ef_severe)
 
 })
 
