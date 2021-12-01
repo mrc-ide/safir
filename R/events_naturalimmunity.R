@@ -21,6 +21,14 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   stopifnot(!is.null(parameters$mu_ab_infection))
   stopifnot(is.finite(parameters$mu_ab_infection))
 
+  if (is.null(parameters$std10_infection)) {
+    std10_infection <- parameters$std10
+  } else {
+    stopifnot(length(parameters$std10_infection) == 1L)
+    stopifnot(is.finite(parameters$std10_infection))
+    std10_infection <- parameters$std10_infection
+  }
+
   # recovery: handle 1 timestep R->S and update ab titre for immune response
   if (length(events$recovery$.listeners) == 2) {
     events$recovery$.listeners[[2]] <- NULL
@@ -51,7 +59,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
 
         # draw NAT boost on linear scale
         inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
-        zdose <- 10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10)
+        zdose <- 10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection)
         new_ab_titre <- current_ab_titre + zdose
 
         # back to ln scale, and impose max value constraint
@@ -70,7 +78,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
         variables$inf_num$queue_update(values = inf, index = target)
         # draw ab titre value
         inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
-        zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = parameters$std10))
+        zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection))
         zdose <- pmin(zdose, parameters$max_ab)
         variables$ab_titre$queue_update(values = zdose, index = target)
         # update last time of infection
