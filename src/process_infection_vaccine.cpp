@@ -7,9 +7,9 @@
 #include <Rcpp.h>
 #include <individual.h>
 #include "../inst/include/utils.hpp"
-#include "../inst/include/efficacy_vaccination.hpp"
+#include "../inst/include/efficacy_nat.hpp"
 
-using get_inf_ages_func = std::function<std::vector<double>(const individual_index_t&, Rcpp::List)>;
+using get_inf_ages_func = std::function<std::vector<double>(const individual_index_t&, Rcpp::List, const size_t)>;
 
 //' @title C++ infection process for vaccine model (multi-dose, no types)
 //' @description this is an internal function, you should use the R interface
@@ -47,16 +47,16 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
   get_inf_ages_func get_inf_ages;
 
   if (Rcpp::as<bool>(parameters["nt_efficacy_transmission"])) {
-    get_inf_ages = [discrete_age, ab_titre](const individual_index_t& infectious_bset, Rcpp::List parameters) -> std::vector<double> {
+    get_inf_ages = [discrete_age, ab_titre](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t timestep) -> std::vector<double> {
       int N_age = Rcpp::as<int>(parameters["N_age"]);
       std::vector<int> ages = discrete_age->get_values(infectious_bset);
       std::vector<double> nat_values = ab_titre->get_values(infectious_bset);
-      std::vector<double> inf_wt = vaccine_efficacy_transmission_cpp(nat_values, parameters);
+      std::vector<double> inf_wt = vaccine_efficacy_transmission_cpp(nat_values, parameters, timestep);
       std::vector<double> inf_ages = tab_bins_weighted(ages, inf_wt, N_age);
       return(inf_ages);
     };
   } else {
-    get_inf_ages = [discrete_age](const individual_index_t& infectious_bset, Rcpp::List parameters) -> std::vector<double> {
+    get_inf_ages = [discrete_age](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t timestep) -> std::vector<double> {
       int N_age = Rcpp::as<int>(parameters["N_age"]);
       std::vector<int> ages = discrete_age->get_values(infectious_bset);
       std::vector<double> inf_ages = tab_bins(ages, N_age);
@@ -89,7 +89,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
         if (infectious.size() > 0) {
 
           // group infectious persons by age
-          std::vector<double> inf_ages = get_inf_ages(infectious, parameters);
+          std::vector<double> inf_ages = get_inf_ages(infectious, parameters, tnow);
 
           // calculate FoI on each susceptible age group
           Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
@@ -102,7 +102,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
           // get vaccine efficacy
           std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
-          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters);
+          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters, tnow);
 
           // FoI on each susceptible person from infectives
           for (auto i = 0u; i < sus_ages.size(); ++i) {

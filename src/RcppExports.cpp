@@ -12,39 +12,42 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // vaccine_efficacy_infection_cpp
-std::vector<double> vaccine_efficacy_infection_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters);
-RcppExport SEXP _safir_vaccine_efficacy_infection_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP) {
+std::vector<double> vaccine_efficacy_infection_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters, const size_t timestep);
+RcppExport SEXP _safir_vaccine_efficacy_infection_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP, SEXP timestepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
-    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_infection_cpp(ab_titre, parameters));
+    Rcpp::traits::input_parameter< const size_t >::type timestep(timestepSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_infection_cpp(ab_titre, parameters, timestep));
     return rcpp_result_gen;
 END_RCPP
 }
 // vaccine_efficacy_severe_cpp
-std::vector<double> vaccine_efficacy_severe_cpp(const std::vector<double>& ab_titre, const std::vector<double>& ef_infection, const Rcpp::List& parameters);
-RcppExport SEXP _safir_vaccine_efficacy_severe_cpp(SEXP ab_titreSEXP, SEXP ef_infectionSEXP, SEXP parametersSEXP) {
+std::vector<double> vaccine_efficacy_severe_cpp(const std::vector<double>& ab_titre, const std::vector<double>& ef_infection, const Rcpp::List& parameters, const size_t timestep);
+RcppExport SEXP _safir_vaccine_efficacy_severe_cpp(SEXP ab_titreSEXP, SEXP ef_infectionSEXP, SEXP parametersSEXP, SEXP timestepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
     Rcpp::traits::input_parameter< const std::vector<double>& >::type ef_infection(ef_infectionSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
-    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters));
+    Rcpp::traits::input_parameter< const size_t >::type timestep(timestepSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters, timestep));
     return rcpp_result_gen;
 END_RCPP
 }
 // vaccine_efficacy_transmission_cpp
-std::vector<double> vaccine_efficacy_transmission_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters);
-RcppExport SEXP _safir_vaccine_efficacy_transmission_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP) {
+std::vector<double> vaccine_efficacy_transmission_cpp(const std::vector<double>& ab_titre, const Rcpp::List& parameters, const size_t timestep);
+RcppExport SEXP _safir_vaccine_efficacy_transmission_cpp(SEXP ab_titreSEXP, SEXP parametersSEXP, SEXP timestepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<double>& >::type ab_titre(ab_titreSEXP);
     Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
-    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_transmission_cpp(ab_titre, parameters));
+    Rcpp::traits::input_parameter< const size_t >::type timestep(timestepSEXP);
+    rcpp_result_gen = Rcpp::wrap(vaccine_efficacy_transmission_cpp(ab_titre, parameters, timestep));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -282,9 +285,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 2},
-    {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 3},
-    {"_safir_vaccine_efficacy_transmission_cpp", (DL_FUNC) &_safir_vaccine_efficacy_transmission_cpp, 2},
+    {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 3},
+    {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 4},
+    {"_safir_vaccine_efficacy_transmission_cpp", (DL_FUNC) &_safir_vaccine_efficacy_transmission_cpp, 3},
     {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},

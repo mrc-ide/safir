@@ -40,17 +40,31 @@ variant_fold_reduction_vector <- function(parameters, dt, vfr, vfr_time_1, vfr_t
 #' interpretation will change
 #' @param std10_infection a standard deviation for log-normal draw of NAT values
 #' @export
-make_immune_parameters <- function(parameters, vfr, mu_ab_infection, std10_infection) {
+make_immune_parameters <- function(parameters, vfr, mu_ab_infection = NULL, std10_infection = NULL) {
 
-  stopifnot(length(std10_infection) == 1L)
-  stopifnot(is.finite(std10_infection))
-  stopifnot(std10_infection > 0)
+  if (!is.null(std10_infection)) {
+    stopifnot(length(std10_infection) == 1L)
+    stopifnot(is.finite(std10_infection))
+    stopifnot(std10_infection > 0)
+  }
 
-  stopifnot(length(mu_ab_infection) > 0)
-  stopifnot(is.finite(mu_ab_infection))
-  stopifnot(mu_ab_infection > 0)
+  if (!is.null(mu_ab_infection)) {
+    stopifnot(length(mu_ab_infection) > 0)
+    stopifnot(is.finite(mu_ab_infection))
+    stopifnot(mu_ab_infection > 0)
+  }
 
   stopifnot(length(vfr) >= parameters$time_period)
+
+  if (is.null(mu_ab_infection)) {
+    stopifnot(!is.null(parameters$mu_ab))
+    mu_ab_infection <- parameters$mu_ab
+  }
+
+  if (is.null(std10_infection)) {
+    stopifnot(!is.null(parameters$std10))
+    std10_infection <- parameters$std10
+  }
 
   parameters$vfr <- vfr
   parameters$mu_ab_infection <- mu_ab_infection

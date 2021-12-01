@@ -4,10 +4,11 @@
 #' @title Compute vaccine efficacy against infection from Ab titre (C++)
 #' @param ab_titre a vector of Ab titres
 #' @param parameters model parameters
+#' @param timestep current time step
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_infection_cpp <- function(ab_titre, parameters) {
-    .Call('_safir_vaccine_efficacy_infection_cpp', PACKAGE = 'safir', ab_titre, parameters)
+vaccine_efficacy_infection_cpp <- function(ab_titre, parameters, timestep) {
+    .Call('_safir_vaccine_efficacy_infection_cpp', PACKAGE = 'safir', ab_titre, parameters, timestep)
 }
 
 #' @title Compute vaccine efficacy against severe disease from Ab titre (C++)
@@ -16,19 +17,21 @@ vaccine_efficacy_infection_cpp <- function(ab_titre, parameters) {
 #' @param ab_titre a vector of Ab titres
 #' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 #' @param parameters model parameters
+#' @param timestep current timestep
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_severe_cpp <- function(ab_titre, ef_infection, parameters) {
-    .Call('_safir_vaccine_efficacy_severe_cpp', PACKAGE = 'safir', ab_titre, ef_infection, parameters)
+vaccine_efficacy_severe_cpp <- function(ab_titre, ef_infection, parameters, timestep) {
+    .Call('_safir_vaccine_efficacy_severe_cpp', PACKAGE = 'safir', ab_titre, ef_infection, parameters, timestep)
 }
 
 #' @title Compute vaccine efficacy against onward transmission from Ab titre (C++)
 #' @param ab_titre a vector of Ab titres
 #' @param parameters model parameters.
+#' @param timestep current timestep
 #' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_transmission_cpp <- function(ab_titre, parameters) {
-    .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', ab_titre, parameters)
+vaccine_efficacy_transmission_cpp <- function(ab_titre, parameters, timestep) {
+    .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', ab_titre, parameters, timestep)
 }
 
 #' @title C++ infection process (nimue vaccine model)
