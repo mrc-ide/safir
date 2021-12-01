@@ -35,7 +35,7 @@ natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
         current_ab_titre <- variables$ab_titre$get_values(index = vaccinated_or_infected)
 
         # new Ab titre
-        new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose_or_infection]
+        new_ab_titre <- current_ab_titre + (parameters$dr_vec[time_since_last_dose_or_infection] * dt)
 
         # if we are supplied with an additional vector for variant fold reduction
         if (!is.null(vfr)) {

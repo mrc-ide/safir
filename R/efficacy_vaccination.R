@@ -8,6 +8,7 @@
 
 #' @title Process that updates the antibody (Ab) titre each time step
 #' @description The values in \code{ab_titre} are calculated on the log scale.
+#' This process will not calculate decay correctly for `dt > 1` so that is disallowed.
 #' @param parameters a list of model parameters
 #' @param variables a list of model variables
 #' @param vfr an optional vector from [safir::variant_fold_reduction_vector]
@@ -18,6 +19,8 @@ vaccine_ab_titre_process <- function(parameters, variables, vfr = NULL, dt) {
   if (!is.null(vfr)) {
     stopifnot(length(vfr) == parameters$time_period / dt)
   }
+
+  stopifnot(dt <= 1)
 
   return(
     function(timestep) {
@@ -39,7 +42,7 @@ vaccine_ab_titre_process <- function(parameters, variables, vfr = NULL, dt) {
         current_ab_titre <- variables$ab_titre$get_values(index = vaccinated)
 
         # new Ab titre
-        new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose]
+        new_ab_titre <- current_ab_titre + (parameters$dr_vec[time_since_last_dose] * dt)
 
         # if we are supplied with an additional vector for variant fold reduction
         if (!is.null(vfr)) {
