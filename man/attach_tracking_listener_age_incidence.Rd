@@ -23,6 +23,9 @@ simulation begins.
 \examples{
 \dontrun{
 incidence_renderer <- individual::Render$new(timesteps)
-attach_tracking_listener_age_incidence(events = events, renderer = age_incidence_renderer, age = variables$discrete_age, parameters = parameters)
+attach_tracking_listener_age_incidence(
+    events = events, renderer = age_incidence_renderer,
+    age = variables$discrete_age, parameters = parameters
+ )
 }
 }

@@ -4,7 +4,13 @@
 \alias{attach_event_listeners_natural_immunity}
 \title{Attach event listeners for natural immunity events}
 \usage{
-attach_event_listeners_natural_immunity(variables, events, parameters, dt)
+attach_event_listeners_natural_immunity(
+  variables,
+  events,
+  parameters,
+  dt,
+  additive = FALSE
+)
 }
 \arguments{
 \item{variables}{a named list of variables}
@@ -14,6 +20,11 @@ attach_event_listeners_natural_immunity(variables, events, parameters, dt)
 \item{parameters}{the parameters}
 
 \item{dt}{size of time step}
+
+\item{additive}{if \code{FALSE} the antibody titre is overwritten upon recovery from infection
+according to \code{parameters$mu_ab_infection}, if \code{TRUE} the antibody titre is sampled and added
+to existing titre. Please choose this option with caution, as it changes the interpretation
+of the parameter value \code{parameters$mu_ab_infection}.}
 }
 \description{
 Attach event listeners for natural immunity events
