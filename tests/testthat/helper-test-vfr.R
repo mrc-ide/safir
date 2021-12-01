@@ -35,12 +35,18 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
     nt[i, ] <- nt[i-1, ] + dr_vec[i-1]
   }
 
+  nt_log <- nt
+
   # VFR
   vfr_vector <- c(rep(1, times = vfr_time_1), seq(from = 1, to = vfr, length.out = (vfr_time_2 - vfr_time_1 + 1)), rep(vfr, times = tmax - vfr_time_2))
 
   nt <- exp(nt) # return to linear scale
   nt <- nt / vfr_vector
-  nt <- log(nt) # back to ln scale
 
-  return(list(nt = nt, z1 = z1))
+  # relate titre to efficacy over time - using log-10 parameters
+  ef_infection <- 1 / (1 + exp(-k * (log10(nt) - log10(ab_50))))
+  ef_severe_uncond <- 1 / (1 + exp(-k * (log10(nt) - log10(ab_50_severe))))
+  ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
+
+  return(list(nt = nt_log, z1 = z1, ef_infection = ef_infection, ef_severe = ef_severe))
 }

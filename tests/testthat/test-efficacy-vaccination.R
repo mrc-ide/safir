@@ -140,7 +140,6 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   ef_infection <- 1 / (1 + exp(-k * (log10(nt1) - log10(ab_50))))
 
   ef_infection_safir <- vaccine_efficacy_infection(ab_titre = safir_out[,1], parameters = parameters, timestep = 1)
-  # ef_infection_safir <- 1 - ef_infection_safir
 
   expect_equal(ef_infection, 1 - ef_infection_safir)
 
