@@ -39,6 +39,8 @@ get_vaccine_ab_titre_parameters <- function(
                            mu_ab_d2 = c(223/94, 32/59, 28/164, 654/158))
 ) {
 
+  stopifnot(is.logical(nt_efficacy_transmission))
+
   stopifnot(max_dose %in%  1:(ncol(mu_ab_list) - 1))
   stopifnot(is.logical(correlated))
   stopifnot(vaccine %in% mu_ab_list[, "name"])
@@ -75,7 +77,7 @@ get_vaccine_ab_titre_parameters <- function(
     ab_50_severe = ab_50_severe,
     k = k,
     nt_transmission_factor = nt_transmission_factor,
-    nt_efficacy_transmission = as.logical(nt_efficacy_transmission),
+    nt_efficacy_transmission = nt_efficacy_transmission,
     max_ab = max_ab,
     correlated = correlated
   )

@@ -68,7 +68,7 @@ events <- create_events(parameters = parameters)
 events <- create_events_vaccination(events = events,parameters = parameters)
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
-attach_event_listeners_natural_immunity(variables = variables, events = events, parameters = parameters, dt = dt)
+attach_event_listeners_natural_immunity(variables = variables, events = events, parameters = parameters, dt = dt, additive = T)
 
 # make renderers
 renderer <- Render$new(parameters$time_period)

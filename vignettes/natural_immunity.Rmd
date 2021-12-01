@@ -90,7 +90,8 @@ parameters$mu_ab_infection <- ab_parameters$mu_ab
 This part is also exactly the same as the "Vaccine model with multiple doses" except the following places:
 
   1. `create_natural_immunity_variables` is called to attach additional variables to the `variables` list needed to model multiple infections
-  2. `attach_event_listeners_natural_immunity` is called to add additional event listeners to `events` list needd to antibody boosting
+  2. `attach_event_listeners_natural_immunity` is called to add additional event listeners to `events` list needd to antibody boosting. Please note there is an argument `additive`
+  which can be used to change how antibody boosting from infection interacts with existing antibody titre levels, so please carefully read the documentation for `attach_event_listeners_natural_immunity()`
   3. We use another render object, `inf_renderer` which will plot the number of cumulative infections the population has. Rendering adds more computation,
   increasing model run time, so for actual use, please don't add this and its associated process function `integer_count_render_process_daily` unless you are interested
   in tracking this information.
