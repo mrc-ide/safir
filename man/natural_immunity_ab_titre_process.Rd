@@ -15,4 +15,5 @@ natural_immunity_ab_titre_process(parameters, variables, dt)
 }
 \description{
 The values in \code{ab_titre} are calculated on the log scale.
+This process will not calculate decay correctly for \code{dt > 1} so that is disallowed.
 }

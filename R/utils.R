@@ -1,16 +1,3 @@
-# --------------------------------------------------
-#   utility functions
-#   May 2021
-#   1. `%||%`
-#   2. make_rerlang
-#   3. make_rexp
-#   4. make_rexp_simple
-#   5. remove_non_numerics
-#   6. vcapply
-#   7. rep_list
-# --------------------------------------------------
-
-
 `%||%` <- function(a, b) { # nolint
   if (is.null(a)) b else a
 }

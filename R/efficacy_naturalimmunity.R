@@ -1,13 +1,14 @@
 #' @title Process that updates the antibody (Ab) titre each time step for model vaccine model with natural immunity
-#' @description The values in \code{ab_titre} are calculated on the log scale.
+#' @description The values in `ab_titre` are calculated on the log scale.
+#' This process will not calculate decay correctly for `dt > 1` so that is disallowed.
 #' @param parameters a list of model parameters
 #' @param variables a list of model variables
 #' @param dt time step size
 #' @export
 natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
 
-  if (!is.null(vfr)) {
-    stopifnot(length(vfr) == parameters$time_period / dt)
+  if (!is.null(parameters$vfr)) {
+    stopifnot(length(parameters$vfr) == parameters$time_period / dt)
   }
 
   return(
@@ -38,9 +39,9 @@ natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
         new_ab_titre <- current_ab_titre + (parameters$dr_vec[time_since_last_dose_or_infection] * dt)
 
         # if we are supplied with an additional vector for variant fold reduction
-        if (!is.null(vfr)) {
-          if (vfr[timestep] != 1) {
-            new_ab_titre <- new_ab_titre / vfr[timestep]
+        if (!is.null(parameters$vfr)) {
+          if (parameters$vfr[timestep] > 1) {
+            new_ab_titre <- new_ab_titre / parameters$vfr[timestep]
           }
         }
 

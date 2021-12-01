@@ -70,6 +70,7 @@ get_vaccine_ab_titre_parameters <- function(
   stopifnot(all(is.finite(mu_ab)))
 
   parameters <- list(
+    # necessary
     dr_vec = dr_vec,
     mu_ab = mu_ab,
     std10 = std10,
@@ -79,7 +80,12 @@ get_vaccine_ab_titre_parameters <- function(
     nt_transmission_factor = nt_transmission_factor,
     nt_efficacy_transmission = nt_efficacy_transmission,
     max_ab = max_ab,
-    correlated = correlated
+    correlated = correlated,
+    # other
+    hl_s = hl_s,
+    hl_l = hl_l,
+    period_s = period_s,
+    t_period_l = t_period_l
   )
   return(parameters)
 }
@@ -145,7 +151,17 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   parameters$vaccine_coverage_mat <- strategy_matrix_array
   parameters$next_dose_priority <- next_dose_priority_matrix
 
-  parameters <- c(parameters, vaccine_ab_parameters)
+  # attach necessary parameters from vaccine pars
+  parameters$dr_vec <- vaccine_ab_parameters$dr_vec
+  parameters$mu_ab <- vaccine_ab_parameters$mu_ab
+  parameters$std10 <- vaccine_ab_parameters$std10
+  parameters$ab_50 <- vaccine_ab_parameters$ab_50
+  parameters$ab_50_severe <- vaccine_ab_parameters$ab_50_severe
+  parameters$k <- vaccine_ab_parameters$k
+  parameters$nt_transmission_factor <- vaccine_ab_parameters$nt_transmission_factor
+  parameters$nt_efficacy_transmission <- vaccine_ab_parameters$nt_efficacy_transmission
+  parameters$max_ab <- vaccine_ab_parameters$max_ab
+  parameters$correlated <- vaccine_ab_parameters$correlated
 
   return(parameters)
 }
