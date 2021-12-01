@@ -10,9 +10,14 @@
 #' @description The values in \code{ab_titre} are calculated on the log scale.
 #' @param parameters a list of model parameters
 #' @param variables a list of model variables
+#' @param vfr an optional vector from [safir::variant_fold_reduction_vector]
 #' @param dt time step size
 #' @export
-vaccine_ab_titre_process <- function(parameters, variables, dt) {
+vaccine_ab_titre_process <- function(parameters, variables, vfr = NULL, dt) {
+
+  if (!is.null(vfr)) {
+    stopifnot(length(vfr) == parameters$time_period / dt)
+  }
 
   return(
     function(timestep) {
@@ -35,6 +40,15 @@ vaccine_ab_titre_process <- function(parameters, variables, dt) {
 
         # new Ab titre
         new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose]
+
+        # if we are supplied with an additional vector for variant fold reduction
+        if (!is.null(vfr)) {
+          if (vfr[timestep] != 1) {
+            # VFR is on linear scale
+            new_ab_titre <- exp(new_ab_titre) / vfr[timestep]
+            new_ab_titre <- log(new_ab_titre)
+          }
+        }
 
         # schedule an update
         variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated)

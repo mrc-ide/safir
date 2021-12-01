@@ -6,6 +6,10 @@
 #' @export
 natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
 
+  if (!is.null(vfr)) {
+    stopifnot(length(vfr) == parameters$time_period / dt)
+  }
+
   return(
     function(timestep) {
 
@@ -32,6 +36,13 @@ natural_immunity_ab_titre_process <- function(parameters, variables, dt) {
 
         # new Ab titre
         new_ab_titre <- current_ab_titre + parameters$dr_vec[time_since_last_dose_or_infection]
+
+        # if we are supplied with an additional vector for variant fold reduction
+        if (!is.null(vfr)) {
+          if (vfr[timestep] != 1) {
+            new_ab_titre <- new_ab_titre / vfr[timestep]
+          }
+        }
 
         # schedule an update
         variables$ab_titre$queue_update(values = new_ab_titre, index = vaccinated_or_infected)
