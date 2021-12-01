@@ -174,7 +174,8 @@
 <li>
 <code>create_natural_immunity_variables</code> is called to attach additional variables to the <code>variables</code> list needed to model multiple infections</li>
 <li>
-<code>attach_event_listeners_natural_immunity</code> is called to add additional event listeners to <code>events</code> list needd to antibody boosting</li>
+<code>attach_event_listeners_natural_immunity</code> is called to add additional event listeners to <code>events</code> list needd to antibody boosting. Please note there is an argument <code>additive</code> which can be used to change how antibody boosting from infection interacts with existing antibody titre levels, so please carefully read the documentation for <code><a href="../reference/attach_event_listeners_natural_immunity.html">attach_event_listeners_natural_immunity()</a></code>
+</li>
 <li>We use another render object, <code>inf_renderer</code> which will plot the number of cumulative infections the population has. Rendering adds more computation, increasing model run time, so for actual use, please don’t add this and its associated process function <code>integer_count_render_process_daily</code> unless you are interested in tracking this information.</li>
 <li>
 <code>natural_immunity_ab_titre_process</code> is added to the <code>processes</code> list to update antibody titre from vaccines or natural immunity (replaces <code>vaccine_ab_titre_process</code>).</li>
@@ -233,7 +234,7 @@
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  13.846   0.397  14.329</span></code></pre></div>
+<span class="co">#&gt;  13.749   0.406  15.227</span></code></pre></div>
 <div id="plot-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-results" class="anchor"></a>Plot Results</h2>

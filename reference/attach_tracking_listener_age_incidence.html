@@ -172,7 +172,10 @@ simulation begins.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
 <span class='r-in'><span class='va'>incidence_renderer</span> <span class='op'>&lt;-</span> <span class='fu'>individual</span><span class='fu'>::</span><span class='va'><a href='https://mrc-ide.github.io/individual/reference/Render.html'>Render</a></span><span class='op'>$</span><span class='fu'>new</span><span class='op'>(</span><span class='va'>timesteps</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'>attach_tracking_listener_age_incidence</span><span class='op'>(</span>events <span class='op'>=</span> <span class='va'>events</span>, renderer <span class='op'>=</span> <span class='va'>age_incidence_renderer</span>, age <span class='op'>=</span> <span class='va'>variables</span><span class='op'>$</span><span class='va'>discrete_age</span>, parameters <span class='op'>=</span> <span class='va'>parameters</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>attach_tracking_listener_age_incidence</span><span class='op'>(</span></span>
+<span class='r-in'>    events <span class='op'>=</span> <span class='va'>events</span>, renderer <span class='op'>=</span> <span class='va'>age_incidence_renderer</span>,</span>
+<span class='r-in'>    age <span class='op'>=</span> <span class='va'>variables</span><span class='op'>$</span><span class='va'>discrete_age</span>, parameters <span class='op'>=</span> <span class='va'>parameters</span></span>
+<span class='r-in'> <span class='op'>)</span></span>
 <span class='r-in'><span class='op'>}</span></span>
 </pre>
   </div>

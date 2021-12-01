@@ -141,7 +141,13 @@
     <p>Attach event listeners for natural immunity events</p>
     </div>
 
-    <pre class="usage"><span class='fu'>attach_event_listeners_natural_immunity</span><span class='op'>(</span><span class='va'>variables</span>, <span class='va'>events</span>, <span class='va'>parameters</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>attach_event_listeners_natural_immunity</span><span class='op'>(</span>
+  <span class='va'>variables</span>,
+  <span class='va'>events</span>,
+  <span class='va'>parameters</span>,
+  <span class='va'>dt</span>,
+  additive <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,6 +167,13 @@
     <tr>
       <th>dt</th>
       <td><p>size of time step</p></td>
+    </tr>
+    <tr>
+      <th>additive</th>
+      <td><p>if <code>FALSE</code> the antibody titre is overwritten upon recovery from infection
+according to <code>parameters$mu_ab_infection</code>, if <code>TRUE</code> the antibody titre is sampled and added
+to existing titre. Please choose this option with caution, as it changes the interpretation
+of the parameter value <code>parameters$mu_ab_infection</code>.</p></td>
     </tr>
     </table>
 
