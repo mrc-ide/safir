@@ -208,3 +208,197 @@ test_that("test VFR decay with NAT from vaccination working with dt = 0.5", {
   expect_equal(1 - ef_severe_cpp[last_row, ], compare_nt$ef_severe[nrow(nt), ])
 
 })
+
+
+
+test_that("test that VFR means more infections are queued in simulation runs with VFR = 5 than without any VFR", {
+
+  library(nimue)
+
+  # pars
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+  pop$n <- as.integer(pop$n / 100)
+
+  pars <- safir::get_parameters(
+    population = pop$n,
+    contact_matrix_set = contact_mat,
+    iso3c = iso3c,
+    R0 = 5,
+    time_period = 365,
+    dt = 1
+  )
+
+  # test states
+  n <- 1e5
+  dt <- 0.5
+  timesteps <- pars$time_period / dt
+  valid_states <- c("S","IMild","ICase","IAsymp")
+  state0 <- sample(x = valid_states,size = n,replace = T)
+  age0 <- sample.int(n = 17,size = n,replace = T)
+  vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  zdose <- log(10^rnorm(n = n, mean = log10(3), sd = 0.05))
+
+  # VFR = 4 (should have more infections)
+
+  # R
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+
+  states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
+  discrete_age <- individual::IntegerVariable$new(initial_values = age0)
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(5436L)
+  inf_proc <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc(timestep = 1)
+
+  inf_VFR4_R <- exposure$get_scheduled()$to_vector()
+
+  # C++
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+
+  states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
+  discrete_age <- individual::IntegerVariable$new(initial_values = age0)
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(5436L)
+  inf_proc <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  execute_process(process = inf_proc,timestep = 1)
+
+  inf_VFR4_CPP <- exposure$get_scheduled()$to_vector()
+
+
+  # no VFR (less infections)
+
+  # R
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters$vfr <- NULL
+
+  states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
+  discrete_age <- individual::IntegerVariable$new(initial_values = age0)
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(5436L)
+  inf_proc <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc(timestep = 1)
+
+  inf_VFR0_R <- exposure$get_scheduled()$to_vector()
+
+  # C++
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters$vfr <- NULL
+
+  states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
+  discrete_age <- individual::IntegerVariable$new(initial_values = age0)
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(5436L)
+  inf_proc <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  execute_process(process = inf_proc,timestep = 1)
+
+  inf_VFR0_CPP <- exposure$get_scheduled()$to_vector()
+
+  # tests
+  expect_equal(sort(inf_VFR4_R), sort(inf_VFR4_CPP))
+  expect_equal(sort(inf_VFR0_R), sort(inf_VFR0_CPP))
+
+  expect_true(length(inf_VFR4_R) > length(inf_VFR0_R))
+})
+
+
+
+test_that("test that VFR means more severe infections are queued in simulation runs with VFR = 5 than without any VFR", {
+
+  library(nimue)
+
+  # pars
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+  pop$n <- as.integer(pop$n / 100)
+
+  pars <- safir::get_parameters(
+    population = pop$n,
+    contact_matrix_set = contact_mat,
+    iso3c = iso3c,
+    R0 = 5,
+    time_period = 365,
+    dt = 1
+  )
+
+  # test states
+  n <- 1e5
+  dt <- 1
+  timesteps <- pars$time_period / dt
+  valid_states <- c("S","IMild","ICase","IAsymp")
+  state0 <- sample(x = valid_states,size = n,replace = T)
+  age0 <- sample.int(n = 17,size = n,replace = T)
+  vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  zdose <- log(10^rnorm(n = n, mean = log(3), sd = 0.05))
+
+  # VFR = 4 (should have more severe outcomes)
+
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(12, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+
+  variables <- list(
+    discrete_age = individual::IntegerVariable$new(initial_values = age0),
+    ab_titre = individual::DoubleVariable$new(initial_values = zdose)
+  )
+
+  events <- list(
+    severe_infection = individual::TargetedEvent$new(population_size = n),
+    asymp_infection = individual::TargetedEvent$new(population_size = n),
+    mild_infection = individual::TargetedEvent$new(population_size = n)
+  )
+
+  target <- individual::Bitset$new(size = n)
+  target$insert(1:n)
+
+  exp_proc <- create_exposure_scheduler_listener_vaccine(events = events, variables = variables, parameters = parameters, dt = dt)
+  exp_proc(timestep = 1, target = target)
+
+  VFR4_severe <- events$severe_infection$get_scheduled()$to_vector()
+  VFR4_asymp <- events$asymp_infection$get_scheduled()$to_vector()
+  VFR4_mild <- events$mild_infection$get_scheduled()$to_vector()
+
+  # no VFR (should have less severe outcomes)
+  parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters$vfr <- NULL
+
+  variables <- list(
+    discrete_age = individual::IntegerVariable$new(initial_values = age0),
+    ab_titre = individual::DoubleVariable$new(initial_values = zdose)
+  )
+
+  events <- list(
+    severe_infection = individual::TargetedEvent$new(population_size = n),
+    asymp_infection = individual::TargetedEvent$new(population_size = n),
+    mild_infection = individual::TargetedEvent$new(population_size = n)
+  )
+
+  target <- individual::Bitset$new(size = n)
+  target$insert(1:n)
+
+  exp_proc <- create_exposure_scheduler_listener_vaccine(events = events, variables = variables, parameters = parameters, dt = dt)
+  exp_proc(timestep = 1, target = target)
+
+  VFR0_severe <- events$severe_infection$get_scheduled()$to_vector()
+  VFR0_asymp <- events$asymp_infection$get_scheduled()$to_vector()
+  VFR0_mild <- events$mild_infection$get_scheduled()$to_vector()
+
+  # tests
+  expect_true(length(VFR4_severe) > length(VFR0_severe))
+  expect_true(length(VFR4_severe) + length(VFR4_asymp) + length(VFR4_mild) == n)
+  expect_true(length(VFR0_severe) + length(VFR0_asymp) + length(VFR0_mild) == n)
+})

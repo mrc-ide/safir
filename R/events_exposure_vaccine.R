@@ -31,8 +31,8 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
 
       # vaccine efficacy against severe disease
       ab_titre <- variables$ab_titre$get_values(hosp)
-      infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, timestep = 1)
-      severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = infection_efficacy,parameters = parameters, timestep = 1)
+      infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, timestep = timestep)
+      severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = infection_efficacy,parameters = parameters, timestep = timestep)
 
       # sample those with severe disease
       hosp$sample(prob_hosp * severe_efficacy)
@@ -68,4 +68,3 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
   )
 
 }
-
