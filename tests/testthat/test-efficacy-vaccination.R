@@ -5,18 +5,18 @@ test_that("efficacy functions work in R and C++", {
   ab_titre <- log(10^rnorm(n = n, mean = log10(vaccine_parameters$mu_ab[1]),sd = vaccine_parameters$std10))
   ab_titre[sample.int(n = n,size = 20,replace = FALSE)] <- -Inf
 
-  ef_inf_R <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = vaccine_parameters)
-  ef_inf_cpp <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = vaccine_parameters)
+  ef_inf_R <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = vaccine_parameters,timestep = 1)
+  ef_inf_cpp <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = vaccine_parameters, timestep = 1)
 
   expect_equal(ef_inf_R, ef_inf_cpp)
 
-  ef_sev_R <- vaccine_efficacy_severe(ab_titre = ab_titre,ef_infection = ef_inf_R,parameters = vaccine_parameters)
-  ef_sev_cpp <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = ef_inf_cpp,parameters = vaccine_parameters)
+  ef_sev_R <- vaccine_efficacy_severe(ab_titre = ab_titre,ef_infection = ef_inf_R,parameters = vaccine_parameters, timestep = 1)
+  ef_sev_cpp <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = ef_inf_cpp,parameters = vaccine_parameters, timestep = 1)
 
   expect_equal(ef_sev_R, ef_sev_cpp)
 
-  ef_trans_R <- vaccine_efficacy_transmission(ab_titre = ab_titre, parameters = vaccine_parameters)
-  ef_trans_cpp <- vaccine_efficacy_transmission_cpp(ab_titre = ab_titre, parameters = vaccine_parameters)
+  ef_trans_R <- vaccine_efficacy_transmission(ab_titre = ab_titre, parameters = vaccine_parameters, timestep = 1)
+  ef_trans_cpp <- vaccine_efficacy_transmission_cpp(ab_titre = ab_titre, parameters = vaccine_parameters, timestep = 1)
 
   expect_equal(ef_sev_R, ef_sev_cpp)
 
@@ -139,8 +139,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   nt1 <- exp(nt[,1])
   ef_infection <- 1 / (1 + exp(-k * (log10(nt1) - log10(ab_50))))
 
-  ef_infection_safir <- vaccine_efficacy_infection(ab_titre = safir_out[,1],parameters = parameters)
-  # ef_infection_safir <- 1 - ef_infection_safir
+  ef_infection_safir <- vaccine_efficacy_infection(ab_titre = safir_out[,1], parameters = parameters, timestep = 1)
 
   expect_equal(ef_infection, 1 - ef_infection_safir)
 
@@ -148,7 +147,7 @@ test_that("vaccine_ab_titre_process works for everyone on dose 1", {
   ef_severe_uncond <- 1 / (1 + exp(-k * (log10(nt1) - log10(ab_50_severe))))
   ef_severe <-  1 - ((1 - ef_severe_uncond)/(1 - ef_infection))
 
-  ef_severe_safir <- vaccine_efficacy_severe(ab_titre = safir_out[,1],ef_infection = ef_infection_safir,parameters = parameters)
+  ef_severe_safir <- vaccine_efficacy_severe(ab_titre = safir_out[,1],ef_infection = ef_infection_safir,parameters = parameters, timestep = 1)
   ef_severe_safir <- 1 - ef_severe_safir
 
   expect_equal(ef_severe,ef_severe_safir)

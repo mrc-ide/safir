@@ -16,6 +16,7 @@
 #' @export
 attach_event_listeners_natural_immunity <- function(variables, events, parameters, dt, additive = FALSE) {
 
+  # checks
   stopifnot(is.logical(additive))
 
   stopifnot(!is.null(parameters$mu_ab_infection))
