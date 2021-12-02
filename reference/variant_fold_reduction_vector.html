@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Discrete age variable — create_discrete_age_variable • safir</title>
+<title>Make vector of variant fold reduction in natural antibody titre values — variant_fold_reduction_vector • safir</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Discrete age variable — create_discrete_age_variable" />
-<meta property="og:description" content="Create a discrete age variable for each of the
-length(pop$age_group) distinct age groups" />
+<meta property="og:title" content="Make vector of variant fold reduction in natural antibody titre values — variant_fold_reduction_vector" />
+<meta property="og:description" content="Generate a vector for each time step where no VFR effect corresponds
+to values in the vector of 1, and the appropriate VFR adjustment otherwise." />
 
 
 
@@ -133,34 +133,43 @@ length(pop$age_group) distinct age groups" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Discrete age variable</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables.R'><code>R/variables.R</code></a></small>
-    <div class="hidden name"><code>create_discrete_age_variable.Rd</code></div>
+    <h1>Make vector of variant fold reduction in natural antibody titre values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/parameters_nat.R'><code>R/parameters_nat.R</code></a></small>
+    <div class="hidden name"><code>variant_fold_reduction_vector.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create a discrete age variable for each of the
-length(pop$age_group) distinct age groups</p>
+    <p>Generate a vector for each time step where no VFR effect corresponds
+to values in the vector of <code>1</code>, and the appropriate VFR adjustment otherwise.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_discrete_age_variable</span><span class='op'>(</span><span class='va'>ages</span>, <span class='va'>pop</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>variant_fold_reduction_vector</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>dt</span>, <span class='va'>vfr</span>, <span class='va'>vfr_time_1</span>, <span class='va'>vfr_time_2</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ages</th>
-      <td><p>Vector of ages from <a href='create_continuous_age_variable.html'>create_continuous_age_variable</a></p></td>
+      <th>parameters</th>
+      <td><p>a list of model parameters</p></td>
     </tr>
     <tr>
-      <th>pop</th>
-      <td><p>Vector of integer ages</p></td>
+      <th>dt</th>
+      <td><p>time step size</p></td>
+    </tr>
+    <tr>
+      <th>vfr</th>
+      <td><p>a positive value giving the fold reduction</p></td>
+    </tr>
+    <tr>
+      <th>vfr_time_1</th>
+      <td><p>time to begin reduction</p></td>
+    </tr>
+    <tr>
+      <th>vfr_time_2</th>
+      <td><p>time to end reduction</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>discrete age variable</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

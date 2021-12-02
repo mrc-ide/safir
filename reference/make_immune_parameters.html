@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Discrete age variable — create_discrete_age_variable • safir</title>
+<title>Attach parameters dealing with immune (NAT) dynamics to parameter list — make_immune_parameters • safir</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Discrete age variable — create_discrete_age_variable" />
-<meta property="og:description" content="Create a discrete age variable for each of the
-length(pop$age_group) distinct age groups" />
+<meta property="og:title" content="Attach parameters dealing with immune (NAT) dynamics to parameter list — make_immune_parameters" />
+<meta property="og:description" content="Attach parameters dealing with immune (NAT) dynamics to parameter list" />
 
 
 
@@ -133,34 +132,46 @@ length(pop$age_group) distinct age groups" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Discrete age variable</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/variables.R'><code>R/variables.R</code></a></small>
-    <div class="hidden name"><code>create_discrete_age_variable.Rd</code></div>
+    <h1>Attach parameters dealing with immune (NAT) dynamics to parameter list</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/parameters_nat.R'><code>R/parameters_nat.R</code></a></small>
+    <div class="hidden name"><code>make_immune_parameters.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create a discrete age variable for each of the
-length(pop$age_group) distinct age groups</p>
+    <p>Attach parameters dealing with immune (NAT) dynamics to parameter list</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_discrete_age_variable</span><span class='op'>(</span><span class='va'>ages</span>, <span class='va'>pop</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>make_immune_parameters</span><span class='op'>(</span>
+  <span class='va'>parameters</span>,
+  <span class='va'>vfr</span>,
+  mu_ab_infection <span class='op'>=</span> <span class='cn'>NULL</span>,
+  std10_infection <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>ages</th>
-      <td><p>Vector of ages from <a href='create_continuous_age_variable.html'>create_continuous_age_variable</a></p></td>
+      <th>parameters</th>
+      <td><p>a list of model parameters</p></td>
     </tr>
     <tr>
-      <th>pop</th>
-      <td><p>Vector of integer ages</p></td>
+      <th>vfr</th>
+      <td><p>a vector from <a href='variant_fold_reduction_vector.html'>variant_fold_reduction_vector</a></p></td>
+    </tr>
+    <tr>
+      <th>mu_ab_infection</th>
+      <td><p>a vector of values associated with NAT for each infection bout;
+please read <a href='attach_event_listeners_natural_immunity.html'>attach_event_listeners_natural_immunity</a> carefully depending on
+if you are using the additive or overwriting NAT model, because this parameter's
+interpretation will change</p></td>
+    </tr>
+    <tr>
+      <th>std10_infection</th>
+      <td><p>a standard deviation for log-normal draw of NAT values</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>discrete age variable</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

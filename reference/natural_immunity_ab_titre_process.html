@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Process that updates the antibody (Ab) titre each time step for model vaccine model with natural immunity — natural_immunity_ab_titre_process" />
-<meta property="og:description" content="The values in ab_titre are calculated on the log scale." />
+<meta property="og:description" content="The values in ab_titre are calculated on the log scale.
+This process will not calculate decay correctly for dt &amp;gt; 1 so that is disallowed." />
 
 
 
@@ -72,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
       </span>
     </div>
 
@@ -133,12 +134,13 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Process that updates the antibody (Ab) titre each time step for model vaccine model with natural immunity</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/efficacy_naturalimmunity.R'><code>R/efficacy_naturalimmunity.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/mrc-ide/safir/blob/master/R/process_nat.R'><code>R/process_nat.R</code></a></small>
     <div class="hidden name"><code>natural_immunity_ab_titre_process.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The values in <code>ab_titre</code> are calculated on the log scale.</p>
+    <p>The values in <code>ab_titre</code> are calculated on the log scale.
+This process will not calculate decay correctly for <code>dt &gt; 1</code> so that is disallowed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>natural_immunity_ab_titre_process</span><span class='op'>(</span><span class='va'>parameters</span>, <span class='va'>variables</span>, <span class='va'>dt</span><span class='op'>)</span></pre>
