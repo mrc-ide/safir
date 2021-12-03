@@ -107,7 +107,7 @@ simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop) {
   attach_event_listeners_natural_immunity(variables = variables, events = events, parameters = parameters, dt = dt, additive = T)
 
   # make renderers
-  renderer <- Render$new(parameters$time_period)
+  renderer <- individual::Render$new(parameters$time_period)
 
   # processes
   processes <- list(

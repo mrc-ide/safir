@@ -21,7 +21,7 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
     get_inf_ages <- function(infection_bset, variables, parameters, day) {
       ages <- variables$discrete_age$get_values(infection_bset)
       nat_values <- variables$ab_titre$get_values(infection_bset)
-      inf_wt <- vaccine_efficacy_transmission_cpp(ab_titre = nat_values, parameters = parameters, day = day - 1) # 0-based index
+      inf_wt <- vaccine_efficacy_transmission_cpp(ab_titre = nat_values, parameters = parameters, day = day - 1L) # 0-based index
       inf_ages <- tab_bins_weighted(a = ages, wt = inf_wt,  nbins = parameters$N_age)
       return(inf_ages)
     }
@@ -67,7 +67,7 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
           # get infection modifier and ages
           ab_titre <- variables$ab_titre$get_values(susceptible)
-          infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, day = day - 1) # 0-based index
+          infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, day = day - 1L) # 0-based index
           ages <- variables$discrete_age$get_values(susceptible)
 
           # FoI for each susceptible based on their age group
