@@ -4,7 +4,7 @@
 \alias{vaccine_efficacy_severe_cpp}
 \title{Compute vaccine efficacy against severe disease from Ab titre (C++)}
 \usage{
-vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters, timestep)
+vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters, day)
 }
 \arguments{
 \item{ab_titre}{a vector of Ab titres}
@@ -13,7 +13,7 @@ vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters, timestep)
 
 \item{parameters}{model parameters}
 
-\item{timestep}{current timestep}
+\item{day}{current day}
 }
 \value{
 a numeric vector, 0 is maximally proective, 1 is maximally unprotective

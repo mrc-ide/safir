@@ -9,21 +9,21 @@
 //' @title Compute vaccine efficacy against infection from Ab titre (C++)
 //' @param ab_titre a vector of Ab titres
 //' @param parameters model parameters
-//' @param timestep current time step
+//' @param day current day
 //' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 //' @export
 // [[Rcpp::export]]
 std::vector<double> vaccine_efficacy_infection_cpp(
     const std::vector<double>& ab_titre,
     const Rcpp::List& parameters,
-    const size_t timestep
+    const size_t day
 ) {
   static double eps = std::numeric_limits<double>::epsilon();
 
   double vfr = 1.0;
   if (parameters.containsElementNamed("vfr")) {
     SEXP vfr_sexp = parameters["vfr"];
-    vfr = REAL(vfr_sexp)[timestep];
+    vfr = REAL(vfr_sexp)[day];
   }
 
   double k = Rcpp::as<double>(parameters["k"]);
@@ -52,7 +52,7 @@ std::vector<double> vaccine_efficacy_infection_cpp(
 //' @param ab_titre a vector of Ab titres
 //' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 //' @param parameters model parameters
-//' @param timestep current timestep
+//' @param day current day
 //' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 //' @export
 // [[Rcpp::export]]
@@ -60,14 +60,14 @@ std::vector<double> vaccine_efficacy_severe_cpp(
     const std::vector<double>& ab_titre,
     const std::vector<double>& ef_infection,
     const Rcpp::List& parameters,
-    const size_t timestep
+    const size_t day
 ) {
   static double eps = std::numeric_limits<double>::epsilon();
 
   double vfr = 1.0;
   if (parameters.containsElementNamed("vfr")) {
     SEXP vfr_sexp = parameters["vfr"];
-    vfr = REAL(vfr_sexp)[timestep];
+    vfr = REAL(vfr_sexp)[day];
   }
 
   double k = Rcpp::as<double>(parameters["k"]);
@@ -95,21 +95,21 @@ std::vector<double> vaccine_efficacy_severe_cpp(
 //' @title Compute vaccine efficacy against onward transmission from Ab titre (C++)
 //' @param ab_titre a vector of Ab titres
 //' @param parameters model parameters.
-//' @param timestep current timestep
+//' @param day current day
 //' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
 //' @export
 // [[Rcpp::export]]
 std::vector<double> vaccine_efficacy_transmission_cpp(
     const std::vector<double>& ab_titre,
     const Rcpp::List& parameters,
-    const size_t timestep
+    const size_t day
 ) {
   static double eps = std::numeric_limits<double>::epsilon();
 
   double vfr = 1.0;
   if (parameters.containsElementNamed("vfr")) {
     SEXP vfr_sexp = parameters["vfr"];
-    vfr = REAL(vfr_sexp)[timestep];
+    vfr = REAL(vfr_sexp)[day];
   }
 
   double k = Rcpp::as<double>(parameters["k"]);

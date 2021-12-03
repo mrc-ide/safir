@@ -21,11 +21,7 @@ variant_fold_reduction_vector <- function(parameters, dt, vfr, vfr_time_1, vfr_t
   stopifnot(vfr_time_2 > vfr_time_1)
   stopifnot(vfr_time_2 < parameters$time_period)
 
-  timesteps <- parameters$time_period / dt
-  vfr_time_1_dt <- vfr_time_1 / dt
-  vfr_time_2_dt <- vfr_time_2 / dt
-
-  vfr_vec <- c(rep(1, times = vfr_time_1_dt - 1), seq(from = 1, to = vfr, length.out = (vfr_time_2_dt - vfr_time_1_dt + 1)), rep(vfr, times = timesteps - vfr_time_2_dt))
+  vfr_vec <- c(rep(1, times = vfr_time_1 - 1), seq(from = 1, to = vfr, length.out = (vfr_time_2 - vfr_time_1 + 1)), rep(vfr, times = parameters$time_period - vfr_time_2))
 
   return(vfr_vec)
 }
@@ -54,7 +50,7 @@ make_immune_parameters <- function(parameters, vfr, mu_ab_infection = NULL, std1
     stopifnot(mu_ab_infection > 0)
   }
 
-  stopifnot(length(vfr) >= parameters$time_period)
+  stopifnot(length(vfr) == parameters$time_period)
 
   if (is.null(mu_ab_infection)) {
     stopifnot(!is.null(parameters$mu_ab))

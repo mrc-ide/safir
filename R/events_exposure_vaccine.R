@@ -23,6 +23,9 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
   return(
     function(timestep, target) {
 
+      # current day of simulation
+      day <- ceiling(timestep * dt)
+
       # probabilities of hospitalization by age group
       disc_ages <- variables$discrete_age$get_values(target)
       prob_hosp <- parameters$prob_hosp[disc_ages]
@@ -31,8 +34,8 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
 
       # vaccine efficacy against severe disease
       ab_titre <- variables$ab_titre$get_values(hosp)
-      infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, timestep = timestep)
-      severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = infection_efficacy,parameters = parameters, timestep = timestep)
+      infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, day = day - 1) # 0-based index
+      severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = ab_titre,ef_infection = infection_efficacy,parameters = parameters, day = day) # 0-based index
 
       # sample those with severe disease
       hosp$sample(prob_hosp * severe_efficacy)

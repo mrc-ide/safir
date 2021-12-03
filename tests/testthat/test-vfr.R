@@ -28,10 +28,10 @@ test_that("test VFR vector gives reasonable output", {
 
   vfr <- variant_fold_reduction_vector(parameters = parameters, dt = dt, vfr = vfr_val, vfr_time_1 = vfr_time_1, vfr_time_2 = vfr_time_2)
 
-  expect_equal(length(vfr), timesteps)
+  expect_equal(length(vfr), time_period)
   expect_equal(vfr[1:vfr_time_1], rep(1, vfr_time_1))
   expect_true(vfr[vfr_time_1 + 1] < vfr[vfr_time_2])
-  expect_equal(vfr[vfr_time_2:timesteps], rep(vfr_val, timesteps - vfr_time_2 + 1))
+  expect_equal(vfr[vfr_time_2:time_period], rep(vfr_val, time_period - vfr_time_2 + 1))
 
   # dt = 0.2
 
@@ -55,10 +55,10 @@ test_that("test VFR vector gives reasonable output", {
 
   vfr <- variant_fold_reduction_vector(parameters = parameters, dt = dt, vfr = vfr_val, vfr_time_1 = vfr_time_1, vfr_time_2 = vfr_time_2)
 
-  expect_equal(length(vfr), timesteps)
+  expect_equal(length(vfr), time_period)
   expect_equal(vfr[1:vfr_time_1], rep(1, vfr_time_1))
-  expect_true(vfr[(vfr_time_1/dt) + 1] < vfr[vfr_time_2/dt])
-  expect_equal(vfr[(vfr_time_2/dt):timesteps], rep(vfr_val, timesteps - (vfr_time_2/dt) + 1))
+  expect_true(vfr[(vfr_time_1) + 1] < vfr[vfr_time_2])
+  expect_equal(vfr[(vfr_time_2):time_period], rep(vfr_val, time_period - (vfr_time_2) + 1))
 
 })
 
@@ -109,21 +109,21 @@ test_that("test VFR decay with NAT from vaccination working with dt = 1", {
 
   safir_out <- matrix(data = NaN,nrow = timesteps + 1,ncol = n)
   safir_out[1, ] <- variables$ab_titre$get_values()
-  ef_infection[1, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 1)
-  ef_severe[1, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[1, ], parameters = parameters, timestep = 1)
-  ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 0)
-  ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, timestep = 0)
+  ef_infection[1, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = 1)
+  ef_severe[1, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[1, ], parameters = parameters, day = 1)
+  ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = 0)
+  ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, day = 0)
 
 
   for (t in 1:timesteps) {
+    day <- ceiling(t * dt)
     ab_titre(timestep = t)
     variables$ab_titre$.update()
     safir_out[t + 1L, ] <- variables$ab_titre$get_values()
-    ef_infection[t + 1L, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t)
-    ef_severe[t + 1L, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[t + 1L, ], parameters = parameters, timestep = t)
-    ef_infection_cpp[t + 1L, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t - 1)
-    ef_severe_cpp[t + 1L, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[t + 1L, ], parameters = parameters, timestep = t - 1)
-
+    ef_infection[t + 1L, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = day)
+    ef_severe[t + 1L, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[t + 1L, ], parameters = parameters, day = day)
+    ef_infection_cpp[t + 1L, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = day - 1)
+    ef_severe_cpp[t + 1L, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[t + 1L, ], parameters = parameters, day = day - 1)
   }
 
   # test ln scale NAT same
@@ -182,21 +182,21 @@ test_that("test VFR decay with NAT from vaccination working with dt = 0.5", {
 
   safir_out <- matrix(data = NaN,nrow = timesteps + 1,ncol = n)
   safir_out[1, ] <- variables$ab_titre$get_values()
-  ef_infection[1, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 1)
-  ef_severe[1, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[1, ], parameters = parameters, timestep = 1)
-  ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = 0)
-  ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, timestep = 0)
+  ef_infection[1, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = 1)
+  ef_severe[1, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[1, ], parameters = parameters, day = 1)
+  ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = 0)
+  ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, day = 0)
 
 
   for (t in 1:timesteps) {
+    day <- ceiling(t * dt)
     ab_titre(timestep = t)
     variables$ab_titre$.update()
     safir_out[t + 1L, ] <- variables$ab_titre$get_values()
-    ef_infection[t + 1L, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t)
-    ef_severe[t + 1L, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[t + 1L, ], parameters = parameters, timestep = t)
-    ef_infection_cpp[t + 1L, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, timestep = t - 1)
-    ef_severe_cpp[t + 1L, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[t + 1L, ], parameters = parameters, timestep = t - 1)
-
+    ef_infection[t + 1L, ] <- vaccine_efficacy_infection(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = day)
+    ef_severe[t + 1L, ] <- vaccine_efficacy_severe(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection[t + 1L, ], parameters = parameters, day = day)
+    ef_infection_cpp[t + 1L, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = day - 1)
+    ef_severe_cpp[t + 1L, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[t + 1L, ], parameters = parameters, day = day - 1)
   }
 
   # test ln scale NAT same
@@ -244,7 +244,7 @@ test_that("test that VFR means more infections are queued in simulation runs wit
 
   # R
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
 
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
@@ -259,7 +259,7 @@ test_that("test that VFR means more infections are queued in simulation runs wit
 
   # C++
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
 
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
@@ -277,7 +277,7 @@ test_that("test that VFR means more infections are queued in simulation runs wit
 
   # R
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
   parameters$vfr <- NULL
 
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
@@ -293,7 +293,7 @@ test_that("test that VFR means more infections are queued in simulation runs wit
 
   # C++
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(4, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
   parameters$vfr <- NULL
 
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
@@ -348,7 +348,7 @@ test_that("test that VFR means more severe infections are queued in simulation r
   # VFR = 4 (should have more severe outcomes)
 
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(12, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(12, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
 
   variables <- list(
     discrete_age = individual::IntegerVariable$new(initial_values = age0),
@@ -373,7 +373,7 @@ test_that("test that VFR means more severe infections are queued in simulation r
 
   # no VFR (should have less severe outcomes)
   parameters <- make_vaccine_parameters(safir_parameters = pars,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
-  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = timesteps), mu_ab_infection = 5, std10_infection = 0.1)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = rep(1, times = pars$time_period), mu_ab_infection = 5, std10_infection = 0.1)
   parameters$vfr <- NULL
 
   variables <- list(
@@ -402,3 +402,27 @@ test_that("test that VFR means more severe infections are queued in simulation r
   expect_true(length(VFR4_severe) + length(VFR4_asymp) + length(VFR4_mild) == n)
   expect_true(length(VFR0_severe) + length(VFR0_asymp) + length(VFR0_mild) == n)
 })
+
+
+test_that("worse outcomes with VFR > 1 than VFR = 1", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1e3)
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vfr_null <- rep(1, tmax)
+  vfr_high <- rep(50, tmax)
+
+  ab_0 <- rep(2, sum(pop$n))
+
+  sim_null <- simulate_vfr(vfr = vfr_null, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop)
+  sim_high <- simulate_vfr(vfr = vfr_high, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop)
+
+  expect_true(sim_null$S_count[tmax] > sim_high$S_count[tmax])
+})
+
+

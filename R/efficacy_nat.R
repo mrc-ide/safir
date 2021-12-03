@@ -1,15 +1,15 @@
 #' @title Compute vaccine efficacy against infection from Ab titre
 #' @param ab_titre a vector of Ab titres
 #' @param parameters model parameters.
-#' @param timestep the time step
+#' @param day the current day
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_infection <- function(ab_titre, parameters, timestep) {
+vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
 
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
-    vfr <- parameters$vfr[timestep]
+    vfr <- parameters$vfr[day]
   }
 
   # null value is 1
@@ -35,15 +35,15 @@ vaccine_efficacy_infection <- function(ab_titre, parameters, timestep) {
 #' @param ab_titre a vector of Ab titres
 #' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 #' @param parameters model parameters
-#' @param timestep the time step
+#' @param day the current day
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, timestep) {
+vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
 
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
-    vfr <- parameters$vfr[timestep]
+    vfr <- parameters$vfr[day]
   }
 
   # null value is 1
@@ -69,15 +69,15 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, timestep
 #' @title Compute vaccine efficacy against onward transmission from Ab titre
 #' @param ab_titre a vector of Ab titres
 #' @param parameters model parameters.
-#' @param timestep the time step
+#' @param day the current day
 #' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_transmission <- function(ab_titre, parameters, timestep) {
+vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
 
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
-    vfr <- parameters$vfr[timestep]
+    vfr <- parameters$vfr[day]
   }
 
   # null value is 1
