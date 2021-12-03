@@ -69,10 +69,10 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
     new process_t([parameters, states, discrete_age, ab_titre, exposure, dt, inf_states, beta, lambda_age, mix_mat_set, beta_set, lambda_external_vector, get_inf_ages](size_t t) mutable {
 
       // current day (subtract one for zero-based indexing)
-      size_t tnow = std::ceil((double)t * dt) - 1.;
+      size_t day = std::ceil((double)t * dt) - 1.;
 
       // FoI from contact outside the population
-      double lambda_external = get_vector_cpp(lambda_external_vector, tnow);
+      double lambda_external = get_vector_cpp(lambda_external_vector, day);
 
       // infectious classes
       individual_index_t infectious = states->get_index_of(inf_states);
@@ -89,11 +89,11 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
         if (infectious.size() > 0) {
 
           // group infectious persons by age
-          std::vector<double> inf_ages = get_inf_ages(infectious, parameters, tnow);
+          std::vector<double> inf_ages = get_inf_ages(infectious, parameters, day);
 
           // calculate FoI on each susceptible age group
           Rcpp::NumericMatrix m = get_contact_matrix_cpp(mix_mat_set, 0);
-          std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, tnow));
+          std::fill(beta.begin(), beta.end(), get_vector_cpp(beta_set, day));
           std::vector<double> m_inf_ages = matrix_vec_mult_cpp(m, inf_ages);
           std::transform(beta.begin(), beta.end(), m_inf_ages.begin(), lambda_age.begin(), std::multiplies<double>());
 
@@ -102,7 +102,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
 
           // get vaccine efficacy
           std::vector<double> ab_titre_susceptible = ab_titre->get_values(susceptible);
-          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters, tnow);
+          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters, day);
 
           // FoI on each susceptible person from infectives
           for (auto i = 0u; i < sus_ages.size(); ++i) {

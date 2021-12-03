@@ -50,3 +50,92 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
   return(list(nt = nt_log, z1 = z1, ef_infection = ef_infection, ef_severe = ef_severe))
 }
+
+
+
+simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop) {
+
+
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+
+  # vaccine dosing
+  vaccine_doses <- 2
+  dose_period <- c(NaN, 28)
+  vaccine_set <- rep(0, tmax)
+
+  # vaccine strategy
+  vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+  next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
+  next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
+
+  # base parameters
+  parameters <- safir::get_parameters(
+    population = pop$n,
+    contact_matrix_set = contact_mat,
+    iso3c = iso3c,
+    R0 = R0,
+    time_period = tmax,
+    dt = dt
+  )
+
+  # vaccine parameters
+  ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE)
+
+  # combine parameters and verify
+  parameters <- make_vaccine_parameters(
+    safir_parameters = parameters,
+    vaccine_ab_parameters = ab_parameters,
+    vaccine_set = vaccine_set,
+    dose_period = dose_period,
+    strategy_matrix = vaccine_coverage_mat,
+    next_dose_priority_matrix = next_dose_priority
+  )
+
+  parameters <- make_immune_parameters(parameters = parameters, vfr = vfr)
+
+  # create variables
+  timesteps <- parameters$time_period/dt
+  variables <- create_variables(pop = pop, parameters = parameters)
+  variables <- create_vaccine_variables(variables = variables,parameters = parameters)
+  variables <- create_natural_immunity_variables(variables = variables, parameters = parameters)
+
+  # create events
+  events <- create_events(parameters = parameters)
+  events <- create_events_vaccination(events = events,parameters = parameters)
+  attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
+  attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
+  attach_event_listeners_natural_immunity(variables = variables, events = events, parameters = parameters, dt = dt, additive = T)
+
+  # make renderers
+  renderer <- Render$new(parameters$time_period)
+
+  # processes
+  processes <- list(
+    natural_immunity_ab_titre_process(parameters = parameters,variables = variables,dt = dt),
+    vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
+    infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+    categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
+  )
+
+  setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
+
+  # give everyone ab titre
+  variables$ab_titre$queue_update(values = ab_titre, index = 1:sum(pop$n))
+  variables$inf_time$queue_update(values = 0, index = 1:sum(pop$n))
+  variables$inf_num$queue_update(values = 1, index = 1:sum(pop$n))
+  variables$ab_titre$.update()
+  variables$inf_time$.update()
+  variables$inf_num$.update()
+
+  simulation_loop_safir(
+    variables = variables,
+    events = events,
+    processes = processes,
+    timesteps = timesteps,
+    variables_dont_update = c("discrete_age", "phase"),
+    progress = FALSE
+  )
+
+  return(renderer$to_dataframe())
+
+}
