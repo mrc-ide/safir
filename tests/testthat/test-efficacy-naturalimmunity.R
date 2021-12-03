@@ -159,7 +159,7 @@ test_that("natural_immunity_ab_titre_process works with mixed inf/vaccinated", {
 
   # base parameters
   parameters <- safir::get_parameters(
-    population = rep(10, 17),
+    population = rep(1e2, 17),
     iso3c = "GBR",
     R0 = 4,
     time_period = 10,
