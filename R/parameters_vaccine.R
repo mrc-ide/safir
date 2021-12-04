@@ -92,6 +92,8 @@ get_vaccine_ab_titre_parameters <- function(
 
 
 #' @title Combine and verify vaccine parameters
+#' @note If modeling a single dose, `dose_period` must be a vector of length 1 and
+#' `next_dose_priority_matrix` may be set to `NULL`.
 #' @param safir_parameters a list from \code{\link{get_parameters}}
 #' @param vaccine_ab_parameters a list from \code{\link{get_vaccine_ab_titre_parameters}}
 #' @param vaccine_set a vector giving the number of doses available each day (not each timestep)

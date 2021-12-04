@@ -32,3 +32,7 @@ final allocation phase there will be no future dose to prioritize}
 \description{
 Combine parameters for simulation and verify for correctness.
 }
+\note{
+If modeling a single dose, \code{dose_period} must be a vector of length 1 and
+\code{next_dose_priority_matrix} may be set to \code{NULL}.
+}
