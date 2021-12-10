@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -73,7 +69,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/mrc-ide/safir/">
+  <a href="https://github.com/mrc-ide/safir/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -94,7 +90,7 @@
       <h1 data-toc-skip>Natural Immunity</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/mrc-ide/safir/blob/master/vignettes/natural_immunity.Rmd"><code>vignettes/natural_immunity.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mrc-ide/safir/blob/HEAD/vignettes/natural_immunity.Rmd" class="external-link"><code>vignettes/natural_immunity.Rmd</code></a></small>
       <div class="hidden name"><code>natural_immunity.Rmd</code></div>
 
     </div>
@@ -102,27 +98,27 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/safir">safir</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/safir" class="external-link">safir</a></span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/safir">safir</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/individual">individual</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">nimue</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/safir" class="external-link">safir</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/individual" class="external-link">individual</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">nimue</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'nimue'</span>
 <span class="co">#&gt; The following object is masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     format</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
-<div id="setup" class="section level1">
-<h1 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h1>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></code></pre></div>
+<div class="section level1">
+<h1 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h1>
 <p>This vignette is essentially identical to the one titled “Vaccine model with multiple doses”, but includes options for modeling immune response mechanistically (a boost to antibody titre as the result of natural infection) as opposed to with an R compartment within which agents are 100% immune for re-infection. The only thing that needs to be added to the <code>parameters</code> list is <code>parameters$mu_ab_infection</code>, giving the antibody boost derived from each natural infection. It is a vector where the 1st element is the antibody boost from someone’s first infection, 2nd from someone’s second subsequent infection, and so on. If an individual is getting reinfected a number of times greater than the length of the vector, the last element of the vector is used as their antibody titre associated with that reinfection event.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">iso3c</span> <span class="op">&lt;-</span> <span class="st">"GBR"</span>
 <span class="va">pop</span> <span class="op">&lt;-</span> <span class="fu">safir</span><span class="fu">::</span><span class="fu"><a href="../reference/get_population.html">get_population</a></span><span class="op">(</span><span class="va">iso3c</span><span class="op">)</span>
-<span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">1e3</span><span class="op">)</span>
-<span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
+<span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">pop</span><span class="op">$</span><span class="va">n</span> <span class="op">/</span> <span class="fl">1e3</span><span class="op">)</span>
+<span class="va">contact_mat</span> <span class="op">&lt;-</span> <span class="fu">squire</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/squire/man/get_mixing_matrix.html" class="external-link">get_mixing_matrix</a></span><span class="op">(</span>iso3c <span class="op">=</span> <span class="va">iso3c</span><span class="op">)</span>
 
 <span class="va">tmax</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 <span class="va">dt</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
@@ -130,13 +126,13 @@
 
 <span class="co"># vaccine dosing</span>
 <span class="va">vaccine_doses</span> <span class="op">&lt;-</span> <span class="fl">2</span>
-<span class="va">dose_period</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">NaN</span>, <span class="fl">28</span><span class="op">)</span>
-<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">1e3</span>, to <span class="op">=</span> <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="va">tmax</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
-<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">floor</a></span><span class="op">(</span><span class="va">vaccine_set</span><span class="op">)</span>
+<span class="va">dose_period</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NaN</span>, <span class="fl">28</span><span class="op">)</span>
+<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">1e3</span>, to <span class="op">=</span> <span class="fl">1e4</span>, length.out <span class="op">=</span> <span class="va">tmax</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<span class="va">vaccine_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">vaccine_set</span><span class="op">)</span>
 
 <span class="co"># vaccine strategy</span>
-<span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="fu">nimue</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html">strategy_matrix</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"Elderly"</span>,max_coverage <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
-<span class="va">next_dose_priority</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fl">0</span>, nrow <span class="op">=</span> <span class="va">vaccine_doses</span> <span class="op">-</span> <span class="fl">1</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">vaccine_coverage_mat</span><span class="op">)</span><span class="op">)</span>
+<span class="va">vaccine_coverage_mat</span> <span class="op">&lt;-</span> <span class="fu">nimue</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html" class="external-link">strategy_matrix</a></span><span class="op">(</span>strategy <span class="op">=</span> <span class="st">"Elderly"</span>,max_coverage <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
+<span class="va">next_dose_priority</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fl">0</span>, nrow <span class="op">=</span> <span class="va">vaccine_doses</span> <span class="op">-</span> <span class="fl">1</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">vaccine_coverage_mat</span><span class="op">)</span><span class="op">)</span>
 <span class="va">next_dose_priority</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">15</span><span class="op">:</span><span class="fl">17</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># prioritize 3 oldest age groups for next dose</span>
 
 <span class="co"># base parameters</span>
@@ -165,9 +161,8 @@
 <span class="co"># ab boost for each infection</span>
 <span class="va">parameters</span><span class="op">$</span><span class="va">mu_ab_infection</span> <span class="op">&lt;-</span> <span class="va">ab_parameters</span><span class="op">$</span><span class="va">mu_ab</span></code></pre></div>
 </div>
-<div id="run-safir" class="section level1">
-<h1 class="hasAnchor">
-<a href="#run-safir" class="anchor"></a>Run <strong>safir</strong>
+<div class="section level1">
+<h1 id="run-safir">Run <strong>safir</strong><a class="anchor" aria-label="anchor" href="#run-safir"></a>
 </h1>
 <p>This part is also exactly the same as the “Vaccine model with multiple doses” except the following places:</p>
 <ol style="list-style-type: decimal">
@@ -196,23 +191,23 @@
 <span class="fu"><a href="../reference/attach_event_listeners_natural_immunity.html">attach_event_listeners_natural_immunity</a></span><span class="op">(</span>variables <span class="op">=</span> <span class="va">variables</span>, events <span class="op">=</span> <span class="va">events</span>, parameters <span class="op">=</span> <span class="va">parameters</span>, dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>
 
 <span class="co"># make renderers</span>
-<span class="va">renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
-<span class="va">ab_renderer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="cn">NaN</span>,nrow <span class="op">=</span> <span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>
-<span class="va">dose_renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
+<span class="va">renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
+<span class="va">ab_renderer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>data <span class="op">=</span> <span class="cn">NaN</span>,nrow <span class="op">=</span> <span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span>,ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dose_renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
 
 <span class="va">double_count_render_process_daily</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">variable</span>, <span class="va">dt</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">inherits</a></span><span class="op">(</span><span class="va">variable</span>, <span class="st">"DoubleVariable"</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">variable</span>, <span class="st">"DoubleVariable"</span><span class="op">)</span><span class="op">)</span>
   <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></span> <span class="fl">1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">ab_renderer</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span>, <span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">variable</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span>
+    <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">1</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">ab_renderer</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">t</span> <span class="op">*</span> <span class="va">dt</span><span class="op">)</span>, <span class="op">]</span> <span class="op">&lt;&lt;-</span> <span class="va">variable</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span>
     <span class="op">}</span>
   <span class="op">}</span>
 <span class="op">}</span>
 
-<span class="va">inf_renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
+<span class="va">inf_renderer</span> <span class="op">&lt;-</span> <span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">parameters</span><span class="op">$</span><span class="va">time_period</span><span class="op">)</span>
 
 <span class="co"># processes</span>
-<span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+<span class="va">processes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
   <span class="fu"><a href="../reference/natural_immunity_ab_titre_process.html">natural_immunity_ab_titre_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>, dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/vaccination_process.html">vaccination_process</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
   <span class="fu"><a href="../reference/infection_process_vaccine_cpp.html">infection_process_vaccine_cpp</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,variables <span class="op">=</span> <span class="va">variables</span>,events <span class="op">=</span> <span class="va">events</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span>,
@@ -225,22 +220,22 @@
 <span class="fu"><a href="../reference/setup_events.html">setup_events</a></span><span class="op">(</span>parameters <span class="op">=</span> <span class="va">parameters</span>,events <span class="op">=</span> <span class="va">events</span>,variables <span class="op">=</span> <span class="va">variables</span>,dt <span class="op">=</span> <span class="va">dt</span><span class="op">)</span></code></pre></div>
 <p>Run the simulation.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="fu"><a href="../reference/simulation_loop_safir.html">simulation_loop_safir</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="../reference/simulation_loop_safir.html">simulation_loop_safir</a></span><span class="op">(</span>
     variables <span class="op">=</span> <span class="va">variables</span>,
     events <span class="op">=</span> <span class="va">events</span>,
     processes <span class="op">=</span> <span class="va">processes</span>,
     timesteps <span class="op">=</span> <span class="va">timesteps</span>,
-    variables_dont_update <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"discrete_age"</span>, <span class="st">"phase"</span><span class="op">)</span>,
+    variables_dont_update <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"discrete_age"</span>, <span class="st">"phase"</span><span class="op">)</span>,
     progress <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  14.059   0.427  15.692</span></code></pre></div>
-<div id="plot-results" class="section level2">
-<h2 class="hasAnchor">
-<a href="#plot-results" class="anchor"></a>Plot Results</h2>
-<div id="antibody-titre" class="section level3">
-<h3 class="hasAnchor">
-<a href="#antibody-titre" class="anchor"></a>Antibody titre</h3>
+<span class="co">#&gt;  14.246   0.448  14.976</span></code></pre></div>
+<div class="section level2">
+<h2 id="plot-results">Plot Results<a class="anchor" aria-label="anchor" href="#plot-results"></a>
+</h2>
+<div class="section level3">
+<h3 id="antibody-titre">Antibody titre<a class="anchor" aria-label="anchor" href="#antibody-titre"></a>
+</h3>
 <p>This lets us check if people are getting vaccinated; Ab titre, averaged over the population, relative to the time of the first dose. It won’t look like the cohort plots because everybody gets their second dose at slightly different times, depending on availability.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot: ab titre</span>
@@ -285,87 +280,87 @@
 <span class="co">#&gt;     xor: function (other)</span>
 
 <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="va">ab_renderer</span><span class="op">[</span>, <span class="va">vaccinated_or_infected</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span><span class="op">]</span>
-<span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html">is.finite</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>
-<span class="va">cols_2_drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html">is.nan</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span>
-<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cols_2_drop</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
+<span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span>
+<span class="va">cols_2_drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.nan</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cols_2_drop</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="va">ab_titre</span><span class="op">[</span>, <span class="op">-</span><span class="va">cols_2_drop</span><span class="op">]</span>
 <span class="op">}</span>
-<span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2e-7</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">}</span><span class="op">)</span>
+<span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">2e-7</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>,FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
-  <span class="va">ab_titre</span><span class="op">[</span><span class="va">start</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span> , <span class="va">x</span><span class="op">]</span>
+<span class="va">ab_titre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>,FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span>
+  <span class="va">ab_titre</span><span class="op">[</span><span class="va">start</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span> , <span class="va">x</span><span class="op">]</span>
 <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ab_titre_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html">data.table</a></span><span class="op">(</span>
-  ab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>,
-  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">{</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>,
-  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span><span class="op">(</span><span class="va">ab_titre</span>,<span class="va">length</span>,<span class="fu"><a href="https://rdrr.io/r/base/integer.html">integer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ab_titre_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>
+  ab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>,
+  t <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ab_titre</span>, <span class="kw">function</span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">{</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>,
+  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ab_titre</span><span class="op">)</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">ab_titre</span>,<span class="va">length</span>,<span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="va">ab_titre_quant_dt</span> <span class="op">&lt;-</span> <span class="va">ab_titre_dt</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">ab</span><span class="op">)</span>, lo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">ab</span>,probs <span class="op">=</span><span class="fl">0.025</span><span class="op">)</span> , hi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">ab</span>,probs <span class="op">=</span> <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span> , by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">]</span>
+<span class="va">ab_titre_quant_dt</span> <span class="op">&lt;-</span> <span class="va">ab_titre_dt</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">ab</span><span class="op">)</span>, lo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">ab</span>,probs <span class="op">=</span><span class="fl">0.025</span><span class="op">)</span> , hi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">ab</span>,probs <span class="op">=</span> <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span> , by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">]</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ab_titre_quant_dt</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>,y<span class="op">=</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>,ymin<span class="op">=</span><span class="va">lo</span>,ymax<span class="op">=</span><span class="va">hi</span><span class="op">)</span>,alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ab_titre_quant_dt</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>,y<span class="op">=</span><span class="va">mean</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>,ymin<span class="op">=</span><span class="va">lo</span>,ymax<span class="op">=</span><span class="va">hi</span><span class="op">)</span>,alpha<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="natural_immunity_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 </div>
-<div id="proportion-of-population-with-each-dose" class="section level3">
-<h3 class="hasAnchor">
-<a href="#proportion-of-population-with-each-dose" class="anchor"></a>Proportion of population with each dose</h3>
+<div class="section level3">
+<h3 id="proportion-of-population-with-each-dose">Proportion of population with each dose<a class="anchor" aria-label="anchor" href="#proportion-of-population-with-each-dose"></a>
+</h3>
 <p>We also want to plot the number of people with each dose over time to check it’s working.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dose_out</span> <span class="op">&lt;-</span> <span class="va">dose_renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">vaccine_doses</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="va">vaccine_doses</span><span class="op">)</span>
-<span class="va">dose_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html">as.data.table</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span>,id.vars<span class="op">=</span><span class="st">"timestep"</span><span class="op">)</span>
-<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">setnames</a></span><span class="op">(</span><span class="va">dose_out</span>, <span class="st">"variable"</span>, <span class="st">"dose"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="va">vaccine_doses</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="va">vaccine_doses</span><span class="op">)</span>
+<span class="va">dose_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">dose_out</span><span class="op">)</span>,id.vars<span class="op">=</span><span class="st">"timestep"</span><span class="op">)</span>
+<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">setnames</a></span><span class="op">(</span><span class="va">dose_out</span>, <span class="st">"variable"</span>, <span class="st">"dose"</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dose_out</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">timestep</span>,y<span class="op">=</span><span class="va">value</span>,color<span class="op">=</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dose_out</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">timestep</span>,y<span class="op">=</span><span class="va">value</span>,color<span class="op">=</span><span class="va">dose</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="natural_immunity_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
-<div id="infection-states" class="section level3">
-<h3 class="hasAnchor">
-<a href="#infection-states" class="anchor"></a>Infection states</h3>
+<div class="section level3">
+<h3 id="infection-states">Infection states<a class="anchor" aria-label="anchor" href="#infection-states"></a>
+</h3>
 <p>The compartmental states of the model.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">saf_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html">as.data.table</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">saf_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">saf_dt</span><span class="op">[</span>, <span class="va">IMild_count</span> <span class="op">:=</span> <span class="va">IMild_count</span> <span class="op">+</span> <span class="va">IAsymp_count</span><span class="op">]</span>
 <span class="va">saf_dt</span><span class="op">[</span>, <span class="va">IAsymp_count</span> <span class="op">:=</span> <span class="cn">NULL</span><span class="op">]</span>
-<span class="va">saf_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="va">saf_dt</span>,id.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"timestep"</span><span class="op">)</span>,variable.name <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>
-<span class="va">saf_dt</span><span class="op">[</span>, <span class="va">name</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">"(^)(\\w*)(_count)"</span>, <span class="st">"\\2"</span>, <span class="va">name</span><span class="op">)</span><span class="op">]</span>
-<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html">setnames</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">saf_dt</span>,old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"timestep"</span>,<span class="st">"name"</span>,<span class="st">"value"</span><span class="op">)</span>,new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"t"</span>,<span class="st">"compartment"</span>,<span class="st">"y"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">saf_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">saf_dt</span>,id.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"timestep"</span><span class="op">)</span>,variable.name <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span>
+<span class="va">saf_dt</span><span class="op">[</span>, <span class="va">name</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"(^)(\\w*)(_count)"</span>, <span class="st">"\\2"</span>, <span class="va">name</span><span class="op">)</span><span class="op">]</span>
+<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">setnames</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">saf_dt</span>,old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"timestep"</span>,<span class="st">"name"</span>,<span class="st">"value"</span><span class="op">)</span>,new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"t"</span>,<span class="st">"compartment"</span>,<span class="st">"y"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">saf_dt</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">t</span>,<span class="va">y</span>,color <span class="op">=</span> <span class="va">compartment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">compartment</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">saf_dt</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">t</span>,<span class="va">y</span>,color <span class="op">=</span> <span class="va">compartment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">compartment</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span></code></pre></div>
 <p><img src="natural_immunity_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
-<div id="cumulative-infections" class="section level3">
-<h3 class="hasAnchor">
-<a href="#cumulative-infections" class="anchor"></a>Cumulative infections</h3>
+<div class="section level3">
+<h3 id="cumulative-infections">Cumulative infections<a class="anchor" aria-label="anchor" href="#cumulative-infections"></a>
+</h3>
 <p>Here we plot how many people in the population have had 0,1,2,… infections.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># infections</span>
 <span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="va">inf_renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span>
-<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="va">inf_out</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">inf_out</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">}</span>, USE.NAMES <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
-<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html">as.data.table</a></span><span class="op">(</span><span class="va">inf_out</span><span class="op">)</span>
-<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html">melt</a></span><span class="op">(</span><span class="va">inf_out</span>, id.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"timestep"</span><span class="op">)</span>,variable.name <span class="op">=</span> <span class="st">"infections"</span><span class="op">)</span>
-<span class="va">inf_out</span><span class="op">[</span>, <span class="va">infections</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">"(^X)(\\w*)(_count)"</span>, <span class="st">"\\2"</span>, <span class="va">infections</span><span class="op">)</span><span class="op">]</span>
+<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="va">inf_out</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">inf_out</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">}</span>, USE.NAMES <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
+<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">inf_out</span><span class="op">)</span>
+<span class="va">inf_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">inf_out</span>, id.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"timestep"</span><span class="op">)</span>,variable.name <span class="op">=</span> <span class="st">"infections"</span><span class="op">)</span>
+<span class="va">inf_out</span><span class="op">[</span>, <span class="va">infections</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"(^X)(\\w*)(_count)"</span>, <span class="st">"\\2"</span>, <span class="va">infections</span><span class="op">)</span><span class="op">]</span>
 <span class="va">inf_out</span><span class="op">[</span>, <span class="va">t</span> <span class="op">:=</span> <span class="va">timestep</span> <span class="op">*</span> <span class="va">dt</span><span class="op">]</span>
 <span class="va">inf_out</span><span class="op">[</span>, <span class="va">timestep</span> <span class="op">:=</span> <span class="cn">NULL</span><span class="op">]</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">inf_out</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">t</span>,<span class="va">value</span>,color <span class="op">=</span> <span class="va">infections</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.25</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">inf_out</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">t</span>,<span class="va">value</span>,color <span class="op">=</span> <span class="va">infections</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.25</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></code></pre></div>
 <p><img src="natural_immunity_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 </div>
 </div>
-<div id="code-design" class="section level1">
-<h1 class="hasAnchor">
-<a href="#code-design" class="anchor"></a>Code design</h1>
+<div class="section level1">
+<h1 id="code-design">Code design<a class="anchor" aria-label="anchor" href="#code-design"></a>
+</h1>
 <p>The new code is in:</p>
 <ol style="list-style-type: decimal">
 <li>R/efficacy_naturalimmunity.R: contains <code>natural_immunity_ab_titre_process</code>, <code>get_time_since_last_dose_or_infection</code> (helper function)</li>
@@ -388,11 +383,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Sean L. Wu, OJ Watson, Peter Winskill.</p>
+  <p></p>
+<p>Developed by Sean L. Wu, OJ Watson, Peter Winskill.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -400,6 +397,8 @@
 
   
 
+
+  
 
   </body>
 </html>
