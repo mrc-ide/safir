@@ -73,7 +73,7 @@ create_vaccine_variables <- function(variables, parameters) {
   variables$ab_titre <- DoubleVariable$new(initial_values = rep(-Inf, n))
 
   if (correlated) {
-    variables$zdose <- DoubleVariable$new(initial_values = rep(NaN, n))
+    variables$zdose <- DoubleVariable$new(initial_values = rep(-Inf, n))
   }
 
   return(variables)

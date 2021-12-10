@@ -45,29 +45,76 @@ schedule_dose_vaccine <- function(timestep, variables, target, dose, parameters)
     n <- length(target)
   }
 
+  nat <- variables$ab_titre$get_values(index = target) # get the stored NAT for that individual
+  nat <- exp(nat) # transform back to linear scale
+
   if (parameters$correlated) {
 
     if (dose > 1) {
+
       # correlated doses > 1; use ratio of mean titre
-      zdose_prev <- variables$zdose$get_values(index = target)
-      zdose_prev <- log10(exp(zdose_prev)) # transform back to log scale
-      zdose <- log(10^zdose_prev * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1]))
-      zdose <- pmin(zdose, parameters$max_ab)
-      variables$zdose$queue_update(values = zdose, index = target)
+      zdose_prev <- variables$zdose$get_values(index = target) # get the drawn titre value from previous dose (this is on natural log scale)
+
+      zdose_prev_linear <- exp(zdose_prev)
+
+      zdose_linear <- (zdose_prev_linear * (parameters$mu_ab[dose] / parameters$mu_ab[dose-1L])) # get value of new dose based on previous dose as they are correlated, linear scale
+
+      # check it doesnt exceed our maximum allowed titre
+      zdose_linear <- pmin(zdose_linear, exp(parameters$max_ab))
+
+      # store the zdose value on nat log scale
+      variables$zdose$queue_update(values = log(zdose_linear), index = target)
+
+      # update nat based on difference between dose i and dose i - 1
+      nat <- nat + zdose_linear
+
+      # transform back to natural log scale
+      nat <- log(nat)
+
+      # check new nat doesnt exceed max allowed titre
+      nat <- pmin(nat, parameters$max_ab)
+
     } else {
-      # initial dose
-      zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
-      zdose <- pmin(zdose, parameters$max_ab)
-      variables$zdose$queue_update(values = zdose, index = target)
+
+      # initial dose titre on linear scale
+      zdose <- 10^rnorm(n = n, mean = log10(parameters$mu_ab[1L]), sd = parameters$std10)
+
+      # check zdose doesnt exceed max value
+      zdose <- pmin(zdose, exp(parameters$max_ab))
+
+      # store the zdose value on nat log scale
+      variables$zdose$queue_update(values = log(zdose), index = target)
+
+      # update NAT
+      nat <- nat + zdose
+
+      # transform back to natural log scale
+      nat <- log(nat)
+
+      # check new nat doesnt exceed max allowed titre
+      nat <- pmin(nat, parameters$max_ab)
+
     }
 
   } else {
-    # uncorrelated doses (also use for dose 1 of correlated dose titre)
-    zdose <- log(10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]),sd = parameters$std10))
-    zdose <- pmin(zdose, parameters$max_ab)
+
+    zdose_linear <- 10^rnorm(n = n, mean = log10(parameters$mu_ab[dose]), sd = parameters$std10) # get value of new dose
+
+    # check it doesnt exceed our maximum allowed titre
+    zdose_linear <- pmin(zdose_linear, exp(parameters$max_ab))
+
+    # update nat based on difference between dose i and dose i - 1
+    nat <- nat + zdose_linear
+
+    # transform back to natural log scale
+    nat <- log(nat)
+
+    # check new nat doesnt exceed max allowed titre
+    nat <- pmin(nat, parameters$max_ab)
+
   }
 
-  variables$ab_titre$queue_update(values = zdose, index = target)
+  variables$ab_titre$queue_update(values = nat, index = target)
 
 }
 
