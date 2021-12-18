@@ -88,5 +88,73 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
     )
   }
 
+}
+
+
+# model where infection and vaccine derived NAT stored separately
+
+#' @title Attach event listeners for modeling independent infection-derived NAT
+#' @param variables a named list of variables
+#' @param events a named list of events
+#' @param parameters the parameters
+#' @param dt size of time step
+#' @export
+attach_event_listeners_independent_nat <- function(variables, events, parameters, dt) {
+
+  stopifnot(c("ab_titre_inf", "ab_titre") %in% names(variables))
+  stopifnot("max_ab_inf" %in% names(parameters))
+
+  stopifnot(!is.null(parameters$mu_ab_infection))
+  stopifnot(is.finite(parameters$mu_ab_infection))
+
+  if (is.null(parameters$std10_infection)) {
+    std10_infection <- parameters$std10
+  } else {
+    stopifnot(length(parameters$std10_infection) == 1L)
+    stopifnot(is.finite(parameters$std10_infection))
+    std10_infection <- parameters$std10_infection
+  }
+
+  # recovery: handle 1 timestep R->S and update ab titre for immune response
+  if (length(events$recovery$.listeners) == 2) {
+    events$recovery$.listeners[[2]] <- NULL
+  }
+
+  # they go from R to S in 1 time step
+  events$recovery$add_listener(
+    function(timestep, target) {
+      events$immunity_loss$schedule(target = target, delay = rep(1, target$size()))
+    }
+  )
+
+  # effect of infection on infection-derived NAT
+  events$recovery$add_listener(
+    function(timestep, target) {
+
+      # update inf_num
+      inf <- variables$inf_num$get_values(target) + 1L
+      variables$inf_num$queue_update(values = inf, index = target)
+
+      # update last time of infection
+      variables$inf_time$queue_update(values = timestep, index = target)
+
+      # get NAT values and convert to linear scale
+      current_nat <- variables$ab_titre_inf$get_values(index = target)
+      current_nat <- exp(current_nat)
+
+      # draw NAT boost on linear scale
+      inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
+      nat_boost <- 10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection)
+      new_nat <- current_nat + nat_boost
+
+      # back to ln scale, and impose max value constraint
+      new_nat <- log(new_nat)
+      new_nat <- pmin(new_nat, parameters$max_ab_inf)
+
+      # queue NAT update
+      variables$ab_titre_inf$queue_update(values = new_nat, index = target)
+    }
+  )
 
 }
+

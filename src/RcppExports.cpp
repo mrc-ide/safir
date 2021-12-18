@@ -101,18 +101,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // infection_process_vaccine_cpp_internal
-Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<DoubleVariable> ab_titre, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
-RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP ab_titreSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
+Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(Rcpp::List parameters, Rcpp::List variables, Rcpp::XPtr<TargetedEvent> exposure, const double dt);
+RcppExport SEXP _safir_infection_process_vaccine_cpp_internal(SEXP parametersSEXP, SEXP variablesSEXP, SEXP exposureSEXP, SEXP dtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DoubleVariable> >::type ab_titre(ab_titreSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type variables(variablesSEXP);
     Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type exposure(exposureSEXP);
     Rcpp::traits::input_parameter< const double >::type dt(dtSEXP);
-    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, states, discrete_age, ab_titre, exposure, dt));
+    rcpp_result_gen = Rcpp::wrap(infection_process_vaccine_cpp_internal(parameters, variables, exposure, dt));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -291,7 +289,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
-    {"_safir_infection_process_vaccine_cpp_internal", (DL_FUNC) &_safir_infection_process_vaccine_cpp_internal, 6},
+    {"_safir_infection_process_vaccine_cpp_internal", (DL_FUNC) &_safir_infection_process_vaccine_cpp_internal, 4},
     {"_safir_compare_floats", (DL_FUNC) &_safir_compare_floats, 2},
     {"_safir_cross_tab_margins", (DL_FUNC) &_safir_cross_tab_margins, 4},
     {"_safir_cross_tab_doses_age", (DL_FUNC) &_safir_cross_tab_doses_age, 4},

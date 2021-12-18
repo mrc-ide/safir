@@ -85,8 +85,8 @@ infection_process_nimue_cpp_internal <- function(parameters, states, vaccine_sta
 #' @param ab_titre a \code{\link[individual]{DoubleVariable}}
 #' @param exposure a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
-infection_process_vaccine_cpp_internal <- function(parameters, states, discrete_age, ab_titre, exposure, dt) {
-    .Call('_safir_infection_process_vaccine_cpp_internal', PACKAGE = 'safir', parameters, states, discrete_age, ab_titre, exposure, dt)
+infection_process_vaccine_cpp_internal <- function(parameters, variables, exposure, dt) {
+    .Call('_safir_infection_process_vaccine_cpp_internal', PACKAGE = 'safir', parameters, variables, exposure, dt)
 }
 
 compare_floats <- function(a, b) {
