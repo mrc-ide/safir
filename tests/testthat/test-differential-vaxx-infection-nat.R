@@ -178,7 +178,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
     iso3c = iso3c,
     time_period = 365,
     dt = 1,
-    R0 = 20
+    R0 = 30
   )
   parameters$beta_set <- parameters$beta_set*rexp(n = length(parameters$beta_set))
 
@@ -199,7 +199,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
   exposure <- individual::TargetedEvent$new(population_size = n)
 
   # NAT effect (with vaccine NAT only)
-  zdose <- rexp(n) + 1
+  zdose <- rep(1, n)
   ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
   ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
@@ -211,7 +211,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
   inf_vacc_only <- exposure$get_scheduled()$to_vector()
 
   # NAT effect (with vaccine AND infection NATs)
-  zdose2 <- rexp(n) + 2
+  zdose2 <- rep(6, n)
   ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
   ab_titre_inf <- individual::DoubleVariable$new(initial_values = zdose2)
   exposure <- individual::TargetedEvent$new(population_size = n)
