@@ -184,7 +184,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
 
   # parameters and states
   n <- 1e5
-  dt <- 0.5
+  dt <- 1
   valid_states <- c("S","IMild","ICase","IAsymp")
   state0 <- sample(x = valid_states,size = n,replace = T)
   age0 <- sample.int(n = 17,size = n,replace = T)
@@ -199,7 +199,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
   exposure <- individual::TargetedEvent$new(population_size = n)
 
   # NAT effect (with vaccine NAT only)
-  zdose <- rexp(n) + 2
+  zdose <- rexp(n) + 1
   ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
   ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
@@ -211,8 +211,9 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
   inf_vacc_only <- exposure$get_scheduled()$to_vector()
 
   # NAT effect (with vaccine AND infection NATs)
+  zdose2 <- rexp(n) + 2
   ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
-  ab_titre_inf <- individual::DoubleVariable$new(initial_values = zdose)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = zdose2)
   exposure <- individual::TargetedEvent$new(population_size = n)
 
   set.seed(699643L)
