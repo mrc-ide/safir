@@ -9,15 +9,11 @@ infection_process_vaccine_cpp_internal(parameters, variables, exposure, dt)
 \arguments{
 \item{parameters}{a list of parameters from \code{\link{get_parameters}}}
 
+\item{variables}{a named list}
+
 \item{exposure}{a \code{\link[individual]{TargetedEvent}}}
 
 \item{dt}{size of time step}
-
-\item{states}{a \code{\link[individual]{CategoricalVariable}}}
-
-\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
-
-\item{ab_titre}{a \code{\link[individual]{DoubleVariable}}}
 }
 \description{
 this is an internal function, you should use the R interface

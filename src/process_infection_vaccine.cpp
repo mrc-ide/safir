@@ -19,9 +19,7 @@ using calculate_nat_func = std::function<std::vector<double>(const individual_in
 //' @description this is an internal function, you should use the R interface
 //' for type checking, \code{\link{infection_process_cpp}}
 //' @param parameters a list of parameters from \code{\link{get_parameters}}
-//' @param states a \code{\link[individual]{CategoricalVariable}}
-//' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-//' @param ab_titre a \code{\link[individual]{DoubleVariable}}
+//' @param variables a named list
 //' @param exposure a \code{\link[individual]{TargetedEvent}}
 //' @param dt size of time step
 // [[Rcpp::export]]

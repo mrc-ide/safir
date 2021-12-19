@@ -51,6 +51,9 @@ This includes the following vignettes:
     from infection, as opposed to a generic R (recovered) class.
 -   **`Modeling of antibody titre and immunity`**: describes how antibody
     titre and protection against infection and severe disease is modeled.
+-   **`Differential modeling of infection and vaccine derived NATs`**: is a short
+    description of how to model differential boost/decay of vaccine and infection
+    derived neutralizing antibody titres.
     
 ## License
 
