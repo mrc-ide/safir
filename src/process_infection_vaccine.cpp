@@ -159,9 +159,7 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
         if (susceptible.size() > 0) {
           exposure->schedule(susceptible, 0.0);
         }
-
       } // end if S>0
-
     }),
     true
   );
