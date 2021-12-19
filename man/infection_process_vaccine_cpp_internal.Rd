@@ -4,23 +4,12 @@
 \alias{infection_process_vaccine_cpp_internal}
 \title{C++ infection process for vaccine model (multi-dose, no types)}
 \usage{
-infection_process_vaccine_cpp_internal(
-  parameters,
-  states,
-  discrete_age,
-  ab_titre,
-  exposure,
-  dt
-)
+infection_process_vaccine_cpp_internal(parameters, variables, exposure, dt)
 }
 \arguments{
 \item{parameters}{a list of parameters from \code{\link{get_parameters}}}
 
-\item{states}{a \code{\link[individual]{CategoricalVariable}}}
-
-\item{discrete_age}{a \code{\link[individual]{IntegerVariable}}}
-
-\item{ab_titre}{a \code{\link[individual]{DoubleVariable}}}
+\item{variables}{a named list}
 
 \item{exposure}{a \code{\link[individual]{TargetedEvent}}}
 

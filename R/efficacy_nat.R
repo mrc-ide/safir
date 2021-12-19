@@ -95,3 +95,37 @@ vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
     return(ef_transmission)
   }
 }
+
+
+#' @title Make function to calculate population NAT
+#' @description This returns a function taking two arguments `variables` (a list of variables)
+#' and `index` (a [individual::Bitset]) which will return the NAT for each person in `index`.
+#' If the list of variables includes `ab_titre_inf`, then the combined NAT from vaccine and
+#' infection derived NATs is returned.
+#' @param variables a named list
+#' @export
+make_calculate_nat <- function(variables) {
+  stopifnot(!is.null(variables$ab_titre))
+  stopifnot(inherits(variables$ab_titre, "DoubleVariable"))
+  if (is.null(variables$ab_titre_inf)) {
+
+    calculate_nat <- function(variables, index) {
+      variables$ab_titre$get_values(index)
+    }
+
+  } else {
+    stopifnot(inherits(variables$ab_titre_inf, "DoubleVariable"))
+
+    calculate_nat <- function(variables, index) {
+      # two types of NAT
+      nat_vaccine <- variables$ab_titre$get_values(index)
+      nat_infection <- variables$ab_titre_inf$get_values(index)
+      # add them for single effect
+      nat <- exp(nat_vaccine) + exp(nat_infection)
+      nat <- log(nat)
+      return(nat)
+    }
+
+  }
+  return(calculate_nat)
+}

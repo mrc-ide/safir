@@ -68,3 +68,44 @@ make_immune_parameters <- function(parameters, vfr, mu_ab_infection = NULL, std1
 
   return(parameters)
 }
+
+
+#' @title Attach parameters for modeling seperate vaccine and infection derived NAT
+#' @param parameters a list of model parameters
+#' @param dr_vec_doses a matrix where each column gives the decay rate vector of NATs following a
+#' particular dose, and each row is a day
+#' @param dr_vec_inf a vector where each element is the decay rate of NATs following infection
+#' @param max_ab_inf maximum allowable NAT boost from natural infection
+#' @export
+make_independent_vaccine_infection_nat_parameters <- function(parameters, dr_vec_doses = NULL, dr_vec_inf = NULL, max_ab_inf = NULL) {
+  # check decay for vaccine doses derived NAT
+  if (!is.null(dr_vec_doses)) {
+    parameters$dr_vec_doses <- dr_vec_doses
+  } else {
+    stopifnot(!is.null(parameters$dr_vec_doses))
+  }
+  stopifnot(inherits(parameters$dr_vec_doses, "matrix"))
+  stopifnot(nrow(parameters$dr_vec_doses) > 1)
+  stopifnot(ncol(parameters$dr_vec_doses) == parameters$max_dose)
+  stopifnot(is.finite(parameters$dr_vec_doses))
+
+  # check decay for natural infection derived NAT
+  if (!is.null(dr_vec_inf)) {
+    parameters$dr_vec_inf <- dr_vec_inf
+  } else {
+    stopifnot(!is.null(parameters$dr_vec_inf))
+  }
+  stopifnot(length(parameters$dr_vec_inf) > 1)
+  stopifnot(is.finite(parameters$dr_vec_inf))
+
+  # max NAT for infection-derived NAT
+  if (!is.null(max_ab_inf)) {
+    parameters$max_ab_inf <- max_ab_inf
+  } else {
+    stopifnot(!is.null(parameters$max_ab_inf))
+  }
+  stopifnot(is.finite(parameters$max_ab_inf))
+  stopifnot(parameters$max_ab_inf > 0)
+
+  return(parameters)
+}

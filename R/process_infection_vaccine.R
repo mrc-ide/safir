@@ -4,6 +4,9 @@
 #   July 2021
 # --------------------------------------------------------------------------------
 
+
+
+
 #' @title Infection process for vaccine model (multi-dose, no types)
 #'
 #' @description This samples infection events in the susceptible population.
@@ -17,10 +20,12 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("states","discrete_age") %in% names(variables)))
 
+  calculate_nat <- make_calculate_nat(variables = variables)
+
   if (parameters$nt_efficacy_transmission) {
     get_inf_ages <- function(infection_bset, variables, parameters, day) {
       ages <- variables$discrete_age$get_values(infection_bset)
-      nat_values <- variables$ab_titre$get_values(infection_bset)
+      nat_values <- calculate_nat(variables = variables, index = infection_bset)
       inf_wt <- vaccine_efficacy_transmission_cpp(ab_titre = nat_values, parameters = parameters, day = day - 1L) # 0-based index
       inf_ages <- tab_bins_weighted(a = ages, wt = inf_wt,  nbins = parameters$N_age)
       return(inf_ages)
@@ -66,8 +71,8 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
           lambda_age <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
 
           # get infection modifier and ages
-          ab_titre <- variables$ab_titre$get_values(susceptible)
-          infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = parameters, day = day - 1L) # 0-based index
+          nat_values <- calculate_nat(variables = variables, index = susceptible)
+          infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = nat_values,parameters = parameters, day = day - 1L) # 0-based index
           ages <- variables$discrete_age$get_values(susceptible)
 
           # FoI for each susceptible based on their age group
@@ -108,9 +113,7 @@ infection_process_vaccine_cpp <- function(parameters, variables, events, dt) {
   return(
     infection_process_vaccine_cpp_internal(
       parameters = parameters,
-      states = variables$states$.variable,
-      discrete_age = variables$discrete_age$.variable,
-      ab_titre = variables$ab_titre$.variable,
+      variables = variables,
       exposure = events$exposure$.event,
       dt = dt
     )

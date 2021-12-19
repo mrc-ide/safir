@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.5.3
+Version: 0.5.4
 Authors@R: c(
             person(
                 given = "Sean L.",
@@ -41,6 +41,7 @@ Imports:
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14
+ByteCompile: true
 Depends: 
     R (>= 2.10)
 LinkingTo: 

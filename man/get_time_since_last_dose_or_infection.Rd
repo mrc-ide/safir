@@ -2,7 +2,7 @@
 % Please edit documentation in R/process_nat.R
 \name{get_time_since_last_dose_or_infection}
 \alias{get_time_since_last_dose_or_infection}
-\title{Calculate the time elapsed in days since each person's last dose}
+\title{Calculate the time elapsed in days since each person's last dose or infection}
 \usage{
 get_time_since_last_dose_or_infection(
   timestep,
@@ -24,5 +24,5 @@ get_time_since_last_dose_or_infection(
 \item{inf_time}{an \link[individual:IntegerVariable]{individual::IntegerVariable} object}
 }
 \description{
-Calculate the time elapsed in days since each person's last dose
+Calculate the time elapsed in days since each person's last dose or infection
 }

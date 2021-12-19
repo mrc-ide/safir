@@ -80,13 +80,11 @@ infection_process_nimue_cpp_internal <- function(parameters, states, vaccine_sta
 #' @description this is an internal function, you should use the R interface
 #' for type checking, \code{\link{infection_process_cpp}}
 #' @param parameters a list of parameters from \code{\link{get_parameters}}
-#' @param states a \code{\link[individual]{CategoricalVariable}}
-#' @param discrete_age a \code{\link[individual]{IntegerVariable}}
-#' @param ab_titre a \code{\link[individual]{DoubleVariable}}
+#' @param variables a named list
 #' @param exposure a \code{\link[individual]{TargetedEvent}}
 #' @param dt size of time step
-infection_process_vaccine_cpp_internal <- function(parameters, states, discrete_age, ab_titre, exposure, dt) {
-    .Call('_safir_infection_process_vaccine_cpp_internal', PACKAGE = 'safir', parameters, states, discrete_age, ab_titre, exposure, dt)
+infection_process_vaccine_cpp_internal <- function(parameters, variables, exposure, dt) {
+    .Call('_safir_infection_process_vaccine_cpp_internal', PACKAGE = 'safir', parameters, variables, exposure, dt)
 }
 
 compare_floats <- function(a, b) {
