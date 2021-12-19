@@ -59,7 +59,10 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
   calculate_nat_func calculate_nat;
 
   if (variables.containsElementNamed("ab_titre_inf")) {
-    Rcpp::XPtr<DoubleVariable> ab_titre_inf(Rcpp::as<SEXP>(variables["ab_titre_inf"]));
+
+    Rcpp::Environment ab_titre_inf_R6 = Rcpp::as<Rcpp::Environment>(variables["ab_titre_inf"]);
+    Rcpp::XPtr<DoubleVariable> ab_titre_inf(Rcpp::as<SEXP>(ab_titre_inf_R6[".variable"]));
+
     calculate_nat = [ab_titre, ab_titre_inf](const individual_index_t& index) -> std::vector<double> {
 
       std::vector<double> nat_vaccine = ab_titre->get_values(index);

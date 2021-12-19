@@ -25,6 +25,8 @@ create_natural_immunity_variables <- function(variables, parameters) {
 #' @export
 create_independent_nat_variables <- function(variables, parameters) {
 
+  n <- sum(parameters$population)
+
   variables <- create_natural_immunity_variables(variables = variables, parameters = parameters)
 
   # ab dynamics

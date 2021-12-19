@@ -1,0 +1,46 @@
+---
+title: "Differential modeling of infection and vaccine derived NATs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Differential modeling of infection and vaccine derived NATs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(safir)
+```
+
+**safir** allows differential modeling of decay from vaccine and infection derived
+neutralizing antibody titre (NAT). To use this feature, set up the model in the same
+way as outline in the "Natural Immunity" vignette with the following changes:
+  
+  1. After all parameters have been made, use `make_independent_vaccine_infection_nat_parameters` and assign the output
+  to the same `parameters` object, e.g. `parameters <- make_independent_vaccine_infection_nat_parameters(parameters, ...)`.
+  It takes several arguments, `dr_vec_doses` will be a matrix where each column corresponds to a dose, and rows are days.
+  The `[i,j]`-th element then corresponds to the decay rate on the `i`-th day since receiving dose `j`. `dr_vec_inf` is a 
+  vector giving daily decay for infection derived NAT, and `max_ab_inf` is the maximum value allowed for infection-derived NAT (on natural log scale).
+  2. After all variables have been made, call `create_independent_nat_variables` and
+  assign the output to the same `variables` object, e.g. `variables <- create_independent_nat_variables(variables = variables, parameters = parameters)`.
+  This adds a new `DoubleVariable` object that stores the NAT derived from infection separately.
+  3. Instead of using `attach_event_listeners_natural_immunity`, please use `attach_event_listeners_independent_nat`. This makes sure that
+  upon recovery from an infection bout, a person's infection-derived NAT boost is added to the variable specifically for infection-derived
+  NAT values.
+  4. Instead of using `natural_immunity_ab_titre_process`, please use `independent_ab_titre_process`. This calculates decay
+  for the two NAT types properly using their specific parameters.
+
+I have listed the specific functions, variables, and parameters that were modified to incorporate
+this feature in this [GitHub issue](https://github.com/mrc-ide/safir/issues/64).
+
+This feature will not conflict with the other versions of the model (i.e. it is backwards compatible).
+All previous vignettes and examples should still run the way one would expect. If you find a bug
+or strange behavior, please make a [GitHub issue](https://github.com/mrc-ide/safir/issues),
+and also be sure to check that the two decay parameters and NAT boosts (`mu_ab_infection` in function `make_immune_parameters` and `mu_ab_list` in `get_vaccine_ab_titre_parameters`) are designed such that adding together
+the two NAT values prior to calculating efficacy makes sense.

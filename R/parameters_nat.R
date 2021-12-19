@@ -86,7 +86,7 @@ make_independent_vaccine_infection_nat_parameters <- function(parameters, dr_vec
   }
   stopifnot(inherits(parameters$dr_vec_doses, "matrix"))
   stopifnot(nrow(parameters$dr_vec_doses) > 1)
-  stopifnot(ncol(parameters$dr_vec_doses) == 3L)
+  stopifnot(ncol(parameters$dr_vec_doses) == parameters$max_dose)
   stopifnot(is.finite(parameters$dr_vec_doses))
 
   # check decay for natural infection derived NAT
