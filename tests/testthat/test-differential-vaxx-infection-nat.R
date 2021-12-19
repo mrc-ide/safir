@@ -161,3 +161,67 @@ test_that("differential decay for infection and vaccine derived NATs works, no v
 
 })
 
+
+test_that("c++ infection process testing with mixed NAT significantly decreases infection when both are accounted for", {
+
+  library(nimue)
+
+  # pars
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+  pop$n <- as.integer(pop$n / 100)
+
+  parameters <- safir::get_parameters(
+    population = pop$n,
+    contact_matrix_set = contact_mat,
+    iso3c = iso3c,
+    time_period = 365,
+    dt = 1,
+    R0 = 20
+  )
+  parameters$beta_set <- parameters$beta_set*rexp(n = length(parameters$beta_set))
+
+  # parameters and states
+  n <- 1e5
+  dt <- 0.5
+  valid_states <- c("S","IMild","ICase","IAsymp")
+  state0 <- sample(x = valid_states,size = n,replace = T)
+  age0 <- sample.int(n = 17,size = n,replace = T)
+  vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
+  ab_titre0 <- rep(-Inf, n)
+
+  parameters <- make_vaccine_parameters(safir_parameters = parameters,vaccine_ab_parameters = vaccine_parameters,vaccine_set = rep(100,365),dose_period = c(NaN, 10),strategy_matrix = nimue::strategy_matrix(strategy = "Elderly"),next_dose_priority_matrix = matrix(0,nrow = 1,ncol = 17))
+  parameters$nt_efficacy_transmission <- TRUE
+
+  states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
+  discrete_age <- individual::IntegerVariable$new(initial_values = age0)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  # NAT effect (with vaccine NAT only)
+  zdose <- rexp(n) + 2
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(699643L)
+  proc_vacc <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf),events = list(exposure=exposure),dt = dt)
+  proc_vacc(timestep = 100)
+
+  inf_vacc_only <- exposure$get_scheduled()$to_vector()
+
+  # NAT effect (with vaccine AND infection NATs)
+  ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = zdose)
+  exposure <- individual::TargetedEvent$new(population_size = n)
+
+  set.seed(699643L)
+  proc_vacc_inf <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf),events = list(exposure=exposure),dt = dt)
+  proc_vacc_inf(timestep = 100)
+
+  inf_vacc_inf <- exposure$get_scheduled()$to_vector()
+
+  expect_true(length(inf_vacc_inf) < length(inf_vacc_only))
+
+})
+
