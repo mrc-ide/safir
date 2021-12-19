@@ -41,6 +41,7 @@ Imports:
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14
+ByteCompile: true
 Depends: 
     R (>= 2.10)
 LinkingTo: 
