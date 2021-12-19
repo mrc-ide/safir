@@ -16,6 +16,9 @@
     <loc>/articles/compare_squire.html</loc>
   </url>
   <url>
+    <loc>/articles/differential_nat.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -38,6 +41,9 @@
   </url>
   <url>
     <loc>/reference/attach_event_listeners.html</loc>
+  </url>
+  <url>
+    <loc>/reference/attach_event_listeners_independent_nat.html</loc>
   </url>
   <url>
     <loc>/reference/attach_event_listeners_natural_immunity.html</loc>
@@ -95,6 +101,9 @@
   </url>
   <url>
     <loc>/reference/create_incidence_tracking_listener.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_independent_nat_variables.html</loc>
   </url>
   <url>
     <loc>/reference/create_natural_immunity_variables.html</loc>
@@ -172,6 +181,9 @@
     <loc>/reference/get_time_since_last_dose_or_infection.html</loc>
   </url>
   <url>
+    <loc>/reference/get_time_since_last_infection.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_vaccination_priority_stage.html</loc>
   </url>
   <url>
@@ -182,6 +194,9 @@
   </url>
   <url>
     <loc>/reference/identify_ages_to_adjust.html</loc>
+  </url>
+  <url>
+    <loc>/reference/independent_ab_titre_process.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -232,7 +247,13 @@
     <loc>/reference/iso3c_ages.html</loc>
   </url>
   <url>
+    <loc>/reference/make_calculate_nat.html</loc>
+  </url>
+  <url>
     <loc>/reference/make_immune_parameters.html</loc>
+  </url>
+  <url>
+    <loc>/reference/make_independent_vaccine_infection_nat_parameters.html</loc>
   </url>
   <url>
     <loc>/reference/make_rerlang.html</loc>

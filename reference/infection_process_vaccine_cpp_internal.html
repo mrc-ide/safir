@@ -18,7 +18,7 @@ for type checking, infection_process_cpp"><!-- mathjax --><script src="https://c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.4</span>
       </span>
     </div>
 
@@ -40,6 +40,9 @@ for type checking, infection_process_cpp"><!-- mathjax --><script src="https://c
     </li>
     <li>
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
+    </li>
+    <li>
+      <a href="../articles/differential_nat.html">Differential modeling of infection and vaccine derived NATs</a>
     </li>
     <li>
       <a href="../articles/natural_immunity.html">Natural Immunity</a>
@@ -74,26 +77,15 @@ for type checking, <code><a href="infection_process_cpp.html">infection_process_
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">infection_process_vaccine_cpp_internal</span><span class="op">(</span>
-  <span class="va">parameters</span>,
-  <span class="va">states</span>,
-  <span class="va">discrete_age</span>,
-  <span class="va">ab_titre</span>,
-  <span class="va">exposure</span>,
-  <span class="va">dt</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">infection_process_vaccine_cpp_internal</span><span class="op">(</span><span class="va">parameters</span>, <span class="va">variables</span>, <span class="va">exposure</span>, <span class="va">dt</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>parameters</dt>
 <dd><p>a list of parameters from <code><a href="get_parameters.html">get_parameters</a></code></p></dd>
-<dt>states</dt>
-<dd><p>a <code><a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link">CategoricalVariable</a></code></p></dd>
-<dt>discrete_age</dt>
-<dd><p>a <code><a href="https://mrc-ide.github.io/individual/reference/IntegerVariable.html" class="external-link">IntegerVariable</a></code></p></dd>
-<dt>ab_titre</dt>
-<dd><p>a <code><a href="https://mrc-ide.github.io/individual/reference/DoubleVariable.html" class="external-link">DoubleVariable</a></code></p></dd>
+<dt>variables</dt>
+<dd><p>a named list</p></dd>
 <dt>exposure</dt>
 <dd><p>a <code><a href="https://mrc-ide.github.io/individual/reference/TargetedEvent.html" class="external-link">TargetedEvent</a></code></p></dd>
 <dt>dt</dt>

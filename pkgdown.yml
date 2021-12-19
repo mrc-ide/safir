@@ -1,11 +1,12 @@
-pandoc: 2.7.3
+pandoc: 2.14.2
 pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   antibody_efficacy: antibody_efficacy.html
   compare_nimue: compare_nimue.html
   compare_squire: compare_squire.html
+  differential_nat: differential_nat.html
   natural_immunity: natural_immunity.html
   vaccine_notypes: vaccine_notypes.html
-last_built: 2021-12-10T00:52Z
+last_built: 2021-12-19T06:27Z
 

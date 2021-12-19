@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.4</span>
       </span>
     </div>
 
@@ -39,6 +39,9 @@
     </li>
     <li>
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
+    </li>
+    <li>
+      <a href="../articles/differential_nat.html">Differential modeling of infection and vaccine derived NATs</a>
     </li>
     <li>
       <a href="../articles/natural_immunity.html">Natural Immunity</a>
@@ -81,6 +84,10 @@
           <p><code><a href="attach_event_listeners.html">attach_event_listeners()</a></code> </p>
         </td>
         <td><p>Attach listeners to events</p></td>
+      </tr><tr><td>
+          <p><code><a href="attach_event_listeners_independent_nat.html">attach_event_listeners_independent_nat()</a></code> </p>
+        </td>
+        <td><p>Attach event listeners for modeling independent infection-derived NAT</p></td>
       </tr><tr><td>
           <p><code><a href="attach_event_listeners_natural_immunity.html">attach_event_listeners_natural_immunity()</a></code> </p>
         </td>
@@ -157,6 +164,10 @@
           <p><code><a href="create_incidence_tracking_listener.html">create_incidence_tracking_listener()</a></code> </p>
         </td>
         <td><p>Create listener to track incidence</p></td>
+      </tr><tr><td>
+          <p><code><a href="create_independent_nat_variables.html">create_independent_nat_variables()</a></code> </p>
+        </td>
+        <td><p>Create independent infection-derived NAT variables</p></td>
       </tr><tr><td>
           <p><code><a href="create_natural_immunity_variables.html">create_natural_immunity_variables()</a></code> </p>
         </td>
@@ -256,7 +267,11 @@
       </tr><tr><td>
           <p><code><a href="get_time_since_last_dose_or_infection.html">get_time_since_last_dose_or_infection()</a></code> </p>
         </td>
-        <td><p>Calculate the time elapsed in days since each person's last dose</p></td>
+        <td><p>Calculate the time elapsed in days since each person's last dose or infection</p></td>
+      </tr><tr><td>
+          <p><code><a href="get_time_since_last_infection.html">get_time_since_last_infection()</a></code> </p>
+        </td>
+        <td><p>Calculate the time elapsed in days since each person's last infection</p></td>
       </tr><tr><td>
           <p><code><a href="get_vaccination_priority_stage.html">get_vaccination_priority_stage()</a></code> </p>
         </td>
@@ -273,6 +288,10 @@
           <p><code><a href="identify_ages_to_adjust.html">identify_ages_to_adjust()</a></code> </p>
         </td>
         <td><p>Identify ages to adjust</p></td>
+      </tr><tr><td>
+          <p><code><a href="independent_ab_titre_process.html">independent_ab_titre_process()</a></code> </p>
+        </td>
+        <td><p>Update NAT for seperate vaccine and infection-derived NAT</p></td>
       </tr><tr><td>
           <p><code><a href="infection_process.html">infection_process()</a></code> </p>
         </td>
@@ -334,9 +353,17 @@
         </td>
         <td><p>Median ages for countries</p></td>
       </tr><tr><td>
+          <p><code><a href="make_calculate_nat.html">make_calculate_nat()</a></code> </p>
+        </td>
+        <td><p>Make function to calculate population NAT</p></td>
+      </tr><tr><td>
           <p><code><a href="make_immune_parameters.html">make_immune_parameters()</a></code> </p>
         </td>
         <td><p>Attach parameters dealing with immune (NAT) dynamics to parameter list</p></td>
+      </tr><tr><td>
+          <p><code><a href="make_independent_vaccine_infection_nat_parameters.html">make_independent_vaccine_infection_nat_parameters()</a></code> </p>
+        </td>
+        <td><p>Attach parameters for modeling seperate vaccine and infection derived NAT</p></td>
       </tr><tr><td>
           <p><code><a href="make_rerlang.html">make_rerlang()</a></code> </p>
         </td>
