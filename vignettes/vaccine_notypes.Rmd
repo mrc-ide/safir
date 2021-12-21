@@ -104,9 +104,10 @@ double_count_render_process_daily <- function(renderer, variable, dt) {
     if ((t * dt) %% 1 == 0) {
       day <- as.integer(t * dt)
       nat <- exp(variable$get_values())
-      renderer$render(name = "q025", value = quantile(x = nat, probs = 0.025), timestep = day)
-      renderer$render(name = "q975", value = quantile(x = nat, probs = 0.975), timestep = day)
-      renderer$render(name = "q5", value = quantile(x = nat, probs = 0.5), timestep = day)
+      quantiles <- quantile(x = nat, probs = c(0.025, 0.5, 0.975))
+      renderer$render(name = "q025", value = quantiles[[1]], timestep = day)
+      renderer$render(name = "q5", value = quantiles[[2]], timestep = day)
+      renderer$render(name = "q975", value = quantiles[[3]], timestep = day)
       renderer$render(name = "mean", value = mean(x = nat), timestep = day)
     }
   }
