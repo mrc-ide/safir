@@ -30,14 +30,14 @@ Suggests:
     mockery,
     ggplot2,
     knitr,
-    rmarkdown,
-    data.table
+    rmarkdown
 Imports:
     individual,
     Rcpp,
     squire,
     nimue,
-    utils
+    utils,
+    data.table
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14

@@ -44,6 +44,8 @@ variables <- safir::create_variables(pop = pop, parameters = parameters)
 events <- safir::create_events(parameters = parameters)
 safir::attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 renderer <- individual::Render$new(timesteps)
+# hosp_render <- create_hosp_renderers(parameters)
+# attach_hosp_listeners(renderers = hosp_render, events = events)
 processes <- list(
   safir::infection_process_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
@@ -78,3 +80,4 @@ ggplot(data = rbind(saf_dt,sq_dt), aes(t,y,color = model)) +
   geom_line() +
   geom_line() +
   facet_wrap(~compartment, scales = "free")
+
