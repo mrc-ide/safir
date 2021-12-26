@@ -55,6 +55,9 @@
     <loc>/reference/attach_event_listeners_vaccination.html</loc>
   </url>
   <url>
+    <loc>/reference/attach_hosp_listeners.html</loc>
+  </url>
+  <url>
     <loc>/reference/attach_tracking_listener_age_incidence.html</loc>
   </url>
   <url>
@@ -95,6 +98,9 @@
   </url>
   <url>
     <loc>/reference/create_exposure_scheduler_listener_vaccine.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_hosp_renderers.html</loc>
   </url>
   <url>
     <loc>/reference/create_hospital_scheduler_listener.html</loc>
@@ -275,6 +281,9 @@
   </url>
   <url>
     <loc>/reference/natural_immunity_ab_titre_process.html</loc>
+  </url>
+  <url>
+    <loc>/reference/process_hosp_renderers.html</loc>
   </url>
   <url>
     <loc>/reference/safir.html</loc>
