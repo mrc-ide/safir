@@ -54,6 +54,7 @@ get_parameters <- function(iso3c = NULL,
         ...)
 
   pars$dt <- dt
+  pars$time_steps <- as.integer(time_period / dt)
 
   # create list of asymptomatic parameters
   asymp_list <- get_asymptomatic()

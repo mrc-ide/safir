@@ -42,7 +42,18 @@ test_that("cross tab for compartments/age works", {
 })
 
 
-test_that("incidence output is working correctly", {
+test_that("hospitalization/ICU rendering creation works", {
+
+  parameters <- get_parameters(iso3c = "GBR", dt = 0.5, time_period = 5)
+  hosp_render <- create_hosp_renderers(parameters = parameters)
+
+  expect_true(length(hosp_render) == 8L)
+  expect_true(all(names(hosp_render) %in% c("ICU_get_live", "ICU_get_die", "hosp_get_live", "hosp_get_die", "ICU_not_get_live", "ICU_not_get_die", "hosp_not_get_live", "hosp_not_get_die")))
+  expect_true(all(vapply(X = hosp_render, FUN = function(x) {inherits(x, "Render")}, FUN.VALUE = logical(1))))
+})
+
+
+test_that("incidence + hosp/ICU output is working correctly", {
 
   R0 <- 15
   time_period <- 2
@@ -67,6 +78,8 @@ test_that("incidence output is working correctly", {
   events <- create_events(parameters = parameters)
   attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
   renderer <- individual::Render$new(timesteps)
+  hosp_render <- create_hosp_renderers(parameters = parameters)
+  attach_hosp_listeners(renderers = hosp_render, events = events)
   processes <- list(
     infection_process_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
     individual::categorical_count_renderer_process(renderer, variables$state, categories = variables$states$get_categories())
@@ -93,4 +106,8 @@ test_that("incidence output is working correctly", {
   out_age_inc <- age_incidence_renderer$to_dataframe()
 
   expect_true(all.equal(out_compartment[2, "E_count"], out_inc[1, "incidence"], sum(out_age_inc[1, -1])))
+
+  out_hosp <- process_hosp_renderers(renderers = hosp_render, parameters = parameters)
+  expect_true(nrow(out_hosp) == 2L)
 })
+
