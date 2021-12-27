@@ -29,7 +29,8 @@ create_hosp_renderers <- function(parameters) {
 #' @export
 attach_hosp_listeners <- function(renderers, events) {
 
-  stopifnot(vapply(X = events, FUN = function(x) {inherits(x, "TargetedEvent")}, FUN.VALUE = logical(1)))
+  event_tags <- c("imv_get_live", "imv_get_die", "iox_get_live", "iox_get_die", "imv_not_get_live", "imv_not_get_die", "iox_not_get_live", "iox_not_get_die")
+  stopifnot(vapply(X = events[event_tags], FUN = function(x) {inherits(x, "TargetedEvent")}, FUN.VALUE = logical(1)))
   stopifnot(vapply(X = renderers, FUN = function(x) {inherits(x, "Render")}, FUN.VALUE = logical(1)))
 
   # need ICU, gets bed, lives
