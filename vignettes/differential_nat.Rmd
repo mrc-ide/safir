@@ -1,8 +1,8 @@
 ---
-title: "Differential modeling of infection and vaccine derived NATs"
+title: "Advanced options"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Differential modeling of infection and vaccine derived NATs}
+  %\VignetteIndexEntry{Advanced options}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(safir)
 ```
+
+## Differential modeling of infection and vaccine derived NATs
 
 **safir** allows differential modeling of decay from vaccine and infection derived
 neutralizing antibody titre (NAT). To use this feature, set up the model in the same
@@ -44,3 +46,28 @@ All previous vignettes and examples should still run the way one would expect. I
 or strange behavior, please make a [GitHub issue](https://github.com/mrc-ide/safir/issues),
 and also be sure to check that the two decay parameters and NAT boosts (`mu_ab_infection` in function `make_immune_parameters` and `mu_ab_list` in `get_vaccine_ab_titre_parameters`) are designed such that adding together
 the two NAT values prior to calculating efficacy makes sense.
+
+## Time varying parameters
+
+In addition to allowing time varying reproductive numbers via average contact rates, **safir** also supports time varying probabilities of hospitalization, severe disease, and disease outcomes, to support modeling of healthcare changes and variants. 
+
+By default **safir** uses the following parameters from **squire**, and all of them
+are vectors where each element gives the relevant probability for each age group.
+By default **safir** also uses these vectors, but it also accepts each parameter
+as a matrix as well. In this case, the rows correspond to age groups and the columns
+correspond to days (not time steps).
+
+1. `parameters$prob_hosp`: P(severe disease | exposure); this probability governs the chance
+that the exposed person will require hospitalization.
+2. `parameters$prob_asymp`: P(asymptomatic | mild disease); if the exposed person does not need
+hospitalization, this probability gives the chance they will be asymptomatic versus mildly symptomatic.
+3. `parameters$prob_severe` P(require ICU | hospitalized); if in hospital, does this person require an ICU
+bed (i.e. mechanical ventilation)?
+4. `parameters$prob_severe_death_treatment` P(death | require ICU, gets bed); if this person
+gets an ICU bed, will they die?
+5. `parameters$prob_severe_death_no_treatment` P(death | require ICU, don't get bed); if this
+person doesn't get an ICU bed, will they die?
+6. `parameters$prob_non_severe_death_treatment` P(death | require hosp, get bed); if in hospital
+but does not require ICU bed, will this person die?
+7. `parameters$prob_non_severe_death_no_treatment` P(death | require hosp, don't get bed); if needs a hospital
+(but not ICU bed) but does not recieve one, will this person die?

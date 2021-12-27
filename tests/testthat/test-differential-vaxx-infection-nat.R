@@ -222,7 +222,7 @@ test_that("c++ infection process testing with mixed NAT significantly decreases 
 
   inf_vacc_inf <- exposure$get_scheduled()$to_vector()
 
-  expect_true(length(inf_vacc_inf) < length(inf_vacc_only))
+  expect_true(length(inf_vacc_inf) <= length(inf_vacc_only))
 
 })
 

@@ -53,7 +53,7 @@ test_that("hospitalization event scheduling works, vector probabilities", {
 
 test_that("hospitalization event scheduling works, matrix probabilities", {
 
-  dt <- 1
+  dt <- 0.5
   N_age <- 2
   N <- 2e4
   ages <- rep(1:N_age, each = N/N_age)
@@ -75,11 +75,11 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
 
   events <- create_events(parameters = parameters)
 
-  parameters$prob_severe <- matrix(c(0.5, 0.1))
-  parameters$prob_severe_death_treatment <- matrix(c(0.9, 0.99))
-  parameters$prob_severe_death_no_treatment <- matrix(c(0.9, 0.99))
-  parameters$prob_non_severe_death_treatment <- matrix(c(0.9, 0.99))
-  parameters$prob_non_severe_death_no_treatment <- matrix(c(0.9, 0.99))
+  parameters$prob_severe <- matrix(c(0.05, 0.01, 0.5, 0.1), 2, 2)
+  parameters$prob_severe_death_treatment <- matrix(c(0.09, 0.099, 0.9, 0.99), 2, 2)
+  parameters$prob_severe_death_no_treatment <- matrix(c(0.09, 0.099, 0.9, 0.99), 2, 2)
+  parameters$prob_non_severe_death_treatment <- matrix(c(0.09, 0.099, 0.9, 0.99), 2, 2)
+  parameters$prob_non_severe_death_no_treatment <- matrix(c(0.09, 0.099, 0.9, 0.99), 2, 2)
 
   hosp_scheduler <- create_hospital_scheduler_listener(parameters = parameters, variables = variables, events = events)
 
@@ -90,7 +90,7 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
 
   # schedule the pop
   set.seed(87753919L)
-  hosp_scheduler(timestep = 1, hospitalised = Bitset$new(size = N)$insert(1:N))
+  hosp_scheduler(timestep = 4, hospitalised = Bitset$new(size = N)$insert(1:N))
 
   # check results
   sizes <- vapply(X = events, FUN = function(e) {
@@ -98,8 +98,8 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
   }, FUN.VALUE = numeric(1), USE.NAMES = TRUE)
 
   expect_equal(sum(sizes), N)
-  expect_true(abs(sum(sizes[c("imv_get_live", "imv_get_die")]) - sum(N/N_age * parameters$prob_severe)) / sum(N/N_age * parameters$prob_severe) < 0.05)
-  expect_true(abs(sum(sizes[c("iox_get_live", "iox_get_die")]) - sum(N/N_age * (1 - parameters$prob_severe))) / sum(N/N_age * parameters$prob_severe) < 0.05)
+  expect_true(abs(sum(sizes[c("imv_get_live", "imv_get_die")]) - sum(N/N_age * parameters$prob_severe[, 2])) / sum(N/N_age * parameters$prob_severe[, 2]) < 0.05)
+  expect_true(abs(sum(sizes[c("iox_get_live", "iox_get_die")]) - sum(N/N_age * (1 - parameters$prob_severe[, 2]))) / sum(N/N_age * parameters$prob_severe[ ,2]) < 0.05)
   expect_true(sizes[["imv_get_die"]]/sizes[["imv_get_live"]] > 1)
   expect_true(sizes[["iox_get_die"]]/sizes[["iox_get_live"]] > 1)
 
@@ -115,7 +115,7 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
   # schedule the pop
   set.seed(87753919L)
   bset <- Bitset$new(size = N)$insert(1:N)
-  evaluate_listener_cpp(listener = hosp_scheduler_cpp, target = bset$.bitset, t = 1)
+  evaluate_listener_cpp(listener = hosp_scheduler_cpp, target = bset$.bitset, t = 4)
 
   sizes_cpp <- vapply(X = events, FUN = function(e) {
     e$get_scheduled()$size()
