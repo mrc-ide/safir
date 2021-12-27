@@ -41,6 +41,14 @@ create_hospital_scheduler_listener <- function(
    variables,
    events
 ) {
+
+  # if probs time-varying, verify they are in the right format
+  check_probabilities(prob = parameters$prob_severe, parameters = parameters)
+  check_probabilities(prob = parameters$prob_severe_death_treatment, parameters = parameters)
+  check_probabilities(prob = parameters$prob_severe_death_no_treatment, parameters = parameters)
+  check_probabilities(prob = parameters$prob_non_severe_death_treatment, parameters = parameters)
+  check_probabilities(prob = parameters$prob_non_severe_death_no_treatment, parameters = parameters)
+
   function(timestep, hospitalised) {
 
     day <- ceiling(timestep * parameters$dt)
@@ -198,15 +206,5 @@ allocate_treatment <- function(
     return(get_treatment)
   } else {
     return(Bitset$new(size = need_treatment$max_size))
-  }
-}
-
-
-#' @noRd
-get_probabilties <- function(prob, ages, day) {
-  if (inherits(prob, "matrix")) {
-    prob[cbind(ages, day)]
-  } else {
-    prob[ages]
   }
 }
