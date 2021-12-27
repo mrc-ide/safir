@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">safir</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.5</span>
       </span>
     </div>
 
@@ -59,7 +59,7 @@
       <a href="../articles/compare_squire.html">Squire Validation Run</a>
     </li>
     <li>
-      <a href="../articles/differential_nat.html">Differential modeling of infection and vaccine derived NATs</a>
+      <a href="../articles/differential_nat.html">Advanced options</a>
     </li>
     <li>
       <a href="../articles/natural_immunity.html">Natural Immunity</a>
@@ -186,7 +186,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  25.222   0.116  26.853</span></code></pre></div>
+<span class="co">#&gt;  22.997   0.120  23.291</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
