@@ -89,6 +89,7 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
   }, FUN.VALUE = logical(1), USE.NAMES = FALSE)))
 
   # schedule the pop
+  set.seed(87753919L)
   hosp_scheduler(timestep = 1, hospitalised = Bitset$new(size = N)$insert(1:N))
 
   # check results
@@ -101,5 +102,27 @@ test_that("hospitalization event scheduling works, matrix probabilities", {
   expect_true(abs(sum(sizes[c("iox_get_live", "iox_get_die")]) - sum(N/N_age * (1 - parameters$prob_severe))) / sum(N/N_age * parameters$prob_severe) < 0.05)
   expect_true(sizes[["imv_get_die"]]/sizes[["imv_get_live"]] > 1)
   expect_true(sizes[["iox_get_die"]]/sizes[["iox_get_live"]] > 1)
+
+  # check C++ is identical
+  events <- create_events(parameters = parameters)
+  hosp_scheduler_cpp <- create_hospital_scheduler_listener_cpp(parameters, variables, events)
+
+  # all empty
+  expect_true(all(vapply(X = events, FUN = function(e) {
+    e$get_scheduled()$size() < 1
+  }, FUN.VALUE = logical(1), USE.NAMES = FALSE)))
+
+  # schedule the pop
+  set.seed(87753919L)
+  bset <- Bitset$new(size = N)$insert(1:N)
+  evaluate_listener_cpp(listener = hosp_scheduler_cpp, target = bset$.bitset, t = 1)
+
+  sizes_cpp <- vapply(X = events, FUN = function(e) {
+    e$get_scheduled()$size()
+  }, FUN.VALUE = numeric(1), USE.NAMES = TRUE)
+
+  # equal
+  expect_equal(sizes, sizes_cpp)
+
 })
 

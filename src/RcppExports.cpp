@@ -51,6 +51,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// evaluate_listener_cpp
+void evaluate_listener_cpp(const Rcpp::XPtr<targeted_listener_t> listener, const Rcpp::XPtr<individual_index_t> target, const size_t t);
+RcppExport SEXP _safir_evaluate_listener_cpp(SEXP listenerSEXP, SEXP targetSEXP, SEXP tSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<targeted_listener_t> >::type listener(listenerSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type target(targetSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type t(tSEXP);
+    evaluate_listener_cpp(listener, target, t);
+    return R_NilValue;
+END_RCPP
+}
+// create_hospital_scheduler_listener_cpp_internal
+Rcpp::XPtr<targeted_listener_t> create_hospital_scheduler_listener_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> imv_get_die, Rcpp::XPtr<TargetedEvent> imv_get_live, Rcpp::XPtr<TargetedEvent> imv_not_get_die, Rcpp::XPtr<TargetedEvent> imv_not_get_live, Rcpp::XPtr<TargetedEvent> iox_get_die, Rcpp::XPtr<TargetedEvent> iox_get_live, Rcpp::XPtr<TargetedEvent> iox_not_get_die, Rcpp::XPtr<TargetedEvent> iox_not_get_live);
+RcppExport SEXP _safir_create_hospital_scheduler_listener_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP discrete_ageSEXP, SEXP imv_get_dieSEXP, SEXP imv_get_liveSEXP, SEXP imv_not_get_dieSEXP, SEXP imv_not_get_liveSEXP, SEXP iox_get_dieSEXP, SEXP iox_get_liveSEXP, SEXP iox_not_get_dieSEXP, SEXP iox_not_get_liveSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<CategoricalVariable> >::type states(statesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<IntegerVariable> >::type discrete_age(discrete_ageSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type imv_get_die(imv_get_dieSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type imv_get_live(imv_get_liveSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type imv_not_get_die(imv_not_get_dieSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type imv_not_get_live(imv_not_get_liveSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type iox_get_die(iox_get_dieSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type iox_get_live(iox_get_liveSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type iox_not_get_die(iox_not_get_dieSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<TargetedEvent> >::type iox_not_get_live(iox_not_get_liveSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_hospital_scheduler_listener_cpp_internal(parameters, states, discrete_age, imv_get_die, imv_get_live, imv_not_get_die, imv_not_get_live, iox_get_die, iox_get_live, iox_not_get_die, iox_not_get_live));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vaccination_process_nimue_cpp_internal
 Rcpp::XPtr<process_t> vaccination_process_nimue_cpp_internal(Rcpp::List parameters, Rcpp::XPtr<CategoricalVariable> states, Rcpp::XPtr<individual_index_t> eligible, Rcpp::XPtr<individual_index_t> vaccinated, Rcpp::XPtr<individual_index_t> empty, Rcpp::XPtr<IntegerVariable> discrete_age, Rcpp::XPtr<TargetedEvent> v0_to_v1v2, const double dt);
 RcppExport SEXP _safir_vaccination_process_nimue_cpp_internal(SEXP parametersSEXP, SEXP statesSEXP, SEXP eligibleSEXP, SEXP vaccinatedSEXP, SEXP emptySEXP, SEXP discrete_ageSEXP, SEXP v0_to_v1v2SEXP, SEXP dtSEXP) {
@@ -286,6 +319,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 3},
     {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 4},
     {"_safir_vaccine_efficacy_transmission_cpp", (DL_FUNC) &_safir_vaccine_efficacy_transmission_cpp, 3},
+    {"_safir_evaluate_listener_cpp", (DL_FUNC) &_safir_evaluate_listener_cpp, 3},
+    {"_safir_create_hospital_scheduler_listener_cpp_internal", (DL_FUNC) &_safir_create_hospital_scheduler_listener_cpp_internal, 11},
     {"_safir_vaccination_process_nimue_cpp_internal", (DL_FUNC) &_safir_vaccination_process_nimue_cpp_internal, 8},
     {"_safir_infection_process_cpp_internal", (DL_FUNC) &_safir_infection_process_cpp_internal, 5},
     {"_safir_infection_process_nimue_cpp_internal", (DL_FUNC) &_safir_infection_process_nimue_cpp_internal, 6},
