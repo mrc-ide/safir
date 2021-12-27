@@ -23,8 +23,11 @@ create_hospital_scheduler_listener <- function(
 ) {
   function(timestep, hospitalised) {
 
+    day <- ceiling(timestep * parameters$dt)
+
     disc_ages <- variables$discrete_age$get_values(hospitalised)
-    prob_severe <- parameters$prob_severe[disc_ages]
+    # prob_severe <- parameters$prob_severe[disc_ages]
+    prob_severe <- get_probabilties(prob = parameters$prob_severe, ages = disc_ages, day = day)
 
     need_mv <- hospitalised$copy()
     need_mv$sample(prob_severe)
@@ -44,7 +47,8 @@ create_hospital_scheduler_listener <- function(
 
         # schedule for those getting mv
         if (mv_get$size() > 0) {
-            prob_death <- parameters$prob_severe_death_treatment[variables$discrete_age$get_values(mv_get)]
+            # prob_death <- parameters$prob_severe_death_treatment[variables$discrete_age$get_values(mv_get)]
+            prob_death <- get_probabilties(prob = parameters$prob_severe_death_treatment, ages = variables$discrete_age$get_values(mv_get), day = day)
             schedule_outcome(
                 target = mv_get,
                 prob_successful = prob_death,
@@ -56,7 +60,8 @@ create_hospital_scheduler_listener <- function(
         # schedule for those not getting mv
         mv_not_get <- need_mv$set_difference(mv_get) # need_mv should not be used after this point
         if (mv_not_get$size() > 0) {
-            prob_death <- parameters$prob_severe_death_no_treatment[variables$discrete_age$get_values(mv_not_get)]
+            # prob_death <- parameters$prob_severe_death_no_treatment[variables$discrete_age$get_values(mv_not_get)]
+            prob_death <- get_probabilties(prob = parameters$prob_severe_death_no_treatment, ages = variables$discrete_age$get_values(mv_not_get), day = day)
             schedule_outcome(
                 target = mv_not_get,
                 prob_successful = prob_death,
@@ -80,7 +85,8 @@ create_hospital_scheduler_listener <- function(
 
         # schedule for those getting ox
         if (ox_get$size() > 0) {
-            prob_death <- parameters$prob_non_severe_death_treatment[variables$discrete_age$get_values(ox_get)]
+            # prob_death <- parameters$prob_non_severe_death_treatment[variables$discrete_age$get_values(ox_get)]
+            prob_death <- get_probabilties(prob = parameters$prob_non_severe_death_treatment, ages = variables$discrete_age$get_values(ox_get), day = day)
             schedule_outcome(
                 target = ox_get,
                 prob_successful = prob_death,
@@ -92,7 +98,8 @@ create_hospital_scheduler_listener <- function(
         # schedule for those not getting ox
         ox_not_get <- need_ox$set_difference(ox_get) # need_ox should not be used after this point
         if (ox_not_get$size() > 0) {
-            prob_death <- parameters$prob_non_severe_death_no_treatment[variables$discrete_age$get_values(ox_not_get)]
+            # prob_death <- parameters$prob_non_severe_death_no_treatment[variables$discrete_age$get_values(ox_not_get)]
+            prob_death <- get_probabilties(prob = parameters$prob_non_severe_death_no_treatment, ages = variables$discrete_age$get_values(ox_not_get), day = day)
             schedule_outcome(
                 target = ox_not_get,
                 prob_successful = prob_death,
@@ -171,5 +178,15 @@ allocate_treatment <- function(
     return(get_treatment)
   } else {
     return(Bitset$new(size = need_treatment$max_size))
+  }
+}
+
+
+#' @noRd
+get_probabilties <- function(prob, ages, day) {
+  if (inherits(prob, "matrix")) {
+    prob[cbind(ages, day)]
+  } else {
+    prob[ages]
   }
 }
