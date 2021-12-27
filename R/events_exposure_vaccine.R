@@ -22,6 +22,9 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
 
   calculate_nat <- make_calculate_nat(variables = variables)
 
+  check_probabilities(prob = parameters$prob_hosp, parameters = parameters)
+  check_probabilities(prob = parameters$prob_asymp, parameters = parameters)
+
   return(
     function(timestep, target) {
 
@@ -30,7 +33,8 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
 
       # probabilities of hospitalization by age group
       disc_ages <- variables$discrete_age$get_values(target)
-      prob_hosp <- parameters$prob_hosp[disc_ages]
+      # prob_hosp <- parameters$prob_hosp[disc_ages]
+      prob_hosp <- get_probabilties(prob = parameters$prob_hosp, ages = disc_ages, day = day)
 
       hosp <- target$copy()
 
@@ -52,7 +56,8 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
       # sample asymptomatic and mild disease persons
       if (not_hosp$size() > 0) {
         disc_ages <- variables$discrete_age$get_values(not_hosp)
-        prob_asymp <- parameters$prob_asymp[disc_ages]
+        # prob_asymp <- parameters$prob_asymp[disc_ages]
+        prob_asymp <- get_probabilties(prob = parameters$prob_asymp, ages = disc_ages, day = day)
 
         to_asymp <- not_hosp$copy()
         to_asymp$sample(prob_asymp)

@@ -1,3 +1,23 @@
+#' @noRd
+get_probabilties <- function(prob, ages, day) {
+  if (inherits(prob, "matrix")) {
+    prob[cbind(ages, day)]
+  } else {
+    prob[ages]
+  }
+}
+
+#' @noRd
+check_probabilities <- function(prob, parameters) {
+  if (inherits(prob, "matrix")) {
+    stopifnot(nrow(prob) == parameters$N_age)
+    stopifnot(ncol(prob) == parameters$time_period)
+  } else {
+    stopifnot(length(prob) == parameters$N_age)
+  }
+  stopifnot(is.finite(prob))
+}
+
 `%||%` <- function(a, b) { # nolint
   if (is.null(a)) b else a
 }
