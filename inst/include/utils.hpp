@@ -11,6 +11,7 @@
 #include <numeric>      // std::iota
 #include <algorithm>    // std::sort, std::stable_sort
 #include <limits>
+#include <functional>
 #include <Rcpp.h>
 #include <individual.h>
 

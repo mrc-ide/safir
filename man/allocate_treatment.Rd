@@ -9,7 +9,7 @@ allocate_treatment(variables, need_treatment, treated_state, limit)
 \arguments{
 \item{variables}{Model variables}
 
-\item{need_treatment}{a vector of individuals who need treatment}
+\item{need_treatment}{a \link[individual:Bitset]{individual::Bitset} of individuals who need treatment}
 
 \item{treated_state}{a list states for individuals receiving treatment}
 

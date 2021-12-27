@@ -7,6 +7,26 @@
 #   3. allocate_treatment
 # --------------------------------------------------
 
+# create_hospital_scheduler_listener_cpp <- function(
+#   parameters,
+#   variables,
+#   events
+# ) {
+#   safir:::create_hospital_scheduler_listener_cpp_internal(
+#     parameters = parameters,
+#     states = variables$states$.variable,
+#     discrete_age = variables$discrete_age$.variable,
+#     imv_get_die = events$imv_get_die$.event,
+#     imv_get_live = events$imv_get_live$.event,
+#     imv_not_get_die = events$imv_not_get_die$.event,
+#     imv_not_get_live = events$imv_not_get_live$.event,
+#     iox_get_die = events$iox_get_die$.event,
+#     iox_get_live = events$iox_get_live$.event,
+#     iox_not_get_die = events$iox_not_get_die$.event,
+#     iox_not_get_live = events$iox_not_get_live$.event
+#   )
+# }
+
 
 #' @title Create listener function to schedule events upon hospitilisation
 #' @description
@@ -152,7 +172,7 @@ schedule_outcome <- function(
 #' allways smaller than the limit of treatments available minus those already
 #' receiving treatment
 #' @param variables Model variables
-#' @param need_treatment a vector of individuals who need treatment
+#' @param need_treatment a [individual::Bitset] of individuals who need treatment
 #' @param treated_state a list states for individuals receiving treatment
 #' @param limit the number of individuals who can receive treatment
 #' @importFrom individual Bitset
