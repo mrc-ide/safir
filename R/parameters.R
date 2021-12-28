@@ -171,7 +171,6 @@ interp_matrix_list_constant <- function(x, y, by = 1, end = max(x) + 1) {
 #' @param y Object to be interpolated
 #' @param by Time steps to interpolate at. Default = 1
 #' @param end End time point for interpoation. Default = \code{max(x)}
-#' @importFrom stats rgamma
 interp_input_par <- function(x, y, by = 1, end = max(x)) {
 
   # check lengths
