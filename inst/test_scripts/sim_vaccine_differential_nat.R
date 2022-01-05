@@ -66,27 +66,40 @@ variables <- create_vaccine_variables(variables = variables,parameters = paramet
 variables <- create_natural_immunity_variables(variables = variables, parameters = parameters)
 variables <- create_independent_nat_variables(variables = variables, parameters = parameters)
 
+# make renderers
+renderer <- Render$new(parameters$time_period)
+dose_renderer <- Render$new(parameters$time_period)
+inf_renderer <- Render$new(parameters$time_period)
+
+nat_renderer <- Render$new(parameters$time_period)
+nat_inf_renderer <- Render$new(parameters$time_period)
+dose_renderer <- Render$new(parameters$time_period)
+
+hosp_render <- create_hosp_renderers(parameters = parameters)
+
+double_count_render_process_daily <- function(renderer, variable, dt) {
+  stopifnot(inherits(variable, "DoubleVariable"))
+  stopifnot(inherits(renderer, "Render"))
+  function(t) {
+    if ((t * dt) %% 1 == 0) {
+      day <- as.integer(t * dt)
+      nat <- exp(variable$get_values())
+      quantiles <- quantile(x = nat, probs = c(0.025, 0.5, 0.975))
+      renderer$render(name = "q025", value = quantiles[[1]], timestep = day)
+      renderer$render(name = "q5", value = quantiles[[2]], timestep = day)
+      renderer$render(name = "q975", value = quantiles[[3]], timestep = day)
+      renderer$render(name = "mean", value = mean(x = nat), timestep = day)
+    }
+  }
+}
+
 # create events
 events <- create_events(parameters = parameters)
 events <- create_events_vaccination(events = events,parameters = parameters)
 attach_event_listeners(variables = variables,events = events,parameters = parameters, dt = dt)
 attach_event_listeners_vaccination(variables = variables,events = events,parameters = parameters,dt = dt)
 attach_event_listeners_independent_nat(variables = variables, events = events, parameters = parameters, dt = dt)
-
-# make renderers
-renderer <- Render$new(parameters$time_period)
-ab_renderer <- matrix(data = NaN,nrow = parameters$time_period,ncol = sum(parameters$population))
-dose_renderer <- Render$new(parameters$time_period)
-inf_renderer <- Render$new(parameters$time_period)
-
-double_count_render_process_daily <- function(variable, dt) {
-  stopifnot(inherits(variable, "DoubleVariable"))
-  function(t) {
-    if ((t * dt) %% 1 == 0) {
-      ab_renderer[as.integer(t * dt), ] <<- variable$get_values()
-    }
-  }
-}
+attach_hosp_listeners(renderers = hosp_render, events = events)
 
 # processes
 processes <- list(
@@ -94,17 +107,13 @@ processes <- list(
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
-  double_count_render_process_daily(variable = variables$ab_titre,dt = dt),
+  double_count_render_process_daily(renderer = nat_renderer, variable = variables$ab_titre,dt = dt),
+  double_count_render_process_daily(renderer = nat_inf_renderer, variable = variables$ab_titre_inf,dt = dt),
   integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt),
   integer_count_render_process_daily(renderer = inf_renderer,variable = variables$inf_num,margin = 0:51,dt = dt)
 )
 
 setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
-
-# # stuff we'd like to check
-# debug(processes[[1]])
-# debugonce(events$recovery$.listeners[[2]])
-# debug(events$recovery$.listeners[[3]])
 
 system.time(simulation_loop_safir(
   variables = variables,
@@ -119,34 +128,27 @@ system.time(simulation_loop_safir(
 
 # diagnostic plots ------------------------------------------------------------
 
-# plot: ab titre
-vaccinated_or_infected <- variables$dose_num$get_index_of(set = 0)
-vaccinated_or_infected$not(inplace = TRUE)
-vaccinated_or_infected$or(variables$inf_num$get_index_of(set = 0)$not(inplace = TRUE))
+ab_titre_dt <- as.data.table(nat_renderer$to_dataframe())
+setnames(ab_titre_dt, "timestep", "Day")
+ab_titre_dt$NAT <- "Vaccine-derived"
 
-ab_titre <- ab_renderer[, vaccinated_or_infected$to_vector()]
-ab_titre[which(!is.finite(ab_titre))] <- NaN
-cols_2_drop <- which(is.nan(ab_titre[nrow(ab_titre), ]))
-if (length(cols_2_drop) > 0) {
-  ab_titre <- ab_titre[, -cols_2_drop]
-}
-start <- apply(ab_titre, 2, function(x){ which(abs(x - 0) > 2e-7)[1] })
+ab_titre_inf_dt <- as.data.table(nat_inf_renderer$to_dataframe())
+setnames(ab_titre_inf_dt, "timestep", "Day")
+ab_titre_inf_dt$NAT <- "Infection-derived"
 
-ab_titre <- lapply(X = 1:ncol(ab_titre),FUN = function(x){
-  ab_titre[start[x]:nrow(ab_titre) , x]
-})
+ggplot(data = rbind(ab_titre_dt, ab_titre_inf_dt)) +
+  geom_line(aes(x=Day,y=mean,color=NAT)) +
+  geom_ribbon(aes(x=Day,ymin=q025,ymax=q975, fill=NAT),alpha=0.15) +
+  theme_bw()
 
-ab_titre_dt <- data.table(
-  ab = unlist(ab_titre),
-  t = unlist(lapply(ab_titre, function(ab_titre){1:length(ab_titre)})),
-  id = rep(1:length(ab_titre), times = vapply(ab_titre,length,integer(1)))
-)
+ggplot(data = ab_titre_dt) +
+  geom_line(aes(x=Day,y=mean,color=NAT)) +
+  geom_ribbon(aes(x=Day,ymin=q025,ymax=q975, fill=NAT),alpha=0.5) +
+  theme_bw()
 
-ab_titre_quant_dt <- ab_titre_dt[, .(mean = mean(ab), lo = quantile(ab,probs =0.025) , hi = quantile(ab,probs = 0.975)) , by = .(t)]
-
-ggplot(data = ab_titre_quant_dt) +
-  geom_line(aes(x=t,y=mean)) +
-  geom_ribbon(aes(x=t,ymin=lo,ymax=hi),alpha=0.5) +
+ggplot(data = ab_titre_inf_dt) +
+  geom_line(aes(x=Day,y=mean,color=NAT)) +
+  geom_ribbon(aes(x=Day,ymin=q025,ymax=q975, fill=NAT),alpha=0.5) +
   theme_bw()
 
 # plot: vaccinations
@@ -184,9 +186,9 @@ inf_out[, timestep := NULL]
 ggplot(data = inf_out, aes(t,value,color = infections)) +
   geom_line(size = 1.25, alpha = 0.75)
 
+# hosp/ICU
+hosp_df <- process_hosp_renderers(renderers = hosp_render, parameters = parameters)
+hosp_df <- melt(hosp_df, id.vars = "day")
 
-
-# gut check
-
-not_inf_or_vaccinated <- variables$inf_num$get_index_of(set = 0)$and(variables$dose_num$get_index_of(set = 0))
-all(!is.finite(variables$ab_titre$get_values(not_inf_or_vaccinated)))
+ggplot(data = hosp_df) +
+  geom_line(aes(x=day,y=value,color=variable))
