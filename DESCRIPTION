@@ -20,7 +20,7 @@ LazyData: true
 URL: https://github.com/mrc-ide/safir, https://mrc-ide.github.io/safir/
 BugReports: https://github.com/mrc-ide/safir/issues
 Remotes: 
-    mrc-ide/individual@dev,
+    mrc-ide/individual,
     mrc-ide/squire,
     mrc-ide/nimue
 Roxygen: list(markdown = TRUE)
