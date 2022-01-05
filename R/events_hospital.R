@@ -2,30 +2,38 @@
 #   hospitilisation scheduler listener (squire transmission model)
 #   Sean L. Wu (slwood89@gmail.com)
 #   May 2021
-#   1. create_hospital_scheduler_listener
-#   2. schedule_outcome
-#   3. allocate_treatment
 # --------------------------------------------------
 
-# create_hospital_scheduler_listener_cpp <- function(
-#   parameters,
-#   variables,
-#   events
-# ) {
-#   safir:::create_hospital_scheduler_listener_cpp_internal(
-#     parameters = parameters,
-#     states = variables$states$.variable,
-#     discrete_age = variables$discrete_age$.variable,
-#     imv_get_die = events$imv_get_die$.event,
-#     imv_get_live = events$imv_get_live$.event,
-#     imv_not_get_die = events$imv_not_get_die$.event,
-#     imv_not_get_live = events$imv_not_get_live$.event,
-#     iox_get_die = events$iox_get_die$.event,
-#     iox_get_live = events$iox_get_live$.event,
-#     iox_not_get_die = events$iox_not_get_die$.event,
-#     iox_not_get_live = events$iox_not_get_live$.event
-#   )
-# }
+
+#' @title Create C++ listener function to schedule events upon hospitilisation
+#' @description
+#' When the `hospitilisation` event fires, this listener should be called
+#' to schedule future events and state changes for those persons. This calls
+#' the function [safir::create_hospital_scheduler_listener_cpp_internal] to make
+#' an [externalptr-class] object.
+#' @param parameters Model parameters
+#' @param variables a list of all of the model variables
+#' @param events a list of all of the model events
+#' @export
+create_hospital_scheduler_listener_cpp <- function(
+  parameters,
+  variables,
+  events
+) {
+  create_hospital_scheduler_listener_cpp_internal(
+    parameters = parameters,
+    states = variables$states$.variable,
+    discrete_age = variables$discrete_age$.variable,
+    imv_get_die = events$imv_get_die$.event,
+    imv_get_live = events$imv_get_live$.event,
+    imv_not_get_die = events$imv_not_get_die$.event,
+    imv_not_get_live = events$imv_not_get_live$.event,
+    iox_get_die = events$iox_get_die$.event,
+    iox_get_live = events$iox_get_live$.event,
+    iox_not_get_die = events$iox_not_get_die$.event,
+    iox_not_get_live = events$iox_not_get_live$.event
+  )
+}
 
 
 #' @title Create listener function to schedule events upon hospitilisation

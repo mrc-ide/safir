@@ -169,7 +169,7 @@ attach_event_listeners <- function(
     # Hospitalisation (no state update, queues other events) ----------
 
     events$hospitilisation$add_listener(
-        create_hospital_scheduler_listener(
+        create_hospital_scheduler_listener_cpp(
             parameters = parameters,
             variables = variables,
             events = events

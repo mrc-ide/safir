@@ -34,6 +34,27 @@ vaccine_efficacy_transmission_cpp <- function(ab_titre, parameters, day) {
     .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', ab_titre, parameters, day)
 }
 
+#' @noRd
+evaluate_listener_cpp <- function(listener, target, t) {
+    invisible(.Call('_safir_evaluate_listener_cpp', PACKAGE = 'safir', listener, target, t))
+}
+
+#' @title Internal C++ function factory for scheduling events upon hospitilisation
+#' @param parameters a named [list]
+#' @param states a [individual::CategoricalVariable] object
+#' @param discrete_age a [individual::IntegerVariable] object
+#' @param imv_get_die a [individual::TargetedEvent] object
+#' @param imv_get_live a [individual::TargetedEvent] object
+#' @param imv_not_get_die a [individual::TargetedEvent] object
+#' @param imv_not_get_live a [individual::TargetedEvent] object
+#' @param iox_get_die a [individual::TargetedEvent] object
+#' @param iox_get_live a [individual::TargetedEvent] object
+#' @param iox_not_get_die a [individual::TargetedEvent] object
+#' @param iox_not_get_live a [individual::TargetedEvent] object
+create_hospital_scheduler_listener_cpp_internal <- function(parameters, states, discrete_age, imv_get_die, imv_get_live, imv_not_get_die, imv_not_get_live, iox_get_die, iox_get_live, iox_not_get_die, iox_not_get_live) {
+    .Call('_safir_create_hospital_scheduler_listener_cpp_internal', PACKAGE = 'safir', parameters, states, discrete_age, imv_get_die, imv_get_live, imv_not_get_die, imv_not_get_live, iox_get_die, iox_get_live, iox_not_get_die, iox_not_get_live)
+}
+
 #' @title C++ infection process (nimue vaccine model)
 #' @description this is an internal function, you should use the R interface
 #' for type checking, \code{\link{infection_process_cpp}}
