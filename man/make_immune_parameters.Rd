@@ -19,7 +19,8 @@ make_immune_parameters(
 \item{mu_ab_infection}{a vector of values associated with NAT for each infection bout;
 please read \link{attach_event_listeners_natural_immunity} carefully depending on
 if you are using the additive or overwriting NAT model, because this parameter's
-interpretation will change}
+interpretation will change. It may also be given as a vector, with each column
+indexing a day in the simulation (so it is equal to \code{time_period}).}
 
 \item{std10_infection}{a standard deviation for log-normal draw of NAT values}
 }

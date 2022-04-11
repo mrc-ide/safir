@@ -33,7 +33,8 @@ variant_fold_reduction_vector <- function(parameters, dt, vfr, vfr_time_1, vfr_t
 #' @param mu_ab_infection a vector of values associated with NAT for each infection bout;
 #' please read [safir::attach_event_listeners_natural_immunity] carefully depending on
 #' if you are using the additive or overwriting NAT model, because this parameter's
-#' interpretation will change
+#' interpretation will change. It may also be given as a vector, with each column
+#' indexing a day in the simulation (so it is equal to `time_period`).
 #' @param std10_infection a standard deviation for log-normal draw of NAT values
 #' @export
 make_immune_parameters <- function(parameters, vfr, mu_ab_infection = NULL, std10_infection = NULL) {
@@ -45,9 +46,14 @@ make_immune_parameters <- function(parameters, vfr, mu_ab_infection = NULL, std1
   }
 
   if (!is.null(mu_ab_infection)) {
-    stopifnot(length(mu_ab_infection) > 0)
     stopifnot(is.finite(mu_ab_infection))
     stopifnot(mu_ab_infection > 0)
+    if (inherits(mu_ab_infection, "matrix")) {
+      stopifnot(nrow(mu_ab_infection) >= 1)
+      stopifnot(ncol(mu_ab_infection) == parameters$time_period)
+    } else {
+      stopifnot(length(mu_ab_infection) >= 1)
+    }
   }
 
   stopifnot(length(vfr) == parameters$time_period)
