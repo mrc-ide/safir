@@ -426,3 +426,23 @@ test_that("worse outcomes with VFR > 1 than VFR = 1", {
 })
 
 
+test_that("time varying mu_ab_infection works", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1e3)
+
+  tmax <- 40
+  dt <- 0.5
+  R0 <- 20
+
+  vfr_null <- rep(1, tmax)
+
+  ab_0 <- rep(1, sum(pop$n))
+
+  sim_const <- simulate_vfr(vfr = vfr_null, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, mu_ab_infection = c(0.25,0.25,0.25), ret_ab = TRUE)
+  sim_timevar <- simulate_vfr(vfr = vfr_null, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, mu_ab_infection = matrix(c(50,60,75), nrow = 3, ncol = tmax), ret_ab = TRUE)
+
+  expect_true(mean(sim_const) <= mean(sim_const))
+})
+

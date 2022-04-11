@@ -42,10 +42,24 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
     }
   )
 
+  # get current mu_ab_inf
+  if (inherits(parameters$mu_ab_infection, "matrix")) {
+    get_mu_ab_inf <- function(day) {
+      return(parameters$mu_ab_infection[, day])
+    }
+  } else {
+    get_mu_ab_inf <- function(day) {
+      return(parameters$mu_ab_infection)
+    }
+  }
+
   # effect of infection on NAT
   if (additive) {
     events$recovery$add_listener(
       function(timestep, target) {
+
+        day <- ceiling(timestep * dt)
+        mu_ab_inf <- get_mu_ab_inf(day)
 
         # update inf_num
         inf <- variables$inf_num$get_values(target) + 1L
@@ -59,8 +73,8 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
         current_ab_titre <- exp(current_ab_titre)
 
         # draw NAT boost on linear scale
-        inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
-        zdose <- 10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection)
+        inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
+        zdose <- 10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection)
         new_ab_titre <- current_ab_titre + zdose
 
         # back to ln scale, and impose max value constraint
@@ -74,12 +88,16 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   } else {
     events$recovery$add_listener(
       function(timestep, target) {
+
+        day <- ceiling(timestep * dt)
+        mu_ab_inf <- get_mu_ab_inf(day)
+
         # update inf_num
         inf <- variables$inf_num$get_values(target) + 1L
         variables$inf_num$queue_update(values = inf, index = target)
         # draw ab titre value
-        inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
-        zdose <- log(10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection))
+        inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
+        zdose <- log(10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection))
         zdose <- pmin(zdose, parameters$max_ab)
         variables$ab_titre$queue_update(values = zdose, index = target)
         # update last time of infection
@@ -127,9 +145,23 @@ attach_event_listeners_independent_nat <- function(variables, events, parameters
     }
   )
 
+  # get current mu_ab_inf
+  if (inherits(parameters$mu_ab_infection, "matrix")) {
+    get_mu_ab_inf <- function(day) {
+      return(parameters$mu_ab_infection[, day])
+    }
+  } else {
+    get_mu_ab_inf <- function(day) {
+      return(parameters$mu_ab_infection)
+    }
+  }
+
   # effect of infection on infection-derived NAT
   events$recovery$add_listener(
     function(timestep, target) {
+
+      day <- ceiling(timestep * dt)
+      mu_ab_inf <- get_mu_ab_inf(day)
 
       # update inf_num
       inf <- variables$inf_num$get_values(target) + 1L
@@ -143,8 +175,8 @@ attach_event_listeners_independent_nat <- function(variables, events, parameters
       current_nat <- exp(current_nat)
 
       # draw NAT boost on linear scale
-      inf[inf > length(parameters$mu_ab_infection)] <- length(parameters$mu_ab_infection)
-      nat_boost <- 10^rnorm(n = target$size(), mean = log10(parameters$mu_ab_infection[inf]),sd = std10_infection)
+      inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
+      nat_boost <- 10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection)
       new_nat <- current_nat + nat_boost
 
       # back to ln scale, and impose max value constraint

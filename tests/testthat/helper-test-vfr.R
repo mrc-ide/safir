@@ -53,8 +53,7 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
 
 
-simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop) {
-
+simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE) {
 
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -91,7 +90,7 @@ simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop) {
     next_dose_priority_matrix = next_dose_priority
   )
 
-  parameters <- make_immune_parameters(parameters = parameters, vfr = vfr)
+  parameters <- make_immune_parameters(parameters = parameters, vfr = vfr, mu_ab_infection = mu_ab_infection)
 
   # create variables
   timesteps <- parameters$time_period/dt
@@ -136,6 +135,10 @@ simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop) {
     progress = FALSE
   )
 
-  return(renderer$to_dataframe())
+  if (ret_ab) {
+    return(variables$ab_titre$get_values())
+  } else {
+    return(renderer$to_dataframe())
+  }
 
 }

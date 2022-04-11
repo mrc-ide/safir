@@ -142,6 +142,11 @@ call_nimue_pars <- function(
   dur_not_get_mv_survive = nimue_durs$dur_not_get_mv_survive,
   dur_not_get_mv_die = nimue_durs$dur_not_get_mv_die,
   dur_rec = nimue_durs$dur_rec,
+  # time varying hosp times
+  tt_dur_get_ox_survive = nimue_durs$tt_dur_get_ox_survive,
+  tt_dur_get_ox_die = nimue_durs$tt_dur_get_ox_die,
+  tt_dur_get_mv_survive = nimue_durs$tt_dur_get_mv_survive,
+  tt_dur_get_mv_die = nimue_durs$tt_dur_get_mv_die,
   # vaccine
   dur_R = nimue_vaccine_pars$dur_R,
   tt_dur_R = nimue_vaccine_pars$tt_dur_R,
@@ -196,6 +201,11 @@ call_nimue_pars <- function(
     dur_not_get_mv_survive = dur_not_get_mv_survive,
     dur_not_get_mv_die = dur_not_get_mv_die,
     dur_rec = dur_rec,
+    # time varying hosp times
+    tt_dur_get_ox_survive = tt_dur_get_ox_survive,
+    tt_dur_get_ox_die = tt_dur_get_ox_die,
+    tt_dur_get_mv_survive = tt_dur_get_mv_survive,
+    tt_dur_get_mv_die = tt_dur_get_mv_die,
     # vaccine
     dur_R = dur_R,
     tt_dur_R = tt_dur_R,
