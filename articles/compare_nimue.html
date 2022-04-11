@@ -43,7 +43,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -100,9 +100,9 @@
 
     
     
-<div class="section level1">
-<h1 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
-</h1>
+<div class="section level2">
+<h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h2>
 <p>Let’s compare <strong>safir</strong> to <strong>nimue</strong>. Set up our parameters for running. We use a time step of 0.1 days.</p>
 <p>Do a run of <strong>nimue</strong> with increasing vaccination.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -137,9 +137,9 @@
   vaccine_efficacy_infection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">17</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="run-safir">Run <strong>safir</strong><a class="anchor" aria-label="anchor" href="#run-safir"></a>
-</h1>
+<div class="section level2">
+<h2 id="run-safir">Run <strong>safir</strong><a class="anchor" aria-label="anchor" href="#run-safir"></a>
+</h2>
 <p>Do a <strong>safir</strong> run. Because running the individual based verion of <strong>nimue</strong> is computationally expensive, we use <code>categorical_count_renderer_process_daily</code> and <code>integer_count_render_process_daily</code> to only render output every day (as opposed to each timestep, which increment by 0.1). In addition, we use the C++ processes <code>vaccination_process_nimue_cpp</code> and <code>infection_process_nimue_cpp</code> (R versions are <code>vaccination_process_nimue</code> and <code>infection_process_nimue_cpp</code>; tests are included in the package to ensure the same results are returned when using identical random number seeds).</p>
 <p>The function <code>get_parameters_nimue</code> grabs parameters directly from the <strong>nimue</strong> package. Then make the basic <strong>squire</strong> transmission model variables using <code>create_variables</code>. Then, attach additional variables to model <strong>nimue</strong> vaccines using <code>create_vaccine_variables_nimue</code>. The same routine is used to make events, calling <code>create_events</code> and <code>create_events_nimue</code>. Listeners are attached similarly.</p>
 <p>Next, make renderer objects. Note that because we are only outputting simulation state every day despite the time step size, the number of time steps is equal to the number of days, not the total number of time steps taken. The process list can then be made, and finally <code>setup_events_nimue</code> is called to queue initial events (this allows the model to be initialized from any valid state, not just S and E individuals).</p>
@@ -191,10 +191,10 @@
   <span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  85.621   0.421  86.058</span></code></pre></div>
-<div class="section level2">
-<h2 id="plot-vaccinations">Plot vaccinations<a class="anchor" aria-label="anchor" href="#plot-vaccinations"></a>
-</h2>
+<span class="co">#&gt;  66.822   0.300  67.130</span></code></pre></div>
+<div class="section level3">
+<h3 id="plot-vaccinations">Plot vaccinations<a class="anchor" aria-label="anchor" href="#plot-vaccinations"></a>
+</h3>
 <p>Compare vaccinations. These are spot-on.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">safir_vax_dt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="va">vaxx_renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -222,9 +222,9 @@
 <span class="co">#&gt; "none")` instead.</span></code></pre></div>
 <p><img src="compare_nimue_files/figure-html/unnamed-chunk-5-1.png" width="864"></p>
 </div>
-<div class="section level2">
-<h2 id="plot-compartments">Plot compartments<a class="anchor" aria-label="anchor" href="#plot-compartments"></a>
-</h2>
+<div class="section level3">
+<h3 id="plot-compartments">Plot compartments<a class="anchor" aria-label="anchor" href="#plot-compartments"></a>
+</h3>
 <p>Compare state (compartments) output. Because <strong>nimue</strong> is an ODE model the convergence of <strong>safir</strong> to it’s results is highly dependent upon the size of dt. Smaller dt will lead to more similar results. The stochastic version of <strong>squire</strong>, on the other hand, uses a discretization of the continuous time Markov process so results should look exactly identical between those two with the same dt.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># extract data - state</span>
@@ -263,29 +263,29 @@
 <span class="co">#&gt; "none")` instead.</span></code></pre></div>
 <p><img src="compare_nimue_files/figure-html/unnamed-chunk-7-1.png" width="864"></p>
 </div>
-<div class="section level2">
-<h2 id="ensemble-plot">Ensemble plot<a class="anchor" aria-label="anchor" href="#ensemble-plot"></a>
-</h2>
+<div class="section level3">
+<h3 id="ensemble-plot">Ensemble plot<a class="anchor" aria-label="anchor" href="#ensemble-plot"></a>
+</h3>
 <p>This is the same run as above, but with 40 repetitions. 95% quantiles and means are plotted for <strong>safir</strong>.</p>
 <p><img src="nimue_comparison.png" width="100%"></p>
 </div>
 </div>
-<div class="section level1">
-<h1 id="code-design">Code design<a class="anchor" aria-label="anchor" href="#code-design"></a>
-</h1>
 <div class="section level2">
-<h2 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a>
+<h2 id="code-design">Code design<a class="anchor" aria-label="anchor" href="#code-design"></a>
 </h2>
+<div class="section level3">
+<h3 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a>
+</h3>
 <p>The function <code>get_parameters_nimue</code> is used to generate parameters from the nimue model, and source code is in R/parameters_nimue.R.</p>
 </div>
-<div class="section level2">
-<h2 id="variables">Variables<a class="anchor" aria-label="anchor" href="#variables"></a>
-</h2>
+<div class="section level3">
+<h3 id="variables">Variables<a class="anchor" aria-label="anchor" href="#variables"></a>
+</h3>
 <p>The function <code>create_vaccine_variables_nimue</code> adds additional information needed for the model to the output of <code>create_variables</code>. It can be found in R/variables_vaccines.R.</p>
 </div>
-<div class="section level2">
-<h2 id="events-processes">Events &amp; Processes<a class="anchor" aria-label="anchor" href="#events-processes"></a>
-</h2>
+<div class="section level3">
+<h3 id="events-processes">Events &amp; Processes<a class="anchor" aria-label="anchor" href="#events-processes"></a>
+</h3>
 <p>The function <code>create_events_nimue</code> attaches additional events for modeling the vaccination process to the events list. <code>attach_event_listeners_nimue</code> attaches additional listeners to the vaccination events. Both functions can be found in R/events_vaccination_nimue.R.</p>
 <p><code>setup_events_nimue</code> initializes event scheduling based on the initial state of the model. This is needed so that the model can be initialized from any valid state, instead of just <strong>S</strong> and <strong>E</strong> persons who are unvaccinated. It can be found in R/initialize_events_nimue.R.</p>
 <p>The infection process can either use an R implementation <code>infection_process_nimue</code> or C++ implementation <code>infection_process_nimue_cpp</code>. The R version is in R/process_infection_nimue.R and the C++ one in src/process_infection_nimue.cpp.</p>
@@ -311,7 +311,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

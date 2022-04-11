@@ -43,7 +43,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -101,15 +101,15 @@
     
     
 <p>This vignette will explain how antibody titre dynamics are modeled in <strong>safir</strong>, and how they are affected by vaccination and (optionally) natural immunity from infection bouts. Furthermore it will explain how protective efficacy against infection and severe disease, and the effect on infectiousness is calculated from an individual’s antibody titre.</p>
-<div class="section level1">
-<h1 id="antibody-dynamics">Antibody dynamics<a class="anchor" aria-label="anchor" href="#antibody-dynamics"></a>
-</h1>
+<div class="section level2">
+<h2 id="antibody-dynamics">Antibody dynamics<a class="anchor" aria-label="anchor" href="#antibody-dynamics"></a>
+</h2>
 <p>The variables needed to store antibody titre are created in <code>create_vaccine_variables</code>, in R/variables_vaccines.R, attached to the variable list <code>variables$ab_titre</code>. The antibody titre decays and that process is <code>vaccine_ab_titre_process</code> (R/efficacy_vaccination.R) or <code>natural_immunity_ab_titre_process</code> (R/ efficacy_naturalimmunity.R), depending on if you are modeling natural immunity or not.</p>
 <p>Each day, an individual’s antibody titre decays at a rate given by the vector <code>parameters$dr_vec</code>, giving the daily rate of decay since last vaccine dose (or recovery from infection bout, for natural immunity). If the person’s time since last dose (or infection) is greater than the length of the vector, the last value is used. The vector is set in <code>get_vaccine_ab_titre_parameters</code> (R/parameters_vaccine.R).</p>
 </div>
-<div class="section level1">
-<h1 id="titre-associated-with-dose-or-infection">Titre associated with dose or infection<a class="anchor" aria-label="anchor" href="#titre-associated-with-dose-or-infection"></a>
-</h1>
+<div class="section level2">
+<h2 id="titre-associated-with-dose-or-infection">Titre associated with dose or infection<a class="anchor" aria-label="anchor" href="#titre-associated-with-dose-or-infection"></a>
+</h2>
 <p>The only way that antibody titre can increase is through a vaccine dose or, optionally, natural infection. For vaccination, the mean titre associated with each dose is associated with the particular vaccine product, and is chosen in <code>get_vaccine_ab_titre_parameters</code>. At this point we note that there are two ways to model the actual titre drawn for each individual receiving a dose. By default the value in <code>mu_ab_list</code> for the chosen vaccine product is used. However if <code>correlated = TRUE</code> is used, then the individual’s antibody titre sampled from the previous dose is multiplied by the ratio of the current to previous dose mean titre values.</p>
 <p>The function which samples antibody titre for each dose is <code>schedule_dose_vaccine</code> and is in R/events_vaccination.R. Note that if <code>correlated = TRUE</code> was selected then there is an additional variable <code>zdose</code> which holds the previous antibody titre associated with the last vaccine dose for each individual.</p>
 <p>Using correlated doses increases memory requirements for the model, and produces nearly identical population level trajectories of antibody titre as uncorrelated, so its use should be weighed against other computational factors.</p>
@@ -229,9 +229,9 @@
 
 <span class="op">}</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="efficacy-against-infection">Efficacy against infection<a class="anchor" aria-label="anchor" href="#efficacy-against-infection"></a>
-</h1>
+<div class="section level2">
+<h2 id="efficacy-against-infection">Efficacy against infection<a class="anchor" aria-label="anchor" href="#efficacy-against-infection"></a>
+</h2>
 <p>Efficacy against infection is used to adjust the per-capita force of infection in the function <code>infection_process_vaccine</code> (R/process_infection_vaccine.R). The relevant code snippet is here:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># get infection modifier and ages</span>
@@ -250,9 +250,9 @@
 <p><code>nt</code> is the antibody titre of each person converted back to the linear scale. The trial efficacy is <span class="math inline">\(\frac{1}{1 + e^{-k(\log_{10}(nt) - \log_{10}(ab_{50}))}}\)</span>. The protective efficacy is <span class="math inline">\(1\)</span> minus this.</p>
 <p>Note that we only compute this for individuals with finite antibody titre, <strong>safir</strong> uses <code>-Inf</code> as a null placeholder for persons who do not yet have antibodies.</p>
 </div>
-<div class="section level1">
-<h1 id="efficacy-against-severe-disease">Efficacy against severe disease<a class="anchor" aria-label="anchor" href="#efficacy-against-severe-disease"></a>
-</h1>
+<div class="section level2">
+<h2 id="efficacy-against-severe-disease">Efficacy against severe disease<a class="anchor" aria-label="anchor" href="#efficacy-against-severe-disease"></a>
+</h2>
 <p>Efficacy against severe disease adjusts the probability of a person once infected to experience a severe disease outcome. It is used in <code>create_exposure_scheduler_listener_vaccine</code> (R/events_exposure_vaccine.R), and the relevant code snippet is here. Note that we first need to compute efficacy against infection, because efficacy against severe disease is conditional upon this.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># vaccine efficacy against severe disease</span>
@@ -273,9 +273,9 @@
 <p><code>nt</code> is the linear scale antibody titre. Unconditional protection against severe disease is computed as <span class="math inline">\(\frac{1}{1 + e^{-k(\log_{10}(nt) - \log_{10}(ab\:\text{severe}_{50}))}}\)</span>. Because this is computing for individuals who <em>have been infected</em> we need to make it conditional on being infected, which we do by <code>1 - ((1 - ef_severe_uncond)/(1 - (1 - ef_infection)))</code> where <code>1 - ef_infection</code> goes from hazard reduction scale to trial efficiency scale, and it simplifies to <code>ef_infection</code>.</p>
 <p>Finally we set <code>ef_severe &lt;- 1 - ef_severe</code> so we are on the proper hazard reduction scale for efficacy against severe disease.</p>
 </div>
-<div class="section level1">
-<h1 id="efficacy-against-onward-infection">Efficacy against onward infection<a class="anchor" aria-label="anchor" href="#efficacy-against-onward-infection"></a>
-</h1>
+<div class="section level2">
+<h2 id="efficacy-against-onward-infection">Efficacy against onward infection<a class="anchor" aria-label="anchor" href="#efficacy-against-onward-infection"></a>
+</h2>
 <p>Antibody titre can (optionally) be used to adjust the contribution of each infectious person to the overall force of infection on susceptible persons. It can be turned on or off, and strength of the effect controlled with parameters set in <code>get_vaccine_ab_titre_parameters</code>.</p>
 <p>It affects the computation of the number of infectious persons by age group in <code>infection_process_vaccine</code> (R/process_infection_vaccine.R):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -307,7 +307,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
