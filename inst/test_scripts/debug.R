@@ -1,8 +1,40 @@
-# --------------------------------------------------------------------------------
-#   test vaxx model, multi dose, no types
-# --------------------------------------------------------------------------------
-
 rm(list=ls());gc()
+
+vaccine_doses <- 4
+
+max_coverage_d2 = 0.9
+max_coverage_d3 = 0.8
+max_coverage_d4 = 0.5
+
+age_groups_covered_d2 = 15
+age_groups_covered_d3 = 14
+age_groups_covered_d4 = 5
+
+vaccine_coverage_strategy <- list()
+vaccine_coverage_strategy[[1]] <-
+  nimue::strategy_matrix(strategy = "Elderly", max_coverage = max_coverage_d2)[1:age_groups_covered_d2, ]
+
+vaccine_coverage_strategy[[2]] <-
+  nimue::strategy_matrix(strategy = "Elderly", max_coverage = max_coverage_d2)[1:age_groups_covered_d2, ]
+
+vaccine_coverage_strategy[[3]] <-
+  nimue::strategy_matrix(strategy = "Elderly", max_coverage = max_coverage_d3)[1:age_groups_covered_d3, ]
+
+vaccine_coverage_strategy[[4]] <-
+  nimue::strategy_matrix(strategy = "Elderly", max_coverage = max_coverage_d4)[1:age_groups_covered_d4, ]
+
+
+# reduce coverage in some younger age groups
+vaccine_coverage_strategy[[1]][,c((17 - age_groups_covered_d2 + 1):5)] <- max_coverage_d2 * .83 * vaccine_coverage_strategy[[1]][,c((17 - age_groups_covered_d2 + 1):5)]
+vaccine_coverage_strategy[[2]][,c((17 - age_groups_covered_d2 + 1):5)] <- max_coverage_d2 * .83 * vaccine_coverage_strategy[[2]][,c((17 - age_groups_covered_d2 + 1):5)]
+vaccine_coverage_strategy[[3]][,c((17 - age_groups_covered_d3 + 1):10)] <- max_coverage_d3 * .625 * vaccine_coverage_strategy[[3]][,c((17 - age_groups_covered_d3 + 1):10)]
+
+next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1, ncol = ncol(vaccine_coverage_strategy[[1]]))
+
+next_dose_priority[1,(17 - age_groups_covered_d2 + 1):17] <- 1
+next_dose_priority[2,(17 - age_groups_covered_d3 + 1):17] <- 1
+next_dose_priority[3,(17 - age_groups_covered_d4 + 1):17] <- 1
+
 library(individual)
 library(data.table)
 library(ggplot2)
@@ -11,27 +43,17 @@ library(nimue)
 
 iso3c <- "GBR"
 pop <- safir:::get_population(iso3c)
-pop$n <- as.integer(pop$n / 1e3)
+pop$n <- as.integer(pop$n / 5e2)
 contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
-tmax <- 100
+tmax <- 400
 dt <- 0.5
 R0 <- 4
 
 # vaccine dosing
-vaccine_doses <- 3
-dose_period <- c(NaN, 28, 56)
-# vaccine_set <- vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
-# vaccine_set <- floor(vaccine_set)
+dose_period <- c(NaN, 10, 10, 10)
 vaccine_set <- c(0, rep(1e3, tmax - 1))
 
-# vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "All",max_coverage = 0.5)
-next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
-next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
-next_dose_priority[2, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
-
-# base parameters
 parameters <- safir::get_parameters(
   population = pop$n,
   contact_matrix_set = contact_mat,
@@ -41,15 +63,14 @@ parameters <- safir::get_parameters(
   dt = dt
 )
 
-# vaccine parameters
-mu_ab_list_3dose <- data.frame(
+mu_ab_list_4dose <- data.frame(
   name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
   d1 = c(13/94, 1/59, 28/164, ((185 + 273)/2)/321),
   d2 = c(223/94, 32/59,28/164, 654/158)
 )
-mu_ab_list_3dose <- cbind(mu_ab_list_3dose, d3 = mu_ab_list_3dose[, 3])
+mu_ab_list_4dose <- cbind(mu_ab_list_4dose, d3 = mu_ab_list_4dose[, 3], d4 = mu_ab_list_4dose[, 3])
 
-ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = TRUE,mu_ab_list = mu_ab_list_3dose)
+ab_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer", max_dose = vaccine_doses,correlated = FALSE, mu_ab_list = mu_ab_list_4dose)
 
 # combine parameters and verify
 parameters <- make_vaccine_parameters(
@@ -57,7 +78,7 @@ parameters <- make_vaccine_parameters(
   vaccine_ab_parameters = ab_parameters,
   vaccine_set = vaccine_set,
   dose_period = dose_period,
-  strategy_matrix = vaccine_coverage_mat,
+  strategy_matrix = vaccine_coverage_strategy,
   next_dose_priority_matrix = next_dose_priority
 )
 
@@ -131,6 +152,7 @@ setnames(dose_out, "variable", "dose")
 
 ggplot(data = dose_out) +
   geom_line(aes(x=timestep,y=value,color=dose)) +
+  xlab("day") +
   theme_bw()
 
 # # cumulative vaccinations

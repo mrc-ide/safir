@@ -57,7 +57,7 @@ test_that("vaccination_process phase 1 step 1; assigns priority doses to next st
   variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   events <- list(scheduled_dose = replicate(n = parameters$N_phase,expr = individual::TargetedEvent$new(n),simplify = FALSE))
 
-  schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17),dose = 1,parameters = parameters)
+  schedule_dose_vaccine(timestep = 1,variables = variables,target = which(ages==17)[1:40],dose = 1,parameters = parameters)
   update_vaccine_variables(variables = variables)
 
   vax_proc <- vaccination_process(parameters = parameters,variables = variables,events = events,dt = 1)
@@ -67,10 +67,10 @@ test_that("vaccination_process phase 1 step 1; assigns priority doses to next st
     all(variables$discrete_age$get_values(events$scheduled_dose[[2]]$get_scheduled()) == 17)
   )
   expect_equal(
-    events$scheduled_dose[[1]]$get_scheduled()$size(), 0
+    events$scheduled_dose[[1]]$get_scheduled()$size(), 40
   )
   expect_equal(
-    events$scheduled_dose[[2]]$get_scheduled()$size(),  parameters$vaccine_set[parameters$dose_period[2] + 1]
+    events$scheduled_dose[[2]]$get_scheduled()$size(),  40
   )
   expect_equal(
     events$scheduled_dose[[3]]$get_scheduled()$size(), 0

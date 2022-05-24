@@ -8,6 +8,11 @@ get_probabilties <- function(prob, ages, day) {
 }
 
 #' @noRd
+get_size_bset <- function(bsets) {
+  vapply(X = bsets, FUN = function(x) {x$size()}, FUN.VALUE = numeric(1), USE.NAMES = FALSE)
+}
+
+#' @noRd
 check_probabilities <- function(prob, parameters) {
   if (inherits(prob, "matrix")) {
     stopifnot(nrow(prob) == parameters$N_age)

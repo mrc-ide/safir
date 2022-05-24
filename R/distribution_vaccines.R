@@ -115,66 +115,100 @@ get_vaccination_priority_stage <- function(variables, events, phase, parameters)
   N_prioritisation_steps <- nrow(vaccine_coverage_mat)
 
   stopifnot(is.finite(parameters$N_phase))
-  stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
-  stopifnot(ncol(parameters$next_dose_priority) == ncol(vaccine_coverage_mat))
 
   # calculate coverage for this dose
   coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
 
-  pr_this_dose <- vapply(X = coverage_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+  pr_this_dose <- get_size_bset(bsets = coverage_this_dose)
   pr_this_dose <- pr_this_dose / age_size
 
-  # not final phase
-  if (phase < parameters$N_phase) {
+  # go through prioritization steps
+  for (p in 1:N_prioritisation_steps) {
 
-    coverage_next_dose <- get_current_coverage(variables = variables, events = events, dose = phase + 1, parameters = parameters)
+    ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
+    this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
 
-    pr_next_dose <- vapply(X = coverage_next_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
-    pr_next_dose <- pr_next_dose / age_size
-
-    # go through prioritization steps
-    for (p in 1:N_prioritisation_steps) {
-
-      ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
-      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
-
-      ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
-      # in case an entire row of next_dose_priority matrix was 0
-      if (length(ages_2_check_next) < 1) {
-        next_dose_not_cover <- FALSE
-      } else {
-        next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < vaccine_coverage_mat[p ,ages_2_check_next])
-      }
-
-      # if either this dose or prioritized next dose groups not covered, return this step
-      if (this_dose_not_cover | next_dose_not_cover) {
-        return(p)
-      }
+    if (this_dose_not_cover) {
+      return(p)
     }
-
-    # if we did not return by now it means this phase is complete, return -1
-    return(-1)
-
-  # final phase: don't need to check for next dose coverage
-  } else {
-
-    # go through prioritization steps
-    for (p in 1:N_prioritisation_steps) {
-
-      ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
-      this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
-
-      if (this_dose_not_cover) {
-        return(p)
-      }
-    }
-
-    # if we did not return by now it means this step is complete, return -1
-    return(-1)
-
   }
 
+  # if we did not return by now it means this step is complete, return -1
+  return(-1)
+
 }
+
+
+# get_vaccination_priority_stage <- function(variables, events, phase, parameters) {
+#
+#   # age groups
+#   age_size <- parameters$population
+#
+#   # strategy matrix for this phase
+#   vaccine_coverage_mat <- parameters$vaccine_coverage_mat[[phase]]
+#   N_prioritisation_steps <- nrow(vaccine_coverage_mat)
+#
+#   stopifnot(is.finite(parameters$N_phase))
+#   stopifnot(nrow(parameters$next_dose_priority) == parameters$N_phase - 1)
+#   stopifnot(ncol(parameters$next_dose_priority) == ncol(vaccine_coverage_mat))
+#
+#   # calculate coverage for this dose
+#   coverage_this_dose <- get_current_coverage(variables = variables, events = events, dose = phase, parameters = parameters)
+#
+#   pr_this_dose <- vapply(X = coverage_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+#   pr_this_dose <- pr_this_dose / age_size
+#
+#   # not final phase
+#   if (phase < parameters$N_phase) {
+#
+#     coverage_next_dose <- get_current_coverage(variables = variables, events = events, dose = phase + 1, parameters = parameters)
+#
+#     pr_next_dose <- vapply(X = coverage_next_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+#     pr_next_dose <- pr_next_dose / age_size
+#
+#     # go through prioritization steps
+#     for (p in 1:N_prioritisation_steps) {
+#
+#       ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
+#       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
+#
+#       ages_2_check_next <- which(parameters$next_dose_priority[phase, ] > 0)
+#       # in case an entire row of next_dose_priority matrix was 0
+#       if (length(ages_2_check_next) < 1) {
+#         next_dose_not_cover <- FALSE
+#       } else {
+#         next_dose_not_cover <- any(pr_next_dose[ages_2_check_next] < vaccine_coverage_mat[p ,ages_2_check_next])
+#       }
+#
+#       # if either this dose or prioritized next dose groups not covered, return this step
+#       if (this_dose_not_cover | next_dose_not_cover) {
+#         return(p)
+#       }
+#     }
+#
+#     # if we did not return by now it means this phase is complete, return -1
+#     return(-1)
+#
+#   # final phase: don't need to check for next dose coverage
+#   } else {
+#
+#     # go through prioritization steps
+#     for (p in 1:N_prioritisation_steps) {
+#
+#       ages_2_check <- which(vaccine_coverage_mat[p, ] > 0)
+#       this_dose_not_cover <- any(pr_this_dose[ages_2_check] < vaccine_coverage_mat[p, ages_2_check])
+#
+#       if (this_dose_not_cover) {
+#         return(p)
+#       }
+#     }
+#
+#     # if we did not return by now it means this step is complete, return -1
+#     return(-1)
+#
+#   }
+#
+# }
 
 
 #' @title Target persons in each age group to vaccinate (multi-dose, no types)
@@ -202,7 +236,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
   )
 
   # current coverage proportion
-  current_coverage <- vapply(X = coverage_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+  current_coverage <- get_size_bset(bsets = coverage_this_dose)
   current_coverage <- current_coverage / age_size
 
   # who is eligible for this dose?
@@ -222,7 +256,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
   n_to_cover <- ceiling(pmax(0, (coverage_targets - current_coverage)) * age_size)
 
   # final number to target for vaccine is minimum of eligible[a] and n_to_cover[a]
-  eligible_num <- vapply(X = eligible_this_dose, FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+  eligible_num <- get_size_bset(bsets = eligible_this_dose)
   n_to_cover <- pmin(n_to_cover, eligible_num)
 
   # if nobody to target, set empty bitset, otherwise use choose to randomly select
@@ -255,7 +289,7 @@ target_pop <- function(dose, variables, events, parameters, timestep, dt, strate
 #' @export
 assign_doses <- function(doses_left, events, dose, eligible, parameters) {
 
-  n_to_assign <- vapply(X = eligible,FUN = function(a){a$size()},FUN.VALUE = numeric(1))
+  n_to_assign <- get_size_bset(bsets = eligible)
 
   # check if can quit early
   if (sum(n_to_assign) < 1) {
@@ -289,6 +323,8 @@ assign_doses <- function(doses_left, events, dose, eligible, parameters) {
       assigned <- assigned + as.vector(rmultinom(n = 1,size = doses_left - sum(assigned),prob = extra_weights))
     }
 
+    # assigned <- as.vector(rmultinom(n = 1L, size = doses_left, prob = n_to_assign))
+
     stopifnot(sum(assigned) <= doses_left)
 
     for (a in 1:parameters$N_age) {
@@ -297,6 +333,7 @@ assign_doses <- function(doses_left, events, dose, eligible, parameters) {
         next()
       } else {
         eligible[[a]]$choose(k = assigned[a])
+        stopifnot(eligible[[a]]$size() == assigned[a])
         events$scheduled_dose[[dose]]$schedule(target = eligible[[a]], delay = 0)
         doses_left <- doses_left - assigned[a]
       }
