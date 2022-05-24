@@ -41,6 +41,8 @@ vaccination_process <- function(parameters, variables, events, dt) {
       # only distribute once a day
       if (day %% 1 == 0) {
 
+        # if (day > 250) {browser()}
+
         # get phase we are on
         phase <- variables$phase$value
 
@@ -85,21 +87,39 @@ vaccination_process <- function(parameters, variables, events, dt) {
         )
 
         # intermediate phases: give prioritized doses to next group for next phase
-        if (phase < parameters$N_phase & doses_left > 0) {
+        if (parameters$N_phase > 1 & phase < parameters$N_phase) {
 
-          eligible <- target_pop(
-            dose = phase + 1, variables = variables, events = events, parameters = parameters,
-            timestep = timestep, dt = dt, strategy_matrix_step = p_step, next_dose_priority = parameters$next_dose_priority[phase, ]
-          )
-          doses_left <- assign_doses(
-            doses_left = doses_left, events = events, dose = phase + 1,
-            eligible = eligible, parameters = parameters
-          )
+          priority_ages <- parameters$next_dose_priority[phase, ]
+          if (sum(priority_ages) > 0) {
+
+            N_prioritisation_steps <- nrow(parameters$vaccine_coverage_mat[[phase + 1L]])
+
+            # step through priority matrix for *next* dose
+            step_priority <- 0L
+
+            while (doses_left > 0 & step_priority < N_prioritisation_steps) {
+
+              step_priority <- step_priority + 1L
+              p_step <- parameters$vaccine_coverage_mat[[phase + 1L]][step_priority, ]
+
+              eligible <- target_pop(
+                dose = phase + 1L, variables = variables, events = events, parameters = parameters,
+                timestep = timestep, dt = dt, strategy_matrix_step = p_step, next_dose_priority = priority_ages
+              )
+              doses_left <- assign_doses(
+                doses_left = doses_left, events = events, dose = phase + 1L,
+                eligible = eligible, parameters = parameters
+              )
+
+            }
+
+          }
 
         }
 
         # if remaining doses, give out for this dose phase according to the prioritization matrix
-        while( doses_left > 0 & step < N_prioritisation_steps) {
+        N_prioritisation_steps <- nrow(vaccine_coverage_mat)
+        while (doses_left > 0 & step < N_prioritisation_steps) {
 
           step <- step + 1
           p_step <- vaccine_coverage_mat[step, ]

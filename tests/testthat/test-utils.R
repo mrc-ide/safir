@@ -43,3 +43,13 @@ test_that("interpolating Rt works", {
   expect_true(interp$Rt[15] == 2)
   expect_equal(interp$Rt_tt, 1:15)
 })
+
+test_that("get_size_bset works", {
+
+  max <- rpois(n = 10, lambda = 100)
+  fill <- rbinom(n = length(max), size = max, prob = 0.5)
+  bsets <- lapply(X = 1:length(max), FUN = function(i) {
+    Bitset$new(size = max[i])$insert(1:fill[i])
+  })
+  expect_equal(get_size_bset(bsets = bsets), fill)
+})
