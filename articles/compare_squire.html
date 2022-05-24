@@ -151,7 +151,9 @@
   day_return <span class="op">=</span> <span class="cn">TRUE</span>,
   R0 <span class="op">=</span> <span class="va">R0</span>,
   dt <span class="op">=</span> <span class="va">dt</span>
-<span class="op">)</span></code></pre></div>
+<span class="op">)</span>
+<span class="co">#&gt; Warning: 'explicit_SEIR(...)' is deprecated; please use 'explicit_SEIR$new(...)'</span>
+<span class="co">#&gt; instead</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-safir">Run <strong>safir</strong><a class="anchor" aria-label="anchor" href="#run-safir"></a>
@@ -186,7 +188,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  24.042   0.136  24.551</span></code></pre></div>
+<span class="co">#&gt;  24.637   0.139  25.012</span></code></pre></div>
 <p>Let’s organize our data for plotting. We’ll compare the 2.5th and 97.5th quantiles and median.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">saf_reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>,<span class="va">saf_reps</span><span class="op">)</span>
