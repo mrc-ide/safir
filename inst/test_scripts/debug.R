@@ -1,5 +1,8 @@
 rm(list=ls());gc()
 
+# 1. give out n+1 prioritized doses before dose n
+# 2. make stepping to phase n+1 depend on prioritized coverage too
+
 vaccine_doses <- 4
 
 max_coverage_d2 = 0.9
@@ -31,9 +34,9 @@ vaccine_coverage_strategy[[3]][,c((17 - age_groups_covered_d3 + 1):10)] <- max_c
 
 next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1, ncol = ncol(vaccine_coverage_strategy[[1]]))
 
-next_dose_priority[1,(17 - age_groups_covered_d2 + 1):17] <- 1
-next_dose_priority[2,(17 - age_groups_covered_d3 + 1):17] <- 1
-next_dose_priority[3,(17 - age_groups_covered_d4 + 1):17] <- 1
+# next_dose_priority[1,(17 - age_groups_covered_d2 + 1):17] <- 1
+# next_dose_priority[2,(17 - age_groups_covered_d3 + 1):17] <- 1
+# next_dose_priority[3,(17 - age_groups_covered_d4 + 1):17] <- 1
 
 library(individual)
 library(data.table)
@@ -95,7 +98,6 @@ attach_event_listeners_vaccination(variables = variables,events = events,paramet
 
 # make renderers
 renderer <- Render$new(parameters$time_period)
-nat_renderer <- Render$new(parameters$time_period)
 dose_renderer <- Render$new(parameters$time_period)
 
 double_count_render_process_daily <- function(renderer, variable, dt) {
@@ -119,11 +121,23 @@ processes <- list(
   vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
   infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
   categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt),
-  double_count_render_process_daily(renderer = nat_renderer, variable = variables$ab_titre, dt = dt),
   integer_count_render_process_daily(renderer = dose_renderer,variable = variables$dose_num,margin = 0:vaccine_doses,dt = dt)
 )
 
 setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
+
+doses_tracker <- cbind("dose1"=rep(NaN,timesteps),"dose2"=rep(NaN,timesteps),"dose3"=rep(NaN,timesteps),"dose4"=rep(NaN,timesteps))
+doses_tracker <- as.data.frame(doses_tracker)
+
+# for that to work, surround any call to `assign_doses` with:
+
+# doses_pre <- doses_left # EXTRA
+#
+# assign_doses
+#
+# doses_post <- doses_left # EXTRA
+# doses_given <- doses_pre - doses_post # EXTRA
+# .GlobalEnv$doses_tracker[day, phase+1] <- doses_given # EXTRA
 
 system.time(simulation_loop_safir(
   variables = variables,
@@ -134,15 +148,6 @@ system.time(simulation_loop_safir(
   progress = TRUE
 ))
 
-
-# # plot: ab titre
-# ab_titre_dt <- as.data.table(nat_renderer$to_dataframe())
-# setnames(ab_titre_dt, "timestep", "Day")
-#
-# ggplot(data = ab_titre_dt) +
-#   geom_line(aes(x=Day,y=mean)) +
-#   geom_ribbon(aes(x=Day,ymin=q025,ymax=q975),alpha=0.5) +
-#   theme_bw()
 
 # plot: vaccinations
 dose_out <- dose_renderer$to_dataframe()
@@ -155,27 +160,29 @@ ggplot(data = dose_out) +
   xlab("day") +
   theme_bw()
 
-# # cumulative vaccinations
-# dcast(dose_out, timestep ~ dose, value.var="value", fill=0L)
-#
-# dose_cum <- dose_out[, "cumulative" := cumsum(value), by = "dose"]
-#
-#
-# ggplot(data = dose_cum[dose!=0,]) +
-#   geom_line(aes(x=timestep,y=cumulative,color=dose)) +
-#   theme_bw()
+
+# plot cumulative vaxx
 
 
-# # states
-# saf_dt <- as.data.table(renderer$to_dataframe())
-# saf_dt[, IMild_count := IMild_count + IAsymp_count]
-# saf_dt[, IAsymp_count := NULL]
-# saf_dt <- melt(saf_dt,id.vars = c("timestep"),variable.name = "name")
-# saf_dt[, name := gsub("(^)(\\w*)(_count)", "\\2", name)]
-# setnames(x = saf_dt,old = c("timestep","name","value"),new = c("t","compartment","y"))
-#
-# ggplot(data = saf_dt, aes(t,y,color = compartment)) +
-#   geom_line() +
-#   geom_line() +
-#   facet_wrap(~compartment, scales = "free")
+doses_cum <- as.data.table(doses_tracker)
+for (i in names(doses_cum)) {
+  doses_cum[is.nan(get(i)), (i):=0]
+}
+doses_cum[, "dose1" := cumsum(dose1)]
+doses_cum[, "dose2" := cumsum(dose2)]
+doses_cum[, "dose3" := cumsum(dose3)]
+doses_cum[, "dose4" := cumsum(dose4)]
+doses_cum[, "day" := 1:nrow(doses_cum)]
 
+doses_cum <- melt(doses_cum, id.vars="day")
+
+ggplot(data = doses_cum, aes(x = day, y = value, col = variable)) +
+  geom_line(size = 0.8) +
+  #geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = NA),
+        panel.border = element_blank(),
+        axis.line = element_line(),
+        legend.text.align = 0) +
+  scale_color_viridis_d(option = "C", end = 0.9) +
+  labs(x = "timestep", y = "cumulative doses", col = "dose number")
