@@ -67,9 +67,10 @@ Rcpp::IntegerMatrix cross_tab_doses_age(
     const size_t num_ages
 ) {
   Rcpp::IntegerMatrix out(num_doses + 1, num_ages);
-
-  for (auto i = 0u; i < doses->size; ++i) {
-    out(doses->values[i], age->values[i]-1)++;
+  std::vector<int> dose_vals = doses->get_values();
+  std::vector<int> age_vals = age->get_values();
+  for (auto i = 0u; i < doses->size(); ++i) {
+    out(dose_vals[i], age_vals[i]-1)++;
   }
 
   return out;
