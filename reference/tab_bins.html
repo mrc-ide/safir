@@ -79,25 +79,28 @@ ensure the maximum value of observations is not greater than <code>nbins</code>.
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tab_bins</span><span class="op">(</span><span class="va">a</span>, <span class="va">nbins</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tab_bins</span><span class="op">(</span><span class="va">a</span>, <span class="va">nbins</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>a</dt>
 <dd><p>a set of observations</p></dd>
+
+
 <dt>nbins</dt>
 <dd><p>number of bins</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">nbin</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">nbin</span>,size <span class="op">=</span> <span class="fl">100</span>,replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/tabulate.html" class="external-link">tabulate</a></span><span class="op">(</span>bin <span class="op">=</span> <span class="va">a</span>,nbins <span class="op">=</span> <span class="va">nbin</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  6 10 14  8 11 13 11 14 11  2</span>
-<span class="r-in"><span class="fu">tab_bins</span><span class="op">(</span>a <span class="op">=</span> <span class="va">a</span>,nbins <span class="op">=</span> <span class="va">nbin</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  6 10 14  8 11 13 11 14 11  2</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nbin</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">nbin</span>,size <span class="op">=</span> <span class="fl">100</span>,replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/tabulate.html" class="external-link">tabulate</a></span><span class="op">(</span>bin <span class="op">=</span> <span class="va">a</span>,nbins <span class="op">=</span> <span class="va">nbin</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 12  8 11  8 10  9  9 12 13  8</span>
+<span class="r-in"><span><span class="fu">tab_bins</span><span class="op">(</span>a <span class="op">=</span> <span class="va">a</span>,nbins <span class="op">=</span> <span class="va">nbin</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 12  8 11  8 10  9  9 12 13  8</span>
 </code></pre></div>
     </div>
   </div>
@@ -112,7 +115,7 @@ ensure the maximum value of observations is not greater than <code>nbins</code>.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

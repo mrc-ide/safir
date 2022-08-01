@@ -75,41 +75,58 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_parameters</span><span class="op">(</span>
-  iso3c <span class="op">=</span> <span class="cn">NULL</span>,
-  population <span class="op">=</span> <span class="cn">NULL</span>,
-  contact_matrix_set <span class="op">=</span> <span class="cn">NULL</span>,
-  time_period <span class="op">=</span> <span class="fl">365</span>,
-  max_age <span class="op">=</span> <span class="fl">100</span>,
-  lambda_external <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">dt</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_parameters</span><span class="op">(</span></span>
+<span>  iso3c <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  population <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  contact_matrix_set <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  time_period <span class="op">=</span> <span class="fl">365</span>,</span>
+<span>  max_age <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  lambda_external <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">dt</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>iso3c</dt>
 <dd><p>Character for country iso3c</p></dd>
+
+
 <dt>population</dt>
 <dd><p>Population vector (for each age group). Default = NULL, which will cause population to be sourced from country</p></dd>
+
+
 <dt>contact_matrix_set</dt>
 <dd><p>Contact matrices used in simulation. Default = NULL, which will generate this based on the country.</p></dd>
+
+
 <dt>time_period</dt>
 <dd><p>length of simulation (in days)</p></dd>
+
+
 <dt>max_age</dt>
 <dd><p>the maximum age for humans</p></dd>
+
+
 <dt>lambda_external</dt>
 <dd><p>a vector of length equal to <code>time_period</code> giving an additional additive term contributing to the force of infection.
 Models infectious contacts the population has with external (unmodeled) populations.</p></dd>
+
+
 <dt>dt</dt>
 <dd><p>size of time step</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other parameters for <a href="https://rdrr.io/pkg/squire/man/parameters_explicit_SEEIR.html" class="external-link">squire::parameters_explicit_SEEIR</a></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>squire model parameters</p>
+    
+
+<p>squire model parameters</p>
     </div>
 
   </div>
@@ -124,7 +141,7 @@ Models infectious contacts the population has with external (unmodeled) populati
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -75,33 +75,44 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_vaccine_parameters</span><span class="op">(</span>
-  <span class="va">safir_parameters</span>,
-  <span class="va">vaccine_ab_parameters</span>,
-  <span class="va">vaccine_set</span>,
-  <span class="va">dose_period</span>,
-  <span class="va">strategy_matrix</span>,
-  <span class="va">next_dose_priority_matrix</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_vaccine_parameters</span><span class="op">(</span></span>
+<span>  <span class="va">safir_parameters</span>,</span>
+<span>  <span class="va">vaccine_ab_parameters</span>,</span>
+<span>  <span class="va">vaccine_set</span>,</span>
+<span>  <span class="va">dose_period</span>,</span>
+<span>  <span class="va">strategy_matrix</span>,</span>
+<span>  <span class="va">next_dose_priority_matrix</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>safir_parameters</dt>
 <dd><p>a list from <code><a href="get_parameters.html">get_parameters</a></code></p></dd>
+
+
 <dt>vaccine_ab_parameters</dt>
 <dd><p>a list from <code><a href="get_vaccine_ab_titre_parameters.html">get_vaccine_ab_titre_parameters</a></code></p></dd>
+
+
 <dt>vaccine_set</dt>
 <dd><p>a vector giving the number of doses available each day (not each timestep)</p></dd>
+
+
 <dt>dose_period</dt>
 <dd><p>a vector giving the minimum delay between doses</p></dd>
+
+
 <dt>strategy_matrix</dt>
 <dd><p>a vaccine strategy matrix from <code><a href="https://rdrr.io/pkg/nimue/man/strategy_matrix.html" class="external-link">strategy_matrix</a></code>
 or a list of strategy matrices, one for each vaccine dose</p></dd>
+
+
 <dt>next_dose_priority_matrix</dt>
 <dd><p>a binary matrix giving age groups prioritized for next dose;
 it should have one fewer row than the number of doses being given, because on the
 final allocation phase there will be no future dose to prioritize</p></dd>
+
 </dl></div>
     <div id="note">
     <h2>Note</h2>
@@ -121,7 +132,7 @@ final allocation phase there will be no future dose to prioritize</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

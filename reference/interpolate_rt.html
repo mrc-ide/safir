@@ -83,21 +83,28 @@ inclusive endpoints.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">dates</span>, <span class="va">rt</span>, max_date <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpolate_rt</span><span class="op">(</span><span class="va">dates</span>, <span class="va">rt</span>, max_date <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dates</dt>
 <dd><p>a vector of <a href="https://rdrr.io/r/base/Dates.html" class="external-link">Date</a>s</p></dd>
+
+
 <dt>rt</dt>
 <dd><p>a vector of reproductive values at those dates</p></dd>
+
+
 <dt>max_date</dt>
 <dd><p>the maximum date of simulation (optional)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a <a href="https://rdrr.io/r/base/list.html" class="external-link">list</a> with named elements <code>Rt</code> and <code>Rt_tt</code>, which can be provided
+    
+
+<p>a <a href="https://rdrr.io/r/base/list.html" class="external-link">list</a> with named elements <code>Rt</code> and <code>Rt_tt</code>, which can be provided
 to the <a href="get_parameters.html">get_parameters</a> function's arguments <code>R0</code> and <code>tt_R0</code>.</p>
     </div>
 
@@ -113,7 +120,7 @@ to the <a href="get_parameters.html">get_parameters</a> function's arguments <co
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

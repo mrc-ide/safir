@@ -75,28 +75,35 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">make_immune_parameters</span><span class="op">(</span>
-  <span class="va">parameters</span>,
-  <span class="va">vfr</span>,
-  mu_ab_infection <span class="op">=</span> <span class="cn">NULL</span>,
-  std10_infection <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">make_immune_parameters</span><span class="op">(</span></span>
+<span>  <span class="va">parameters</span>,</span>
+<span>  <span class="va">vfr</span>,</span>
+<span>  mu_ab_infection <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  std10_infection <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>parameters</dt>
 <dd><p>a list of model parameters</p></dd>
+
+
 <dt>vfr</dt>
 <dd><p>a vector from <a href="variant_fold_reduction_vector.html">variant_fold_reduction_vector</a></p></dd>
+
+
 <dt>mu_ab_infection</dt>
 <dd><p>a vector of values associated with NAT for each infection bout;
 please read <a href="attach_event_listeners_natural_immunity.html">attach_event_listeners_natural_immunity</a> carefully depending on
 if you are using the additive or overwriting NAT model, because this parameter's
 interpretation will change. It may also be given as a vector, with each column
 indexing a day in the simulation (so it is equal to <code>time_period</code>).</p></dd>
+
+
 <dt>std10_infection</dt>
 <dd><p>a standard deviation for log-normal draw of NAT values</p></dd>
+
 </dl></div>
 
   </div>
@@ -111,7 +118,7 @@ indexing a day in the simulation (so it is equal to <code>time_period</code>).</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

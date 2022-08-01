@@ -77,41 +77,50 @@ See examples for how to quickly summarize the output.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">compartments_age_render_process_daily</span><span class="op">(</span>
-  <span class="va">renderer</span>,
-  <span class="va">age</span>,
-  <span class="va">compartments</span>,
-  <span class="va">parameters</span>,
-  <span class="va">dt</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compartments_age_render_process_daily</span><span class="op">(</span></span>
+<span>  <span class="va">renderer</span>,</span>
+<span>  <span class="va">age</span>,</span>
+<span>  <span class="va">compartments</span>,</span>
+<span>  <span class="va">parameters</span>,</span>
+<span>  <span class="va">dt</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>renderer</dt>
 <dd><p>a <a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">individual::Render</a> object</p></dd>
+
+
 <dt>age</dt>
 <dd><p>a <a href="https://mrc-ide.github.io/individual/reference/IntegerVariable.html" class="external-link">individual::IntegerVariable</a> object</p></dd>
+
+
 <dt>compartments</dt>
 <dd><p>a <a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link">individual::CategoricalVariable</a> object</p></dd>
+
+
 <dt>parameters</dt>
 <dd><p>model parameters</p></dd>
+
+
 <dt>dt</dt>
 <dd><p>size of time step</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># if the renderer object is called comp_render</span></span>
-<span class="r-in"><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu">as.data.table</span><span class="op">(</span><span class="va">comp_render</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu">melt</span><span class="op">(</span><span class="va">tmp</span>,id.vars<span class="op">=</span><span class="st">"timestep"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tmp1</span> <span class="op">&lt;-</span> <span class="va">tmp</span><span class="op">[</span>, <span class="fu">tstrsplit</span><span class="op">(</span><span class="va">variable</span>, <span class="st">"_"</span>, keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-in"><span class="va">tmp</span><span class="op">[</span> , <span class="va">variable</span> <span class="op">:=</span> <span class="cn">NULL</span><span class="op">]</span></span>
-<span class="r-in"><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="va">tmp1</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">setnames</span><span class="op">(</span>x <span class="op">=</span> <span class="va">tmp</span>,old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"V1"</span>, <span class="st">"V2"</span><span class="op">)</span>,new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compartment"</span>,<span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">compartment_dt</span> <span class="op">&lt;-</span> <span class="va">tmp</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">compartment</span>, <span class="va">timestep</span><span class="op">)</span><span class="op">]</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># if the renderer object is called comp_render</span></span></span>
+<span class="r-in"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu">as.data.table</span><span class="op">(</span><span class="va">comp_render</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu">melt</span><span class="op">(</span><span class="va">tmp</span>,id.vars<span class="op">=</span><span class="st">"timestep"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tmp1</span> <span class="op">&lt;-</span> <span class="va">tmp</span><span class="op">[</span>, <span class="fu">tstrsplit</span><span class="op">(</span><span class="va">variable</span>, <span class="st">"_"</span>, keep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">tmp</span><span class="op">[</span> , <span class="va">variable</span> <span class="op">:=</span> <span class="cn">NULL</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">tmp</span>, <span class="va">tmp1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">setnames</span><span class="op">(</span>x <span class="op">=</span> <span class="va">tmp</span>,old <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"V1"</span>, <span class="st">"V2"</span><span class="op">)</span>,new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"compartment"</span>,<span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">compartment_dt</span> <span class="op">&lt;-</span> <span class="va">tmp</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">compartment</span>, <span class="va">timestep</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -126,7 +135,7 @@ See examples for how to quickly summarize the output.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
