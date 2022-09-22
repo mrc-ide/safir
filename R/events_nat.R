@@ -23,11 +23,11 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
   stopifnot(is.finite(parameters$mu_ab_infection))
 
   if (is.null(parameters$std10_infection)) {
-    std10_infection <- parameters$std10
+    std_infection <- parameters$std10 * log(10)
   } else {
     stopifnot(length(parameters$std10_infection) == 1L)
     stopifnot(is.finite(parameters$std10_infection))
-    std10_infection <- parameters$std10_infection
+    std_infection <- parameters$std10_infection *log(10)
   }
 
   # recovery: handle 1 timestep R->S and update ab titre for immune response
@@ -68,17 +68,15 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
         # update last time of infection
         variables$inf_time$queue_update(values = timestep, index = target)
 
-        # get NAT values and convert to linear scale
+        # get NAT values on log scale
         current_ab_titre <- variables$ab_titre$get_values(index = target)
-        current_ab_titre <- exp(current_ab_titre)
 
-        # draw NAT boost on linear scale
+        # draw NAT boost on log scale
         inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
-        zdose <- 10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection)
-        new_ab_titre <- current_ab_titre + zdose
+        zdose <- rnorm(n = target$size(), mean = log(mu_ab_inf[inf]),sd = std_infection)
+        new_ab_titre <- current_ab_titre + zdose  # add boost on log scale
 
-        # back to ln scale, and impose max value constraint
-        new_ab_titre <- log(new_ab_titre)
+        # impose max value constraint
         new_ab_titre <- pmin(new_ab_titre, parameters$max_ab)
 
         # queue NAT update
@@ -97,7 +95,7 @@ attach_event_listeners_natural_immunity <- function(variables, events, parameter
         variables$inf_num$queue_update(values = inf, index = target)
         # draw ab titre value
         inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
-        zdose <- log(10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection))
+        zdose <- rnorm(n = target$size(), mean = log(mu_ab_inf[inf]),sd = std_infection)
         zdose <- pmin(zdose, parameters$max_ab)
         variables$ab_titre$queue_update(values = zdose, index = target)
         # update last time of infection
@@ -126,11 +124,11 @@ attach_event_listeners_independent_nat <- function(variables, events, parameters
   stopifnot(is.finite(parameters$mu_ab_infection))
 
   if (is.null(parameters$std10_infection)) {
-    std10_infection <- parameters$std10
+    std_infection <- parameters$std10 *log(10)
   } else {
     stopifnot(length(parameters$std10_infection) == 1L)
     stopifnot(is.finite(parameters$std10_infection))
-    std10_infection <- parameters$std10_infection
+    std_infection <- parameters$std10_infection * log(10)
   }
 
   # recovery: handle 1 timestep R->S and update ab titre for immune response
@@ -170,17 +168,15 @@ attach_event_listeners_independent_nat <- function(variables, events, parameters
       # update last time of infection
       variables$inf_time$queue_update(values = timestep, index = target)
 
-      # get NAT values and convert to linear scale
+      # get NAT values on log scale
       current_nat <- variables$ab_titre_inf$get_values(index = target)
-      current_nat <- exp(current_nat)
 
-      # draw NAT boost on linear scale
+      # draw NAT boost on log scale
       inf[inf > length(mu_ab_inf)] <- length(mu_ab_inf)
-      nat_boost <- 10^rnorm(n = target$size(), mean = log10(mu_ab_inf[inf]),sd = std10_infection)
-      new_nat <- current_nat + nat_boost
+      nat_boost <- rnorm(n = target$size(), mean = log(mu_ab_inf[inf]),sd = std_infection)
+      new_nat <- current_nat + nat_boost  # boost added on log NAT scale
 
-      # back to ln scale, and impose max value constraint
-      new_nat <- log(new_nat)
+      # impose max value constraint
       new_nat <- pmin(new_nat, parameters$max_ab_inf)
 
       # queue NAT update
@@ -189,4 +185,3 @@ attach_event_listeners_independent_nat <- function(variables, events, parameters
   )
 
 }
-
