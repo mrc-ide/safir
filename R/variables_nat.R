@@ -6,10 +6,17 @@
 #' @export
 create_natural_immunity_variables <- function(variables, parameters) {
 
-  n <- sum(parameters$population)
-
-  variables$inf_num <- IntegerVariable$new(initial_values = rep(0L, n))
-  variables$inf_time <- IntegerVariable$new(initial_values = rep(-1L, n))
+  if(is.null(parameters$initial_state)){
+    n <- sum(parameters$population)
+    variables$inf_num <- IntegerVariable$new(initial_values = rep(0L, n))
+    variables$inf_time <- IntegerVariable$new(initial_values = rep(-1L, n))
+  } else {
+    infection_number <- parameters$initial_state[['infection_number']]
+    days_since_last_infection <- parameters$initial_state[['days_since_last_infection']]
+    ticks_since_last_infection <- as.integer(days_since_last_infection / parameters$dt)
+    variables$inf_num <- IntegerVariable$new(initial_values = infection_number)
+    variables$inf_time <- IntegerVariable$new(initial_values = -ticks_since_last_infection)
+  }
 
   return(variables)
 }

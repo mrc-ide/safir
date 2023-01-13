@@ -26,7 +26,8 @@
 #' @importFrom squire parameters_explicit_SEEIR get_mixing_matrix
 #' @return squire model parameters
 #' @export
-get_parameters <- function(iso3c = NULL,
+get_parameters <- function(initial_state = NULL,
+                           iso3c = NULL,
                            population = NULL,
                            contact_matrix_set = NULL,
                            time_period = 365,
@@ -53,6 +54,30 @@ get_parameters <- function(iso3c = NULL,
         time_period = time_period,
         ...)
 
+  if(!is.null(initial_state)){
+
+    # Population size according to squire
+    population_size_squire <- sum(pars$population)
+
+    # Initial state
+    pars$initial_state <- initial_state
+
+    # Population size according to the initial state
+    age <- pars$initial_state[['age']]
+    pars$max_age <- max(age)
+    population_size_initial_state <- length(age)
+    population_size_by_age_group <- rep(0, pars$N_age)
+    for(a in age){
+      discrete_age <- min(a %/% 5, pars$N_age - 1) + 1
+      population_size_by_age_group[discrete_age] <- population_size_by_age_group[discrete_age] + 1
+    }
+    pars$population <- population_size_by_age_group
+
+    # Scale factor
+    pars$scale <- population_size_initial_state / population_size_squire
+
+  }
+
   pars$dt <- dt
   pars$time_steps <- as.integer(time_period / dt)
 
@@ -74,8 +99,6 @@ get_parameters <- function(iso3c = NULL,
     c(pars$tt_beta, time_period),
     c(pars$beta_set, tail(pars$beta_set, 1))
   )
-
-  pars$country <- country
 
   # external FoI term
   if (!is.null(lambda_external)) {
