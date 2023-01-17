@@ -27,6 +27,7 @@
 #' @return squire model parameters
 #' @export
 get_parameters <- function(initial_state = NULL,
+                           num_initial_exposures = 1,
                            iso3c = NULL,
                            population = NULL,
                            contact_matrix_set = NULL,
@@ -76,8 +77,18 @@ get_parameters <- function(initial_state = NULL,
     # Scale factor
     pars$scale <- population_size_initial_state / population_size_squire
 
+    # Rescale hospital bed numbers
+    pars$hosp_beds <- max(pars$hosp_beds * pars$scale, 1)
+    pars$ICU_beds <- max(pars$ICU_beds * pars$scale, 1)
+
   }
 
+  # Initial exposures
+  age_dist = pars$population / sum(pars$population)
+  pars$E1_0 <- pmin(as.integer(num_initial_exposures * age_dist), pars$population)
+  pars$S_0 <- pars$population - pars$E1_0
+
+  # Time steps
   pars$dt <- dt
   pars$time_steps <- as.integer(time_period / dt)
 
@@ -93,6 +104,9 @@ get_parameters <- function(initial_state = NULL,
 
   # remove all non integer and double class objects as not compatible
   pars <- remove_non_numerics(pars)
+
+  # reinsert initial state
+  pars$initial_state <- initial_state
 
   # extend all time varying parameters to fill time steps
   pars$beta_set <- interp_input_par(
