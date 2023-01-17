@@ -13,9 +13,7 @@ knitr::opts_chunk$set(
 
 ```{r}
 library(nimue)
-library(devtools)
-devtools::load_all("C:/Users/jt511/Documents/Github/safir")
-# library(safir)
+library(safir)
 library(individual)
 library(data.table)
 library(ggplot2)
@@ -27,18 +25,26 @@ Here we will set up the model with vaccinations. In this model only a single typ
 
 Start by making parameters. Note that `get_vaccine_ab_titre_parameters` gets parameters giving antibody titre and decay rates for each supported vaccine type, and that `make_vaccine_parameters` does final type checking and combines the different parameters into a single list for the simulation. The function `make_vaccine_parameters` uses a `strategy_matrix` which is the output of [strategy_matrix in **nimue**](https://mrc-ide.github.io/nimue/articles/Coverage_and_Prioritisation.html). A user can either provide a single matrix that will give the strategy used to allocate all phases (all doses), or a list of matrices, one for each dosing phase.
 
-```{r}
-initial_state <- readRDS("C:/Users/jt511/Documents/Github/safir/data/synthetic_populations/SGP_20220901_010_1.Rds")
-num_initial_exposures <- 100
-iso3c <- "SGP"
-pop <- safir::get_population(iso3c)
-pop$n <- as.integer(pop$n / 1e3)
-contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
+The user can also provide the file path to an initial state, containing initial data in Rds format for the variables age, ab_titre, infection_number, dose_number, days_since_last_infection, days_since_last_dose. This data will be used to initialize these variables and overwrite data extracted from squire. The initial states have been given file names in the format XXX_YYYYMMDD_YYY_Z.Rds. Here XXX is the iso3c of the country represented, YYYYMMDD is the date to which this state refers, YYY is the scale factor (for example, 010 corresponds to the scale factor 0.010) and Z refers to the random seed used to generate the state.
 
-dur_R <- 1
+```{r}
+iso3c <- "TUR"
+
+# file path to initial state (can be NULL)
+initial_state <- readRDS("xxx/safir/data/synthetic_populations/TUR_20220901_010_1.Rds")
+
+# number of initial exposures (before rescaling)
+num_initial_exposures <- 10000
+
+# if an initial state is provided, the following will be overwritten
+pop <- safir::get_population(iso3c)
+pop$n <- as.integer(pop$n)
+
+contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 tmax <- 100
 dt <- 0.5
 R0 <- 4
+dur_R <- 1
 
 # vaccine dosing
 vaccine_doses <- 2

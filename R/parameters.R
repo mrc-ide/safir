@@ -55,6 +55,8 @@ get_parameters <- function(initial_state = NULL,
         time_period = time_period,
         ...)
 
+  pars$scale <- 1.0
+
   if(!is.null(initial_state)){
 
     # Population size according to squire
@@ -85,6 +87,7 @@ get_parameters <- function(initial_state = NULL,
 
   # Initial exposures
   age_dist = pars$population / sum(pars$population)
+  num_initial_exposures <- max(as.integer(num_initial_exposures * pars$scale), 1)
   pars$E1_0 <- pmin(as.integer(num_initial_exposures * age_dist), pars$population)
   pars$S_0 <- pars$population - pars$E1_0
 
