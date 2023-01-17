@@ -27,6 +27,8 @@ Start by making parameters. Note that `get_vaccine_ab_titre_parameters` gets par
 
 The user can also provide the file path to an initial state, containing initial data in Rds format for the variables age, ab_titre, infection_number, dose_number, days_since_last_infection, days_since_last_dose. This data will be used to initialize these variables and overwrite data extracted from squire. The initial states have been given file names in the format XXX_YYYYMMDD_YYY_Z.Rds. Here XXX is the iso3c of the country represented, YYYYMMDD is the date to which this state refers, YYY is the scale factor (for example, 010 corresponds to the scale factor 0.010) and Z refers to the random seed used to generate the state.
 
+Initial states at 0.010 scale for China, India, USA, Indonesia, Pakistan, Brazil and Nigeria are over 100MB and are therefore not included.
+
 ```{r}
 iso3c <- "TUR"
 
