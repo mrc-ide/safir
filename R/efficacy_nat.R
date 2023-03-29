@@ -12,14 +12,31 @@ vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
     vfr <- parameters$vfr[day]
   }
 
-  # null value is 1
-  ef_infection <- rep(1, length(ab_titre))
 
-  if (any(is.finite(ab_titre))) {
+
+  # null value is 1
+  ef_infection <- rep(1, length(ab_titre[[1]]))
+
+
+  if (any(is.finite(ab_titre[[1]]))){
+
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre))
-    nt <- exp(ab_titre[finite_ab])
-    nt <- pmax(.Machine$double.eps, nt / vfr)
+    finite_ab <- which(is.finite(ab_titre[[1]]))
+
+    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
+    nat_inf <- exp(ab_titre[[2]][finite_ab])
+
+    if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+
+      nt <- nat_vaccine + nat_inf
+      nt <- pmax(.Machine$double.eps, nt / vfr)
+
+    } else if (parameters$vp_time >= day){
+
+      nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
+      nt <- nat_vaccine + nat_infection
+    }
+
     ef_infection[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50)))) # reported efficacy in trials
     ef_infection[finite_ab] <- 1 - ef_infection[finite_ab]
     return(ef_infection)
@@ -47,15 +64,28 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
   }
 
   # null value is 1
-  ef_severe <- rep(1, length(ab_titre))
+  ef_severe <- rep(1, length(ab_titre[[1]]))
 
-  if (any(is.finite(ab_titre))) {
-    # input is on "hazard reduction" scale, convert to efficacy
-    # ef_infection <- 1 - ef_infection
+  if (any(is.finite(ab_titre[[1]]))){
+
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre))
-    nt <- exp(ab_titre[finite_ab])
-    nt <- pmax(.Machine$double.eps, nt / vfr)
+    finite_ab <- which(is.finite(ab_titre[[1]]))
+
+    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
+    nat_inf <- exp(ab_titre[[2]][finite_ab])
+
+    if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+
+      nt <- nat_vaccine + nat_inf
+      nt <- pmax(.Machine$double.eps, nt / vfr)
+
+    } else if (parameters$vp_time >= day){
+
+      nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
+      nt <- nat_vaccine + nat_infection
+    }
+
+
     ef_severe_uncond <- 1 / (1 + exp(-parameters$k * (log10(nt) - log10(parameters$ab_50_severe))))
     ef_severe[finite_ab] <-  1 - ((1 - ef_severe_uncond)/ef_infection[finite_ab]) # 1 - (1 - ef_infection) goes from hazard reduction scale to efficacy, simplifies to ef_infection
     ef_severe[finite_ab] <- 1 - ef_severe[finite_ab]
@@ -67,7 +97,7 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
 
 
 #' @title Compute vaccine efficacy against onward transmission from Ab titre
-#' @param ab_titre a vector of Ab titres
+#' @param ab_titre a list of Ab titres with two vecotrs: nat_vaccine and nat_infection
 #' @param parameters model parameters.
 #' @param day the current day
 #' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
@@ -81,13 +111,26 @@ vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
   }
 
   # null value is 1
-  ef_transmission <- rep(1, length(ab_titre))
+  ef_transmission <- rep(1, length(ab_titre[[1]]))
 
-  if (any(is.finite(ab_titre))) {
+  if (any(is.finite(ab_titre[[1]]))){
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre))
-    nt <- exp(ab_titre[finite_ab])
+    finite_ab <- which(is.finite(ab_titre[[1]]))
+
+    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
+    nat_inf <- exp(ab_titre[[2]][finite_ab])
+
+  if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+
+    nt <- nat_vaccine + nat_inf
     nt <- pmax(.Machine$double.eps, nt / vfr)
+
+  } else if (parameters$vp_time >= day){
+
+    nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
+    nt <- nat_vaccine + nat_infection
+  }
+
     ef_transmission[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt / parameters$nt_transmission_factor) - log10(parameters$ab_50)))) # reported efficacy in trials
     ef_transmission[finite_ab] <- 1 - ef_transmission[finite_ab]
     return(ef_transmission)
@@ -121,8 +164,7 @@ make_calculate_nat <- function(variables) {
       nat_vaccine <- variables$ab_titre$get_values(index)
       nat_infection <- variables$ab_titre_inf$get_values(index)
       # add them for single effect
-      nat <- exp(nat_vaccine) + exp(nat_infection)
-      nat <- log(nat)
+      nat <- list (nat_vaccine,nat_infection)
       return(nat)
     }
 
