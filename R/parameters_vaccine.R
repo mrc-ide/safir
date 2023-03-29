@@ -37,6 +37,7 @@ get_vaccine_ab_titre_parameters <- function(
   mu_ab_list = data.frame(name = c("Pfizer", "AstraZeneca", "Sinovac", "Moderna"),
                            mu_ab_d1 = c(13/94, 1/59, 28/164, ((185+273)/2)/321),
                            mu_ab_d2 = c(223/94, 32/59, 28/164, 654/158))
+
 ) {
 
   stopifnot(is.logical(nt_efficacy_transmission))
@@ -85,7 +86,8 @@ get_vaccine_ab_titre_parameters <- function(
     hl_s = hl_s,
     hl_l = hl_l,
     period_s = period_s,
-    t_period_l = t_period_l
+    t_period_l = t_period_l,
+
   )
   return(parameters)
 }
@@ -103,9 +105,10 @@ get_vaccine_ab_titre_parameters <- function(
 #' @param next_dose_priority_matrix a binary matrix giving age groups prioritized for next dose;
 #' it should have one fewer row than the number of doses being given, because on the
 #' final allocation phase there will be no future dose to prioritize
+#' @param vp_time day at which variant proof vaccine in introduced. If -1 there is not variant proof vaccine
 #' @description Combine parameters for simulation and verify for correctness.
 #' @export
-make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vaccine_set, dose_period, strategy_matrix, next_dose_priority_matrix) {
+make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vaccine_set, dose_period, strategy_matrix, next_dose_priority_matrix,vp_time=-1) {
 
   parameters <- safir_parameters
 
@@ -164,6 +167,7 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   parameters$nt_efficacy_transmission <- vaccine_ab_parameters$nt_efficacy_transmission
   parameters$max_ab <- vaccine_ab_parameters$max_ab
   parameters$correlated <- vaccine_ab_parameters$correlated
+  parameters$vp_time<- vp_time
 
   return(parameters)
 }
