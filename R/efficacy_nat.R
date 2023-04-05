@@ -15,16 +15,16 @@ vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
 
 
   # null value is 1
-  ef_infection <- rep(1, length(ab_titre[[1]]))
+  ef_infection <- rep(1, length(ab_titre[1,]))
 
 
-  if (any(is.finite(ab_titre[[1]]))){
+  if (any(is.finite(ab_titre[1,]))){
 
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[[1]]))
+    finite_ab <- which(is.finite(ab_titre[1,]))
 
-    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
-    nat_inf <- exp(ab_titre[[2]][finite_ab])
+    nat_vaccine <- exp(ab_titre[1,][finite_ab])
+    nat_inf <- exp(ab_titre[2,][finite_ab])
 
     if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
 
@@ -64,15 +64,15 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
   }
 
   # null value is 1
-  ef_severe <- rep(1, length(ab_titre[[1]]))
+  ef_severe <- rep(1, length(ab_titre[1,]))
 
-  if (any(is.finite(ab_titre[[1]]))){
+  if (any(is.finite(ab_titre[1,]))){
 
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[[1]]))
+    finite_ab <- which(is.finite(ab_titre[1,]))
 
-    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
-    nat_inf <- exp(ab_titre[[2]][finite_ab])
+    nat_vaccine <- exp(ab_titre[1,][finite_ab])
+    nat_inf <- exp(ab_titre[2,][finite_ab])
 
     if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
 
@@ -111,14 +111,14 @@ vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
   }
 
   # null value is 1
-  ef_transmission <- rep(1, length(ab_titre[[1]]))
+  ef_transmission <- rep(1, length(ab_titre[1,]))
 
-  if (any(is.finite(ab_titre[[1]]))){
+  if (any(is.finite(ab_titre[1,]))){
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[[1]]))
+    finite_ab <- which(is.finite(ab_titre[1,]))
 
-    nat_vaccine <- exp(ab_titre[[1]][finite_ab])
-    nat_inf <- exp(ab_titre[[2]][finite_ab])
+    nat_vaccine <- exp(ab_titre[1,][finite_ab])
+    nat_inf <- exp(ab_titre[2,][finite_ab])
 
   if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
 
@@ -153,7 +153,7 @@ make_calculate_nat <- function(variables) {
   if (is.null(variables$ab_titre_inf)) {
 
     calculate_nat <- function(variables, index) {
-      variables$ab_titre$get_values(index)
+      as.matrix(variables$ab_titre$get_values(index))
     }
 
   } else {
@@ -164,7 +164,7 @@ make_calculate_nat <- function(variables) {
       nat_vaccine <- variables$ab_titre$get_values(index)
       nat_infection <- variables$ab_titre_inf$get_values(index)
       # add them for single effect
-      nat <- list (nat_vaccine,nat_infection)
+      nat <- as.matrix(rbind(nat_vaccine,nat_infection))
       return(nat)
     }
 
