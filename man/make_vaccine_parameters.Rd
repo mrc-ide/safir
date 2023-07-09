@@ -10,7 +10,8 @@ make_vaccine_parameters(
   vaccine_set,
   dose_period,
   strategy_matrix,
-  next_dose_priority_matrix
+  next_dose_priority_matrix,
+  vp_time = -1
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ or a list of strategy matrices, one for each vaccine dose}
 \item{next_dose_priority_matrix}{a binary matrix giving age groups prioritized for next dose;
 it should have one fewer row than the number of doses being given, because on the
 final allocation phase there will be no future dose to prioritize}
+
+\item{vp_time}{day at which variant proof vaccine in introduced. If -1 there is not variant proof vaccine}
 }
 \description{
 Combine parameters for simulation and verify for correctness.

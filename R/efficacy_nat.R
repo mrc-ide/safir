@@ -153,7 +153,7 @@ make_calculate_nat <- function(variables) {
   if (is.null(variables$ab_titre_inf)) {
 
     calculate_nat <- function(variables, index) {
-      as.matrix(variables$ab_titre$get_values(index))
+      matrix(data = variables$ab_titre$get_values(index), nrow = 1)
     }
 
   } else {
@@ -164,7 +164,7 @@ make_calculate_nat <- function(variables) {
       nat_vaccine <- variables$ab_titre$get_values(index)
       nat_infection <- variables$ab_titre_inf$get_values(index)
       # add them for single effect
-      nat <- as.matrix(rbind(nat_vaccine,nat_infection))
+      nat <- rbind(nat_vaccine,nat_infection)
       return(nat)
     }
 

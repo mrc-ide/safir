@@ -86,8 +86,7 @@ get_vaccine_ab_titre_parameters <- function(
     hl_s = hl_s,
     hl_l = hl_l,
     period_s = period_s,
-    t_period_l = t_period_l,
-
+    t_period_l = t_period_l
   )
   return(parameters)
 }
