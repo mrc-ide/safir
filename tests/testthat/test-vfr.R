@@ -114,7 +114,6 @@ test_that("test VFR decay with NAT from vaccination working with dt = 1", {
   ef_infection_cpp[1, ] <- vaccine_efficacy_infection_cpp(ab_titre = variables$ab_titre$get_values(), parameters = parameters, day = 0)
   ef_severe_cpp[1, ] <- vaccine_efficacy_severe_cpp(ab_titre = variables$ab_titre$get_values(), ef_infection = ef_infection_cpp[1, ], parameters = parameters, day = 0)
 
-
   for (t in 1:timesteps) {
     day <- ceiling(t * dt)
     ab_titre(timestep = t)

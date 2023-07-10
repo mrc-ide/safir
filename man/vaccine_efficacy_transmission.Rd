@@ -7,7 +7,7 @@
 vaccine_efficacy_transmission(ab_titre, parameters, day)
 }
 \arguments{
-\item{ab_titre}{a vector of Ab titres}
+\item{ab_titre}{a list of Ab titres with two vecotrs: nat_vaccine and nat_infection}
 
 \item{parameters}{model parameters.}
 
