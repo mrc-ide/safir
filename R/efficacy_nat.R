@@ -1,39 +1,45 @@
 #' @title Compute vaccine efficacy against infection from Ab titre
-#' @param ab_titre a vector of Ab titres
+#' @param variables a list of variables that include the ab_titres
 #' @param parameters model parameters.
 #' @param day the current day
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
+vaccine_efficacy_infection <- function(variables, parameters, day) {
 
+  # Check if the ab_titre vectors are not null
+  stopifnot(!is.null(variables$ab_titre))
+  stopifnot(!is.null(variables$ab_titre_inf))
+  stopifnot(inherits(variables$ab_titre, "DoubleVariable"))
+
+  # Get VFR parameter, if null assign 1
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
     vfr <- parameters$vfr[day]
   }
 
-
-
   # null value is 1
-  ef_infection <- rep(1, length(ab_titre[1,]))
+  ef_infection <- rep(1,variables$ab_titre)
 
 
-  if (any(is.finite(ab_titre[1,]))){
+  if (any(is.finite(variables$ab_titre))){
 
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[1,]))
+    finite_ab <- which(variables$ab_titre)
 
-    nat_vaccine <- exp(ab_titre[1,][finite_ab])
-    nat_inf <- exp(ab_titre[2,][finite_ab])
+    nat_vaccine <- exp(variables$ab_titre$get_values(index))
+    nat_infection <- exp(variables$ab_titre_inf$get_values(index))
 
-    if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+    vp_on <- parameters$vp_time[day]
 
-      nt <- nat_vaccine + nat_inf
+    if(vp_on == 0 ){  # If there is not a variant proof vaccine
+
+      nt <- nat_vaccine + nat_infection
       nt <- pmax(.Machine$double.eps, nt / vfr)
 
-    } else if (parameters$vp_time >= day){
+    } else if (vp_on ==1 ){
 
-      nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
+      nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)  # Only infection induced antibodies are scaled down by vfr
       nt <- nat_vaccine + nat_infection
     }
 
@@ -49,7 +55,7 @@ vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
 #' @title Compute vaccine efficacy against severe disease from Ab titre
 #' @description This needs the efficacy against infection because efficacy against severe disease,
 #' conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).
-#' @param ab_titre a vector of Ab titres
+#' @param variables a list of variables that include the ab_titres
 #' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 #' @param parameters model parameters
 #' @param day the current day
@@ -57,6 +63,13 @@ vaccine_efficacy_infection <- function(ab_titre, parameters, day) {
 #' @export
 vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
 
+
+  # Check if the ab_titre vectors are not null
+  stopifnot(!is.null(variables$ab_titre))
+  stopifnot(!is.null(variables$ab_titre_inf))
+  stopifnot(inherits(variables$ab_titre, "DoubleVariable"))
+
+  # Get VFR parameter, if null assign 1
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
@@ -64,24 +77,26 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
   }
 
   # null value is 1
-  ef_severe <- rep(1, length(ab_titre[1,]))
+  ef_severe <- rep(1, length(variables$ab_titre))
 
-  if (any(is.finite(ab_titre[1,]))){
+  if (any(is.finite(variables$ab_titre))){
 
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[1,]))
+    finite_ab <- which(variables$ab_titre)
 
-    nat_vaccine <- exp(ab_titre[1,][finite_ab])
-    nat_inf <- exp(ab_titre[2,][finite_ab])
+    nat_vaccine <- exp(variables$ab_titre$get_values(index))
+    nat_infection <- exp(variables$ab_titre_inf$get_values(index))
 
-    if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+    vp_on <- parameters$vp_time[day]
 
-      nt <- nat_vaccine + nat_inf
+    if(vp_on == 0 ){  # If there is not a variant proof vaccine
+
+      nt <- nat_vaccine + nat_infection
       nt <- pmax(.Machine$double.eps, nt / vfr)
 
-    } else if (parameters$vp_time >= day){
+    } else if (vp_on ==1 ){
 
-      nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
+      nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)  # Only infection induced antibodies are scaled down by vfr
       nt <- nat_vaccine + nat_infection
     }
 
@@ -97,13 +112,19 @@ vaccine_efficacy_severe <- function(ab_titre, ef_infection, parameters, day) {
 
 
 #' @title Compute vaccine efficacy against onward transmission from Ab titre
-#' @param ab_titre a list of Ab titres with two vecotrs: nat_vaccine and nat_infection
+#' @param variables a list of variables that include the ab_titres
 #' @param parameters model parameters.
 #' @param day the current day
 #' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
 #' @export
 vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
 
+  # Check if the ab_titre vectors are not null
+  stopifnot(!is.null(variables$ab_titre))
+  stopifnot(!is.null(variables$ab_titre_inf))
+  stopifnot(inherits(variables$ab_titre, "DoubleVariable"))
+
+  # Get VFR parameter, if null assign 1
   if (is.null(parameters$vfr)) {
     vfr <- 1
   } else {
@@ -111,25 +132,28 @@ vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
   }
 
   # null value is 1
-  ef_transmission <- rep(1, length(ab_titre[1,]))
+  ef_transmission <- rep(1, length(variables$ab_titre))
 
-  if (any(is.finite(ab_titre[1,]))){
+  if (any(is.finite(variables$ab_titre))){
     # if some vaccinated individuals with ab titre, calc efficacy for them
-    finite_ab <- which(is.finite(ab_titre[1,]))
+    finite_ab <- which(variables$ab_titre)
 
-    nat_vaccine <- exp(ab_titre[1,][finite_ab])
-    nat_inf <- exp(ab_titre[2,][finite_ab])
+    nat_vaccine <- exp(variables$ab_titre$get_values(index))
+    nat_infection <- exp(variables$ab_titre_inf$get_values(index))
 
-  if(parameters$vp_time == -1 | parameters$vp_time < day ){  # If there is not a variant proof vaccine or before variant proof vaccine is introduced
+    vp_on <- parameters$vp_time[day]
 
-    nt <- nat_vaccine + nat_inf
-    nt <- pmax(.Machine$double.eps, nt / vfr)
+    if(vp_on == 0 ){  # If there is not a variant proof vaccine
 
-  } else if (parameters$vp_time >= day){
+      nt <- nat_vaccine + nat_infection
+      nt <- pmax(.Machine$double.eps, nt / vfr)
 
-    nat_infection <-  pmax(.Machine$double.eps, nt_vec[2] / vfr)  # Only infection induced antibodies are scaled down by vfr
-    nt <- nat_vaccine + nat_infection
-  }
+    } else if (vp_on ==1 ){
+
+      nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)  # Only infection induced antibodies are scaled down by vfr
+      nt <- nat_vaccine + nat_infection
+    }
+
 
     ef_transmission[finite_ab] <- 1 / (1 + exp(-parameters$k * (log10(nt / parameters$nt_transmission_factor) - log10(parameters$ab_50)))) # reported efficacy in trials
     ef_transmission[finite_ab] <- 1 - ef_transmission[finite_ab]
@@ -139,35 +163,3 @@ vaccine_efficacy_transmission <- function(ab_titre, parameters, day) {
   }
 }
 
-
-#' @title Make function to calculate population NAT
-#' @description This returns a function taking two arguments `variables` (a list of variables)
-#' and `index` (a [individual::Bitset]) which will return the NAT for each person in `index`.
-#' If the list of variables includes `ab_titre_inf`, then the combined NAT from vaccine and
-#' infection derived NATs is returned.
-#' @param variables a named list
-#' @export
-make_calculate_nat <- function(variables) {
-  stopifnot(!is.null(variables$ab_titre))
-  stopifnot(inherits(variables$ab_titre, "DoubleVariable"))
-  if (is.null(variables$ab_titre_inf)) {
-
-    calculate_nat <- function(variables, index) {
-      as.matrix(variables$ab_titre$get_values(index))
-    }
-
-  } else {
-    stopifnot(inherits(variables$ab_titre_inf, "DoubleVariable"))
-
-    calculate_nat <- function(variables, index) {
-      # two types of NAT
-      nat_vaccine <- variables$ab_titre$get_values(index)
-      nat_infection <- variables$ab_titre_inf$get_values(index)
-      # add them for single effect
-      nat <- as.matrix(rbind(nat_vaccine,nat_infection))
-      return(nat)
-    }
-
-  }
-  return(calculate_nat)
-}
