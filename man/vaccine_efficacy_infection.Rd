@@ -4,10 +4,10 @@
 \alias{vaccine_efficacy_infection}
 \title{Compute vaccine efficacy against infection from Ab titre}
 \usage{
-vaccine_efficacy_infection(ab_titre, parameters, day)
+vaccine_efficacy_infection(nat, parameters, day)
 }
 \arguments{
-\item{ab_titre}{a vector of Ab titres}
+\item{nat}{a vector of NAT values}
 
 \item{parameters}{model parameters.}
 

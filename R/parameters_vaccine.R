@@ -166,7 +166,14 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   parameters$nt_efficacy_transmission <- vaccine_ab_parameters$nt_efficacy_transmission
   parameters$max_ab <- vaccine_ab_parameters$max_ab
   parameters$correlated <- vaccine_ab_parameters$correlated
-  parameters$vp_time<- vp_time
+
+  parameters$vp_time <- rep(0, parameters$time_period)
+  if (vp_time != -1) {
+    stopifnot(vp_time >= 0)
+    parameters$vp_time <- rep(0, parameters$time_period)
+    parameters$vp_time[vp_time:length(parameters$vp_time)] <- 1
+  }
+  parameters$vp_time <- as.integer(parameters$vp_time)
 
   return(parameters)
 }

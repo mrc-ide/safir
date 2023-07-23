@@ -20,7 +20,7 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
   IMild_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
   IAsymp_delay <- make_rerlang(mu = parameters$dur_E, dt = dt, shift = shift)
 
-  calculate_nat <- make_calculate_nat(variables = variables)
+  calculate_nat <- make_calculate_nat(variables = variables, parameters = parameters)
 
   check_probabilities(prob = parameters$prob_hosp, parameters = parameters)
   check_probabilities(prob = parameters$prob_asymp, parameters = parameters)
@@ -39,9 +39,9 @@ create_exposure_scheduler_listener_vaccine <- function(events, variables, parame
       hosp <- target$copy()
 
       # vaccine efficacy against severe disease
-      nat <- calculate_nat(variables = variables, index = hosp)
-      infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = nat, parameters = parameters, day = day - 1L) # 0-based index
-      severe_efficacy <- vaccine_efficacy_severe_cpp(ab_titre = nat, ef_infection = infection_efficacy,parameters = parameters, day = day - 1L) # 0-based index
+      nat <- calculate_nat(index = hosp, day = day)
+      infection_efficacy <- vaccine_efficacy_infection_cpp(nat = nat, parameters = parameters, day = day - 1L) # 0-based index
+      severe_efficacy <- vaccine_efficacy_severe_cpp(nat = nat, ef_infection = infection_efficacy,parameters = parameters, day = day - 1L) # 0-based index
 
       # sample those with severe disease
       hosp$sample(prob_hosp * severe_efficacy)

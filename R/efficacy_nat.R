@@ -70,9 +70,6 @@ make_calculate_nat <- function(variables, parameters) {
   if (is.null(variables$ab_titre_inf)) {
 
     stop("currently safir only correctly simulates models with seperate tracking of vaccine and infection derived NAT values")
-    calculate_nat <- function(index, day) {
-      return(variables$ab_titre$get_values(index))
-    }
 
   } else {
     stopifnot(inherits(variables$ab_titre_inf, "DoubleVariable"))
@@ -96,12 +93,11 @@ make_calculate_nat <- function(variables, parameters) {
         nt <- nat_vaccine + nat_infection
         nt <- pmax(.Machine$double.eps, nt / vfr)
 
-      } else if (vp_on == 1){
+      } else {
 
         nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)  # Only infection induced antibodies are scaled down by vfr
         nt <- nat_vaccine + nat_infection
       }
-
       return(nt)
     }
 

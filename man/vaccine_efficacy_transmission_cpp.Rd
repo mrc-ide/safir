@@ -4,10 +4,10 @@
 \alias{vaccine_efficacy_transmission_cpp}
 \title{Compute vaccine efficacy against onward transmission from Ab titre (C++)}
 \usage{
-vaccine_efficacy_transmission_cpp(ab_titre, parameters, day)
+vaccine_efficacy_transmission_cpp(nat, parameters, day)
 }
 \arguments{
-\item{ab_titre}{a vector of Ab titres}
+\item{nat}{a vector of NAT values}
 
 \item{parameters}{model parameters.}
 

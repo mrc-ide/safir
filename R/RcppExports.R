@@ -2,36 +2,36 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @title Compute vaccine efficacy against infection from Ab titre (C++)
-#' @param ab_titre a vector of Ab titres
+#' @param nat a vector of NAT values
 #' @param parameters model parameters
 #' @param day current day
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_infection_cpp <- function(ab_titre, parameters, day) {
-    .Call('_safir_vaccine_efficacy_infection_cpp', PACKAGE = 'safir', ab_titre, parameters, day)
+vaccine_efficacy_infection_cpp <- function(nat, parameters, day) {
+    .Call('_safir_vaccine_efficacy_infection_cpp', PACKAGE = 'safir', nat, parameters, day)
 }
 
 #' @title Compute vaccine efficacy against severe disease from Ab titre (C++)
 #' @description This needs the efficacy against infection because efficacy against severe disease,
 #' conditional on breakthrough infection is what safir needs, which is computed as  1 - ((1 - efficacy_disease)/(1 - efficacy_infection)).
-#' @param ab_titre a vector of Ab titres
+#' @param nat a vector of NAT values
 #' @param ef_infection a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}
 #' @param parameters model parameters
 #' @param day current day
 #' @return a numeric vector, 0 is maximally proective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_severe_cpp <- function(ab_titre, ef_infection, parameters, day) {
-    .Call('_safir_vaccine_efficacy_severe_cpp', PACKAGE = 'safir', ab_titre, ef_infection, parameters, day)
+vaccine_efficacy_severe_cpp <- function(nat, ef_infection, parameters, day) {
+    .Call('_safir_vaccine_efficacy_severe_cpp', PACKAGE = 'safir', nat, ef_infection, parameters, day)
 }
 
 #' @title Compute vaccine efficacy against onward transmission from Ab titre (C++)
-#' @param ab_titre a vector of Ab titres
+#' @param nat a vector of NAT values
 #' @param parameters model parameters.
 #' @param day current day
 #' @return a numeric vector, 0 is maximally protective, 1 is maximally unprotective
 #' @export
-vaccine_efficacy_transmission_cpp <- function(ab_titre, parameters, day) {
-    .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', ab_titre, parameters, day)
+vaccine_efficacy_transmission_cpp <- function(nat, parameters, day) {
+    .Call('_safir_vaccine_efficacy_transmission_cpp', PACKAGE = 'safir', nat, parameters, day)
 }
 
 #' @noRd

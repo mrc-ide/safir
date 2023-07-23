@@ -1,6 +1,7 @@
 test_that("c++ infection process (multiple doses, no types) returns identical results as R version", {
 
   library(nimue)
+  library(individual)
 
   # pars
   iso3c <- "GBR"
@@ -18,7 +19,7 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
   parameters$beta_set <- parameters$beta_set*rexp(n = length(parameters$beta_set))
 
   # test states
-  n <- 1e5
+  n <- 1e4
   dt <- 0.5
   valid_states <- c("S","IMild","ICase","IAsymp")
   state0 <- sample(x = valid_states,size = n,replace = T)
@@ -31,10 +32,13 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
   ab_titre <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = rep(-Inf,n))
   exposure <- individual::TargetedEvent$new(population_size = n)
 
+  vars <- list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf)
+
   set.seed(5436L)
-  inf_proc_R <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt =dt)
+  inf_proc_R <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt =dt)
   inf_proc_R(timestep = 100)
 
   sched_R <- exposure$get_scheduled()$to_vector()
@@ -43,11 +47,14 @@ test_that("c++ infection process (multiple doses, no types) returns identical re
   states1 <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age1 <- individual::IntegerVariable$new(initial_values = age0)
   ab_titre1 <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  ab_titre_inf1 <- individual::DoubleVariable$new(initial_values = rep(-Inf,n))
   exposure1 <- individual::TargetedEvent$new(population_size = n)
 
+  vars1 <- list(states=states1,discrete_age=discrete_age1,ab_titre=ab_titre1,ab_titre_inf=ab_titre_inf1)
+
   set.seed(5436L)
-  inf_proc_Cpp <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states1,discrete_age=discrete_age1,ab_titre=ab_titre1),events = list(exposure=exposure1),dt =dt)
-  execute_process(process = inf_proc_Cpp,timestep = 100)
+  inf_proc_Cpp <- infection_process_vaccine_cpp(parameters = parameters,variables = vars1,events = list(exposure=exposure1),dt =dt)
+  individual:::execute_process(process = inf_proc_Cpp,timestep = 100)
 
   sched_Cpp <- exposure1$get_scheduled()$to_vector()
 
@@ -106,6 +113,7 @@ test_that("infection process with vaccines: infection_efficacy prevents transmis
   timesteps <- parameters$time_period/dt
   variables <- create_variables(pop = pop, parameters = parameters)
   variables <- create_vaccine_variables(variables = variables,parameters = parameters)
+  variables <- create_independent_nat_variables(variables = variables, parameters = parameters)
 
   # create events
   events <- create_events(parameters = parameters)
@@ -162,6 +170,7 @@ test_that("infection process with vaccines: infection_efficacy prevents transmis
   timesteps <- parameters$time_period/dt
   variables <- create_variables(pop = pop, parameters = parameters)
   variables <- create_vaccine_variables(variables = variables,parameters = parameters)
+  variables <- create_independent_nat_variables(variables = variables, parameters = parameters)
 
   # create events
   events <- create_events(parameters = parameters)

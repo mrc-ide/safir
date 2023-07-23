@@ -4,14 +4,11 @@
 \alias{make_calculate_nat}
 \title{Make function to calculate population NAT}
 \usage{
-make_calculate_nat(variables)
+make_calculate_nat(variables, parameters)
 }
 \arguments{
 \item{variables}{a named list}
 }
 \description{
-This returns a function taking two arguments \code{variables} (a list of variables)
-and \code{index} (a \link[individual:Bitset]{individual::Bitset}) which will return the NAT for each person in \code{index}.
-If the list of variables includes \code{ab_titre_inf}, then the combined NAT from vaccine and
-infection derived NATs is returned.
+The returned function takes arguments \code{index} (a bitset) and \code{day} and returns the NAT of persons in \code{index} on the linear scale.
 }

@@ -20,13 +20,13 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
 
   stopifnot(all(c("states","discrete_age") %in% names(variables)))
 
-  calculate_nat <- make_calculate_nat(variables = variables)
+  calculate_nat <- make_calculate_nat(variables = variables, parameters = parameters)
 
   if (parameters$nt_efficacy_transmission) {
     get_inf_ages <- function(infection_bset, variables, parameters, day) {
       ages <- variables$discrete_age$get_values(infection_bset)
-      nat_values <- calculate_nat(variables = variables, index = infection_bset)
-      inf_wt <- vaccine_efficacy_transmission_cpp(ab_titre = nat_values, parameters = parameters, day = day - 1L) # 0-based index
+      nat <- calculate_nat(index = infection_bset, day = day)
+      inf_wt <- vaccine_efficacy_transmission_cpp(nat = nat, parameters = parameters, day = day - 1L) # 0-based index
       inf_ages <- tab_bins_weighted(a = ages, wt = inf_wt,  nbins = parameters$N_age)
       return(inf_ages)
     }
@@ -71,8 +71,8 @@ infection_process_vaccine <- function(parameters, variables, events, dt) {
           lambda_age <- parameters$beta_set[day] * as.vector(m %*% inf_ages)
 
           # get infection modifier and ages
-          nat_values <- calculate_nat(variables = variables, index = susceptible)
-          infection_efficacy <- vaccine_efficacy_infection_cpp(ab_titre = nat_values,parameters = parameters, day = day - 1L) # 0-based index
+          nat_values <- calculate_nat(index = susceptible, day = day)
+          infection_efficacy <- vaccine_efficacy_infection_cpp(nat = nat_values,parameters = parameters, day = day - 1L) # 0-based index
           ages <- variables$discrete_age$get_values(susceptible)
 
           # FoI for each susceptible based on their age group

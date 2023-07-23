@@ -53,7 +53,7 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
 
 
-simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE) {
+simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE) {
 
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -97,6 +97,7 @@ simulate_vfr <- function(vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NUL
   variables <- create_variables(pop = pop, parameters = parameters)
   variables <- create_vaccine_variables(variables = variables,parameters = parameters)
   variables <- create_natural_immunity_variables(variables = variables, parameters = parameters)
+  variables <- create_independent_nat_variables(variables = variables, parameters = parameters)
 
   # create events
   events <- create_events(parameters = parameters)
