@@ -4,9 +4,6 @@
 #   July 2021
 # --------------------------------------------------------------------------------
 
-
-
-
 #' @title Infection process for vaccine model (multi-dose, no types)
 #'
 #' @description This samples infection events in the susceptible population.
