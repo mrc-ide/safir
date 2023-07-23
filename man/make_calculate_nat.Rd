@@ -8,6 +8,8 @@ make_calculate_nat(variables, parameters)
 }
 \arguments{
 \item{variables}{a named list}
+
+\item{parameters}{a named list}
 }
 \description{
 The returned function takes arguments \code{index} (a bitset) and \code{day} and returns the NAT of persons in \code{index} on the linear scale.

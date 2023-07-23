@@ -63,6 +63,7 @@ vaccine_efficacy_transmission <- function(nat, parameters, day) {
 #' @title Make function to calculate population NAT
 #' @description The returned function takes arguments `index` (a bitset) and `day` and returns the NAT of persons in `index` on the linear scale.
 #' @param variables a named list
+#' @param parameters a named list
 #' @export
 make_calculate_nat <- function(variables, parameters) {
   stopifnot(!is.null(variables$ab_titre))

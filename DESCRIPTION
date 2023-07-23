@@ -30,8 +30,7 @@ Suggests:
     mockery,
     ggplot2,
     knitr,
-    rmarkdown,
-    mockery
+    rmarkdown
 Imports:
     individual,
     Rcpp,
