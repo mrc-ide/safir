@@ -53,7 +53,7 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
 
 
-simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, vp_time = NULL, inf_proc = "R") {
+simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, vp_time = NULL, inf_proc = "R", vaccine_set = 0) {
 
   stopifnot(inf_proc == "R" || inf_proc == "C++")
 
@@ -62,7 +62,7 @@ simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_
   # vaccine dosing
   vaccine_doses <- 2
   dose_period <- c(NaN, 28)
-  vaccine_set <- rep(0, tmax)
+  vaccine_set <- rep(vaccine_set, tmax)
 
   # vaccine strategy
   vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
@@ -162,9 +162,9 @@ simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_
 
 }
 
-simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE, vp_time = NULL, inf_proc = "R") {
+simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE, vp_time = NULL, inf_proc = "R", vaccine_set = 0) {
 
-  simout <- simulate_vfr_simonly(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection, vp_time, inf_proc)
+  simout <- simulate_vfr_simonly(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection, vp_time, inf_proc, vaccine_set = vaccine_set)
 
   if (ret_ab) {
     return(simout$variables$ab_titre$get_values())
