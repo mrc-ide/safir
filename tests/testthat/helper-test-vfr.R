@@ -53,7 +53,7 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
 
 
-simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE, vp_time = NULL, inf_proc = "R") {
+simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, vp_time = NULL, inf_proc = "R") {
 
   stopifnot(inf_proc == "R" || inf_proc == "C++")
 
@@ -149,10 +149,26 @@ simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infectio
     progress = FALSE
   )
 
-  if (ret_ab) {
-    return(variables$ab_titre$get_values())
-  } else {
-    return(renderer$to_dataframe())
-  }
+  return(
+    list(
+      "variables" = variables,
+      "events" = events,
+      "processes" = processes,
+      "parameters" = parameters,
+      "events" = events,
+      "renderer" = renderer
+    )
+  )
 
+}
+
+simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE, vp_time = NULL, inf_proc = "R") {
+
+  simout <- simulate_vfr_simonly(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection, vp_time, inf_proc)
+
+  if (ret_ab) {
+    return(simout$variables$ab_titre$get_values())
+  } else {
+    return(simout$renderer$to_dataframe())
+  }
 }

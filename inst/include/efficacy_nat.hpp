@@ -19,6 +19,14 @@ calculate_nat_func make_calculate_nat(
     const Rcpp::List& parameters
 );
 
+// used for testing only, calculate NAT
+std::vector<double> test_make_calculate_nat_cpp(
+    const Rcpp::List& variables,
+    const Rcpp::List& parameters,
+    Rcpp::XPtr<individual_index_t> index,
+    const size_t day
+);
+
 std::vector<double> vaccine_efficacy_infection_cpp(
     const std::vector<double>& nat,
     const Rcpp::List& parameters,

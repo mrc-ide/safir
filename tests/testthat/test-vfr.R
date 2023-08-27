@@ -478,26 +478,79 @@ test_that("time varying mu_ab_infection works", {
 })
 
 
-# test_that("R and C++ agree with variant proof option", {
-#
-#   iso3c <- "GBR"
-#   pop <- safir::get_population(iso3c)
-#   pop$n <- as.integer(pop$n / 1e3)
-#
-#   tmax <- 20
-#   dt <- 0.5
-#   R0 <- 20
-#
-#   vfr <- rep(50, tmax)
-#
-#   ab_0 <- rep(2, sum(pop$n))
-#
-#   vp_time <- 2
-#
-#   set.seed(123)
-#   sim_R <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", ret_ab = TRUE)
-#   set.seed(123)
-#   sim_cpp <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", ret_ab = TRUE)
-#
-#   expect_true(abs(mean(sim_R) - mean(sim_cpp)) < 1e-2)
-# })
+test_that("R and C++ agree on NAT calculation with vp_time and without", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- rep(10, length(pop$n))
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vfr <- rep(50, tmax)
+
+  ab_0 <- rep(2, sum(pop$n))
+
+  vp_time <- NULL
+
+  set.seed(123)
+  simout <- simulate_vfr_simonly(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R")
+
+  # test with no vp_time
+  bset <- Bitset$new(size = sum(pop$n))$insert(1:sum(pop$n))
+  calc_nat_r <- make_calculate_nat(variables = simout$variables, parameters = simout$parameters)
+  out_r <- calc_nat_r(index = bset, day = 20)
+
+  out_cpp <- test_make_calculate_nat_cpp(variables = simout$variables, parameters = simout$parameters, index = bset$.bitset, day = 19)
+
+  expect_true(all(abs(out_r - out_cpp) < 1e-6))
+
+  # test with vp_time
+  simout$parameters$vp_time <- rep(0, simout$parameters$time_period)
+  simout$parameters$vp_time[10:simout$parameters$time_period] <- 1
+  simout$parameters$vp_time <- as.integer(simout$parameters$vp_time)
+
+  # use some random vals for vaccinated person times
+  n_vaxx <- as.integer(sum(pop$n)/2)
+  bset_vaxx <- Bitset$new(size = sum(pop$n))$insert(sample(x = sum(pop$n), size = n_vaxx, replace = FALSE))
+  times_vaxx <- sample(x = simout$parameters$time_steps-1, size = n_vaxx, replace = TRUE)
+  simout$variables$dose_time$queue_update(values = times_vaxx, index = bset_vaxx)
+  simout$variables$dose_time$.update()
+
+  simout$variables$dose_num$queue_update(values = 1, index = bset_vaxx)
+  simout$variables$dose_num$.update()
+
+  calc_nat_r <- make_calculate_nat(variables = simout$variables, parameters = simout$parameters)
+  out_r <- calc_nat_r(index = bset, day = 20)
+
+  out_cpp <- test_make_calculate_nat_cpp(variables = simout$variables, parameters = simout$parameters, index = bset$.bitset, day = 19)
+
+  expect_true(all(abs(out_r - out_cpp) < 1e-6))
+})
+
+
+test_that("R and C++ agree with variant proof option", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1e3)
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vfr <- rep(50, tmax)
+
+  ab_0 <- rep(2, sum(pop$n))
+
+  vp_time <- 2
+
+  set.seed(123)
+  sim_R <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", ret_ab = TRUE)
+  set.seed(123)
+  sim_cpp <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", ret_ab = TRUE)
+
+  expect_true(abs(mean(sim_R) - mean(sim_cpp)) < 1e-5)
+  expect_true(abs(sd(sim_R) - sd(sim_cpp)) < 1e-5)
+})

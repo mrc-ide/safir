@@ -169,6 +169,7 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
 
   parameters$vp_time <- NULL
   if (!is.null(vp_time) && is.numeric(vp_time) && vp_time >= 0) {
+    stopifnot(vp_time <= parameters$time_period)
     parameters$vp_time <- rep(0, parameters$time_period)
     parameters$vp_time[vp_time:length(parameters$vp_time)] <- 1
     parameters$vp_time <- as.integer(parameters$vp_time)

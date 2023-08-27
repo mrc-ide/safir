@@ -26,12 +26,15 @@ calculate_nat_func make_calculate_nat(
   Rcpp::Environment ab_titre_inf_R6 = Rcpp::as<Rcpp::Environment>(variables["ab_titre_inf"]);
   Rcpp::XPtr<DoubleVariable> ab_titre_inf(Rcpp::as<SEXP>(ab_titre_inf_R6[".variable"]));
 
-  if (variables.containsElementNamed("vp_time")) {
+  if (parameters.containsElementNamed("vp_time") && parameters["vp_time"] != R_NilValue) {
 
     Rcpp::Environment dose_time_R6 = Rcpp::as<Rcpp::Environment>(variables["dose_time"]);
     Rcpp::XPtr<IntegerVariable> dose_time(Rcpp::as<SEXP>(dose_time_R6[".variable"]));
 
-    calculate_nat = [ab_titre, ab_titre_inf, parameters, dose_time](const individual_index_t& index, const size_t day) -> std::vector<double> {
+    Rcpp::Environment dose_num_R6 = Rcpp::as<Rcpp::Environment>(variables["dose_num"]);
+    Rcpp::XPtr<IntegerVariable> dose_num(Rcpp::as<SEXP>(dose_num_R6[".variable"]));
+
+    calculate_nat = [ab_titre, ab_titre_inf, parameters, dose_time, dose_num](const individual_index_t& index, const size_t day) -> std::vector<double> {
 
       double vfr{1.0};
       if (parameters.containsElementNamed("vfr")) {
@@ -48,6 +51,7 @@ calculate_nat_func make_calculate_nat(
       int* vp_on_ptr = INTEGER(vp_on_sexp);
 
       std::vector<int> dose_times = dose_time->get_values(index);
+      std::vector<int> dose_nums = dose_num->get_values(index);
 
       std::vector<double> nat(index.size());
 
@@ -55,17 +59,20 @@ calculate_nat_func make_calculate_nat(
       int my_dose_time;
 
       for (auto i = 0u; i < index.size(); ++i) {
-        my_nat_infection = exp(nat_infection[i]);
-        my_nat_vaccine = exp(nat_vaccine[i]);
+        my_nat_infection = std::exp(nat_infection[i]);
+        my_nat_vaccine = std::exp(nat_vaccine[i]);
 
         // nat_infection should always be scaled by vfr regardless
         my_nat_infection = std::max(eps, my_nat_infection / vfr);
 
-        // find individuals who were vaccinated when variant proof vaccine was on
-        my_dose_time = static_cast<int>(std::ceil(static_cast<double>(dose_times[i]) * dt) - 1.0);
-        if (vp_on_ptr[my_dose_time] == 0) {
-          // apply vfr to those that were vaccinated not during variant proof window
-          my_nat_vaccine = std::max(eps, my_nat_vaccine / vfr);
+        // if this person was vaccinated
+        if (dose_nums[i] != 0) {
+          // find individuals who were vaccinated when variant proof vaccine was on
+          my_dose_time = static_cast<int>(std::ceil(static_cast<double>(dose_times[i]) * dt) - 1.0);
+          if (vp_on_ptr[my_dose_time] == 0) {
+            // apply vfr to those that were vaccinated not during variant proof window
+            my_nat_vaccine = std::max(eps, my_nat_vaccine / vfr);
+          }
         }
 
         // and combine these for overall NAT
@@ -103,6 +110,26 @@ calculate_nat_func make_calculate_nat(
 
   return calculate_nat;
 };
+
+
+//' @title used for testing only, calculate NAT
+//' @param variables model variables
+//' @param parameters model parameters
+//' @param index a bitset
+//' @param day current day
+//' @return a numeric vector
+//' @export
+// [[Rcpp::export]]
+std::vector<double> test_make_calculate_nat_cpp(
+    const Rcpp::List& variables,
+    const Rcpp::List& parameters,
+    Rcpp::XPtr<individual_index_t> index,
+    const size_t day
+) {
+  calculate_nat_func calc_nat = make_calculate_nat(variables, parameters);
+  return calc_nat(*(index), day);
+};
+
 
 //' @title Compute vaccine efficacy against infection from Ab titre (C++)
 //' @param nat a vector of NAT values

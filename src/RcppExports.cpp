@@ -11,6 +11,20 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// test_make_calculate_nat_cpp
+std::vector<double> test_make_calculate_nat_cpp(const Rcpp::List& variables, const Rcpp::List& parameters, Rcpp::XPtr<individual_index_t> index, const size_t day);
+RcppExport SEXP _safir_test_make_calculate_nat_cpp(SEXP variablesSEXP, SEXP parametersSEXP, SEXP indexSEXP, SEXP daySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type variables(variablesSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<individual_index_t> >::type index(indexSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type day(daySEXP);
+    rcpp_result_gen = Rcpp::wrap(test_make_calculate_nat_cpp(variables, parameters, index, day));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vaccine_efficacy_infection_cpp
 std::vector<double> vaccine_efficacy_infection_cpp(const std::vector<double>& nat, const Rcpp::List& parameters, const size_t day);
 RcppExport SEXP _safir_vaccine_efficacy_infection_cpp(SEXP natSEXP, SEXP parametersSEXP, SEXP daySEXP) {
@@ -316,6 +330,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_safir_test_make_calculate_nat_cpp", (DL_FUNC) &_safir_test_make_calculate_nat_cpp, 4},
     {"_safir_vaccine_efficacy_infection_cpp", (DL_FUNC) &_safir_vaccine_efficacy_infection_cpp, 3},
     {"_safir_vaccine_efficacy_severe_cpp", (DL_FUNC) &_safir_vaccine_efficacy_severe_cpp, 4},
     {"_safir_vaccine_efficacy_transmission_cpp", (DL_FUNC) &_safir_vaccine_efficacy_transmission_cpp, 3},

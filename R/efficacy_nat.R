@@ -98,11 +98,23 @@ make_calculate_nat <- function(variables, parameters) {
         # find individuals who were vaccinated when variant proof vaccine was on
         dose_times <- ceiling(variables$dose_time$get_values(index) * dt)
 
+        been_vaccinated <- variables$dose_num$get_index_of(set = 0)$not()
+
+        been_vaccinated_vec <- been_vaccinated$to_vector()
+
+        # browser()
+
+        # so i think here it's likely that a lot of the values coming out of dose_time will be -1
+        # for persons unvaccinated. we'll need to check for those and somehow account for it.
+
         # N.B. Sean - this may not be right if dose_times are different indexed to the day (e.g. might be on off by one error)
-        non_vp_index <- which(parameters$vp_time[dose_times] == 0)
+        non_vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 0)
+
+        # people who have been vaccinated and whose dose_times are not during variant proof window
+        been_vaccinated_non_vp <- been_vaccinated_vec[non_vp_index]
 
         # apply vfr to those that were vaccinated not during variant proof window
-        nat_vaccine[non_vp_index] <-  pmax(.Machine$double.eps,  nat_vaccine[non_vp_index] / vfr)
+        nat_vaccine[been_vaccinated_non_vp] <-  pmax(.Machine$double.eps,  nat_vaccine[been_vaccinated_non_vp] / vfr)
 
         # and combine these for overall NAT
         nt <- nat_vaccine + nat_infection
