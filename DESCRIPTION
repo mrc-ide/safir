@@ -24,7 +24,7 @@ Remotes:
     mrc-ide/squire,
     mrc-ide/nimue
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1.9000
+RoxygenNote: 7.2.3
 Suggests:
     testthat,
     mockery,

@@ -477,3 +477,27 @@ test_that("time varying mu_ab_infection works", {
   expect_true(mean(sim_const) <= mean(sim_const))
 })
 
+
+test_that("R and C++ agree with variant proof option", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- as.integer(pop$n / 1e3)
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vfr <- rep(2, tmax)
+
+  ab_0 <- rep(2, sum(pop$n))
+
+  vp_time <- 2
+
+  set.seed(123)
+  sim_R <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", ret_ab = TRUE)
+  set.seed(123)
+  sim_cpp <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", ret_ab = TRUE)
+
+  expect_true(abs(mean(sim_R) - mean(sim_cpp)) < 1e-2)
+})

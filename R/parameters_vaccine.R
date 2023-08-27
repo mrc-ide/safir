@@ -104,10 +104,10 @@ get_vaccine_ab_titre_parameters <- function(
 #' @param next_dose_priority_matrix a binary matrix giving age groups prioritized for next dose;
 #' it should have one fewer row than the number of doses being given, because on the
 #' final allocation phase there will be no future dose to prioritize
-#' @param vp_time day at which variant proof vaccine in introduced. If -1 there is not variant proof vaccine
+#' @param vp_time day at which variant proof vaccine in introduced. If not a numeric value >= 0, there is not variant proof vaccine
 #' @description Combine parameters for simulation and verify for correctness.
 #' @export
-make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vaccine_set, dose_period, strategy_matrix, next_dose_priority_matrix,vp_time=-1) {
+make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vaccine_set, dose_period, strategy_matrix, next_dose_priority_matrix,vp_time=NULL) {
 
   parameters <- safir_parameters
 
@@ -167,13 +167,12 @@ make_vaccine_parameters <- function(safir_parameters, vaccine_ab_parameters, vac
   parameters$max_ab <- vaccine_ab_parameters$max_ab
   parameters$correlated <- vaccine_ab_parameters$correlated
 
-  parameters$vp_time <- rep(0, parameters$time_period)
-  if (vp_time != -1) {
-    stopifnot(vp_time >= 0)
+  parameters$vp_time <- NULL
+  if (!is.null(vp_time) && is.numeric(vp_time) && vp_time >= 0) {
     parameters$vp_time <- rep(0, parameters$time_period)
     parameters$vp_time[vp_time:length(parameters$vp_time)] <- 1
+    parameters$vp_time <- as.integer(parameters$vp_time)
   }
-  parameters$vp_time <- as.integer(parameters$vp_time)
 
   return(parameters)
 }

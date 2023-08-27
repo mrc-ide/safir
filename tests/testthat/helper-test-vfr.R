@@ -53,7 +53,9 @@ draw_nt_vfr <- function(parameters, n, tmax, vfr, vfr_time_1, vfr_time_2) {
 
 
 
-simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE) {
+simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infection = NULL, ret_ab = FALSE, vp_time = NULL, inf_proc = "R") {
+
+  stopifnot(inf_proc == "R" || inf_proc == "C++")
 
   contact_mat <- squire::get_mixing_matrix(iso3c = iso3c)
 
@@ -87,7 +89,8 @@ simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infectio
     vaccine_set = vaccine_set,
     dose_period = dose_period,
     strategy_matrix = vaccine_coverage_mat,
-    next_dose_priority_matrix = next_dose_priority
+    next_dose_priority_matrix = next_dose_priority,
+    vp_time = vp_time
   )
 
   parameters <- make_immune_parameters(parameters = parameters, vfr = vfr, mu_ab_infection = mu_ab_infection)
@@ -110,12 +113,22 @@ simulate_vfr <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_infectio
   renderer <- individual::Render$new(parameters$time_period)
 
   # processes
-  processes <- list(
-    natural_immunity_ab_titre_process(parameters = parameters,variables = variables,dt = dt),
-    vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
-    infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
-    categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
-  )
+  if (inf_proc == "R") {
+    processes <- list(
+      natural_immunity_ab_titre_process(parameters = parameters,variables = variables,dt = dt),
+      vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
+      infection_process_vaccine(parameters = parameters,variables = variables,events = events,dt = dt),
+      categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
+    )
+  } else {
+    processes <- list(
+      natural_immunity_ab_titre_process(parameters = parameters,variables = variables,dt = dt),
+      vaccination_process(parameters = parameters,variables = variables,events = events,dt = dt),
+      infection_process_vaccine_cpp(parameters = parameters,variables = variables,events = events,dt = dt),
+      categorical_count_renderer_process_daily(renderer = renderer,variable = variables$states,categories = variables$states$get_categories(),dt = dt)
+    )
+
+  }
 
   setup_events(parameters = parameters,events = events,variables = variables,dt = dt)
 

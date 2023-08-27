@@ -75,31 +75,61 @@ make_calculate_nat <- function(variables, parameters) {
   } else {
     stopifnot(inherits(variables$ab_titre_inf, "DoubleVariable"))
 
-    calculate_nat <- function(index, day) {
+    # for new variant proof VFR modeling
+    if (!is.null(parameters$vp_time)) {
 
-      # Get VFR parameter, if null assign 1
-      if (is.null(parameters$vfr)) {
-        vfr <- 1
-      } else {
-        vfr <- parameters$vfr[day]
+      dt <- parameters$dt
+
+      calculate_nat <- function(index, day) {
+
+        # Get VFR parameter, if null assign 1
+        if (is.null(parameters$vfr)) {
+          vfr <- 1
+        } else {
+          vfr <- parameters$vfr[day]
+        }
+
+        nat_vaccine <- exp(variables$ab_titre$get_values(index))
+        nat_infection <- exp(variables$ab_titre_inf$get_values(index))
+
+        # nat_infection should always be scaled by vfr regardless
+        nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)
+
+        # find individuals who were vaccinated when variant proof vaccine was on
+        dose_times <- ceiling(variables$dose_time$get_values(index) * dt)
+
+        # N.B. Sean - this may not be right if dose_times are different indexed to the day (e.g. might be on off by one error)
+        non_vp_index <- which(parameters$vp_time[dose_times] == 0)
+
+        # apply vfr to those that were vaccinated not during variant proof window
+        nat_vaccine[non_vp_index] <-  pmax(.Machine$double.eps,  nat_vaccine[non_vp_index] / vfr)
+
+        # and combine these for overall NAT
+        nt <- nat_vaccine + nat_infection
+
+        return(nt)
       }
 
-      nat_vaccine <- exp(variables$ab_titre$get_values(index))
-      nat_infection <- exp(variables$ab_titre_inf$get_values(index))
+    } else {
+      # existing setup
 
-      vp_on <- parameters$vp_time[day]
+      calculate_nat <- function(index, day) {
 
-      if(vp_on == 0 ){  # If there is not a variant proof vaccine
+        # Get VFR parameter, if null assign 1
+        if (is.null(parameters$vfr)) {
+          vfr <- 1
+        } else {
+          vfr <- parameters$vfr[day]
+        }
+
+        nat_vaccine <- exp(variables$ab_titre$get_values(index))
+        nat_infection <- exp(variables$ab_titre_inf$get_values(index))
 
         nt <- nat_vaccine + nat_infection
         nt <- pmax(.Machine$double.eps, nt / vfr)
-
-      } else {
-
-        nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)  # Only infection induced antibodies are scaled down by vfr
-        nt <- nat_vaccine + nat_infection
+        return(nt)
       }
-      return(nt)
+
     }
 
   }
