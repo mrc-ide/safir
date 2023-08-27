@@ -12,6 +12,13 @@
 #include <Rcpp.h>
 #include <individual.h>
 
+using calculate_nat_func = std::function<std::vector<double>(const individual_index_t&, const size_t)>;
+
+calculate_nat_func make_calculate_nat(
+    const Rcpp::List& variables,
+    const Rcpp::List& parameters
+);
+
 std::vector<double> vaccine_efficacy_infection_cpp(
     const std::vector<double>& nat,
     const Rcpp::List& parameters,
