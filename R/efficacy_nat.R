@@ -102,11 +102,6 @@ make_calculate_nat <- function(variables, parameters) {
 
         been_vaccinated_vec <- been_vaccinated$to_vector()
 
-        # browser()
-
-        # so i think here it's likely that a lot of the values coming out of dose_time will be -1
-        # for persons unvaccinated. we'll need to check for those and somehow account for it.
-
         # N.B. Sean - this may not be right if dose_times are different indexed to the day (e.g. might be on off by one error)
         non_vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 0)
 
