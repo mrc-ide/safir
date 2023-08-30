@@ -65,7 +65,7 @@ simulate_vfr_simonly <- function(iso3c, vfr, tmax, dt, R0, ab_titre, pop, mu_ab_
   vaccine_set <- rep(vaccine_set, tmax)
 
   # vaccine strategy
-  vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.2)
+  vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "All",max_coverage = 0.2)
   next_dose_priority <- matrix(data = 0, nrow = vaccine_doses - 1,ncol = ncol(vaccine_coverage_mat))
   next_dose_priority[1, 15:17] <- 1 # prioritize 3 oldest age groups for next dose
 

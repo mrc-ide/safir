@@ -542,21 +542,67 @@ test_that("R and C++ agree on NAT calculation with vp_time and without", {
 })
 
 
-test_that("R and C++ infection processes agree with variant proof option", {
+test_that("R and C++ infection processes agree with variant proof option NO vaccination", {
 
   iso3c <- "GBR"
   pop <- safir::get_population(iso3c)
-  pop$n <- rep(50, length(pop$n))
+  pop$n <- rep(1e3, length(pop$n))
 
   tmax <- 20
   dt <- 0.5
   R0 <- 20
 
-  vaccine_set <- 10
+  vaccine_set <- 0
 
   vfr <- rep(50, tmax)
 
   ab_0 <- rep(2, sum(pop$n))
+
+  vp_time <- NULL
+
+  set.seed(123)
+  simout <- simulate_vfr_simonly(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R")
+
+  simout$parameters$vp_time <- as.integer(rep(0,times=tmax+1))
+  simout$parameters$lambda_external <- rep(0,times=tmax+1)
+  simout$parameters$vfr <- rep(50, tmax+1)
+
+  # r test
+  proc_r <- infection_process_vaccine(parameters = simout$parameters,variables = simout$variables,events = simout$events,dt = dt)
+  set.seed(123)
+  proc_r(timestep = (tmax/dt)+1)
+
+  scheduled_r <- simout$events$exposure$get_scheduled()$to_vector()
+  simout$events$exposure$clear_schedule(simout$events$exposure$get_scheduled())
+
+  # c++ test
+  proc_cpp <- infection_process_vaccine_cpp(parameters = simout$parameters,variables = simout$variables,events = simout$events,dt = dt)
+  set.seed(123)
+  individual:::execute_process(process = proc_cpp, timestep = (tmax/dt)+1)
+
+  scheduled_cpp <- simout$events$exposure$get_scheduled()$to_vector()
+  simout$events$exposure$clear_schedule(simout$events$exposure$get_scheduled())
+
+  # test
+  expect_equal(scheduled_cpp, scheduled_r)
+})
+
+
+test_that("R and C++ infection processes agree with variant proof option WITH vaccination", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- rep(1e3, length(pop$n))
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vaccine_set <- 1e4
+
+  vfr <- rep(50, tmax)
+
+  ab_0 <- rep(1, sum(pop$n))
 
   vp_time <- NULL
 
@@ -607,10 +653,10 @@ test_that("variant proof VFR integration test R/C++", {
   vp_time <- 5
 
   set.seed(1234)
-  simout_r <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", vaccine_set = vaccine_set, ret_ab = T)
+  simout_r <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", vaccine_set = vaccine_set, ret_ab = T)
   set.seed(1234)
   simout_cpp <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", vaccine_set = vaccine_set, ret_ab = T)
 
   diff <- abs(simout_r - simout_cpp)
-  expect_true(mean(diff) < 0.05)
+  expect_true(all(diff < sqrt(.Machine$double.eps)))
 })
