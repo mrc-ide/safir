@@ -63,7 +63,7 @@ calculate_nat_func make_calculate_nat(
         my_nat_vaccine = std::exp(nat_vaccine[i]);
 
         // nat_infection should always be scaled by vfr regardless
-        my_nat_infection = std::max(eps, my_nat_infection / vfr);
+        my_nat_infection = my_nat_infection / vfr;
 
         // if this person was vaccinated
         if (dose_nums[i] != 0) {
@@ -71,12 +71,14 @@ calculate_nat_func make_calculate_nat(
           my_dose_time = static_cast<int>(std::ceil(static_cast<double>(dose_times[i]) * dt) - 1.0);
           if (vp_on_ptr[my_dose_time] == 0) {
             // apply vfr to those that were vaccinated not during variant proof window
-            my_nat_vaccine = std::max(eps, my_nat_vaccine / vfr);
+            my_nat_vaccine = my_nat_vaccine / vfr;
           }
+        } else {
+          my_nat_vaccine = my_nat_vaccine / vfr;
         }
 
         // and combine these for overall NAT
-        nat[i] = my_nat_infection + my_nat_vaccine;
+        nat[i] = std::max(eps, my_nat_infection + my_nat_vaccine);
       }
 
       return nat;
