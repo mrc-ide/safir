@@ -107,14 +107,24 @@ make_calculate_nat <- function(variables, parameters) {
         # Find those in index that have been vaccinated (dose_num not equal to 0)
         been_vaccinated_vec <- which(variables$dose_num$get_values(index) != 0)
 
-        # who are those that were vaccinated during this time
-        vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 1)
+        # Is there any one who has been vaccinated
+        if(length(been_vaccinated_vec) > 0) {
 
-        # people who have been vaccinated and whose dose_times are not during variant proof window
-        been_vaccinated_with_vp <- been_vaccinated_vec[vp_index]
+          # who are those that were vaccinated during this time
+          vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 1)
 
-        # those that had the vp vaccine should not have had vfr applied so put back in place
-        nat_vaccine[been_vaccinated_with_vp] <-  nat_vaccine_store[been_vaccinated_with_vp]
+          # Is there any one who has been vaccinated during the time VP vaccines were used
+          if(length(vp_index) > 0) {
+
+            # people who have been vaccinated and whose dose_times are not during variant proof window
+            been_vaccinated_with_vp <- been_vaccinated_vec[vp_index]
+
+            # those that had the vp vaccine should not have had vfr applied so put back in place
+            nat_vaccine[been_vaccinated_with_vp] <-  nat_vaccine_store[been_vaccinated_with_vp]
+
+          }
+
+        }
 
         # and combine these for overall NAT
         nt <- nat_vaccine + nat_infection
