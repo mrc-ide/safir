@@ -676,7 +676,7 @@ test_that("variant proof timing later than VFR test", {
 
   vfr <- c(rep(1, 10), rep(50, 10))
 
-  ab_0 <- rep(2, sum(pop$n))
+  ab_0 <- rep(0, sum(pop$n))
 
   # vp vaccine comes in 5 days after vfr change
   vp_time <- 15

@@ -37,7 +37,8 @@ Imports:
     squire,
     nimue,
     utils,
-    data.table
+    data.table,
+    odin
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14
