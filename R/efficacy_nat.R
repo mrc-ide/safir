@@ -93,7 +93,13 @@ make_calculate_nat <- function(variables, parameters) {
         nat_infection <- exp(variables$ab_titre_inf$get_values(index))
 
         # nat_infection should always be scaled by vfr regardless
-        nat_infection <-  pmax(.Machine$double.eps, nat_infection / vfr)
+        nat_infection <-  nat_infection / vfr
+
+        # store the nat vaccine here
+        nat_vaccine_store <- nat_vaccine
+
+        # apply vfr to everyong
+        nat_vaccine <-  nat_vaccine / vfr
 
         # find individuals who were vaccinated when variant proof vaccine was on
         dose_times <- ceiling(variables$dose_time$get_values(index) * dt)
@@ -101,17 +107,20 @@ make_calculate_nat <- function(variables, parameters) {
         # Find those in index that have been vaccinated (dose_num not equal to 0)
         been_vaccinated_vec <- which(variables$dose_num$get_values(index) != 0)
 
-        # N.B. Sean - this may not be right if dose_times are different indexed to the day (e.g. might be on off by one error)
-        non_vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 0)
+        # who are those that were vaccinated during this time
+        vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 1)
 
         # people who have been vaccinated and whose dose_times are not during variant proof window
-        been_vaccinated_non_vp <- been_vaccinated_vec[non_vp_index]
+        been_vaccinated_with_vp <- been_vaccinated_vec[vp_index]
 
-        # apply vfr to those that were vaccinated not during variant proof window
-        nat_vaccine[been_vaccinated_non_vp] <-  pmax(.Machine$double.eps,  nat_vaccine[been_vaccinated_non_vp] / vfr)
+        # those that had the vp vaccine should not have had vfr applied so put back in place
+        nat_vaccine[been_vaccinated_with_vp] <-  nat_vaccine_store[been_vaccinated_with_vp]
 
         # and combine these for overall NAT
         nt <- nat_vaccine + nat_infection
+
+        # and now do the pmax comparison
+        nt <- pmax(.Machine$double.eps, nt)
 
         return(nt)
       }
