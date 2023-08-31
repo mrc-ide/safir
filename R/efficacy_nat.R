@@ -98,9 +98,8 @@ make_calculate_nat <- function(variables, parameters) {
         # find individuals who were vaccinated when variant proof vaccine was on
         dose_times <- ceiling(variables$dose_time$get_values(index) * dt)
 
-        been_vaccinated <- variables$dose_num$get_index_of(set = 0)$not()
-
-        been_vaccinated_vec <- been_vaccinated$to_vector()
+        # Find those in index that have been vaccinated (dose_num not equal to 0)
+        been_vaccinated_vec <- which(variables$dose_num$get_values(index) != 0)
 
         # N.B. Sean - this may not be right if dose_times are different indexed to the day (e.g. might be on off by one error)
         non_vp_index <- which(parameters$vp_time[dose_times[been_vaccinated_vec]] == 0)

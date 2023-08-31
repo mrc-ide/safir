@@ -653,7 +653,7 @@ test_that("variant proof VFR integration test R/C++", {
   vp_time <- 5
 
   set.seed(1234)
-  simout_r <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", vaccine_set = vaccine_set, ret_ab = T)
+  simout_r <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", vaccine_set = vaccine_set, ret_ab = T)
   set.seed(1234)
   simout_cpp <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "C++", vaccine_set = vaccine_set, ret_ab = T)
 
