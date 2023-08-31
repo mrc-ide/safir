@@ -694,4 +694,8 @@ test_that("variant proof timing later than VFR test", {
   diff <- abs(simout_r2$E_count[1:10] - simout_r$E_count[1:10])
   expect_true(all(diff < sqrt(.Machine$double.eps)))
 
+  # And so they should be different after day 10
+  diff <- abs(simout_r2$E_count[10:length(simout_r2$E_count)] - simout_r$E_count[10:length(simout_r$E_count)])
+  expect_false(all(diff < sqrt(.Machine$double.eps)))
+
 })
