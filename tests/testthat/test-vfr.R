@@ -673,8 +673,8 @@ test_that("variant proof timing later than VFR test", {
   R0 <- 20
 
   vaccine_set <- 10
-
-  vfr <- c(rep(1, 4), rep(50, 16))
+  vfr_on <- 4
+  vfr <- c(rep(1, vfr_on), rep(50, tmax-vfr_on))
 
   ab_0 <- rep(-Inf, sum(pop$n))
 
@@ -688,7 +688,6 @@ test_that("variant proof timing later than VFR test", {
   set.seed(1234)
   simout_r2 <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", vaccine_set = vaccine_set, ret_ab = F)
 
-  rbind(simout_r$E_count, simout_r2$E_count)
 
   # These should be the same as the change in vaccine in the first sim should only be
   # after day 10
