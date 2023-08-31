@@ -660,3 +660,37 @@ test_that("variant proof VFR integration test R/C++", {
   diff <- abs(simout_r - simout_cpp)
   expect_true(all(diff < sqrt(.Machine$double.eps)))
 })
+
+
+test_that("variant proof timing later than VFR test", {
+
+  iso3c <- "GBR"
+  pop <- safir::get_population(iso3c)
+  pop$n <- rep(50, length(pop$n))
+
+  tmax <- 20
+  dt <- 0.5
+  R0 <- 20
+
+  vaccine_set <- 10
+
+  vfr <- c(rep(1, 10), rep(50, 10))
+
+  ab_0 <- rep(2, sum(pop$n))
+
+  # vp vaccine comes in 5 days after vfr change
+  vp_time <- 15
+  set.seed(1234)
+  simout_r <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", vaccine_set = vaccine_set, ret_ab = F)
+
+  # no vp vaccine at all
+  vp_time <- -1
+  set.seed(1234)
+  simout_r2 <- simulate_vfr(iso3c = iso3c, vfr = vfr, tmax = tmax, dt = dt, R0 = R0, ab_titre = ab_0, pop = pop, vp_time = vp_time, inf_proc = "R", vaccine_set = vaccine_set, ret_ab = F)
+
+  # These should be the same as the change in vaccine in the first sim should only be
+  # after day 15
+  diff <- abs(simout_r2$E_count[1:12] - simout_r$E_count[1:12])
+  expect_true(all(diff < sqrt(.Machine$double.eps)))
+
+})
