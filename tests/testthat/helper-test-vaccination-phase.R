@@ -18,7 +18,7 @@ vaccine_set <- c(0, seq(from = 1e3, to = 1e4, length.out = tmax-1))
 vaccine_set <- floor(vaccine_set)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
+vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(0,nrow = 2, ncol = 17)
 next_dose_priority[1:2, 15:17] <- 1
 

@@ -248,10 +248,12 @@ assign_doses <- function(doses_left, events, dose, eligible, parameters) {
     if(sum(assigned) != doses_left){
       extra_to_assign <- n_to_assign - assigned
       extra_weights <- extra_to_assign / sum(extra_to_assign)
-      assigned <- assigned + as.vector(rmultinom(n = 1,size = doses_left - sum(assigned),prob = extra_weights))
+      assigned <- assigned + as.vector(odin:::rmhyper(n_sample = doses_left - sum(assigned), k = extra_to_assign))
+      #assigned <- assigned + as.vector(rmultinom(n = 1,size = doses_left - sum(assigned),prob = extra_weights))
     }
 
     stopifnot(sum(assigned) <= doses_left)
+    stopifnot(assigned <= n_to_assign)
 
     for (a in 1:parameters$N_age) {
 

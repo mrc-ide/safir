@@ -4,10 +4,10 @@
 \alias{vaccine_efficacy_severe_cpp}
 \title{Compute vaccine efficacy against severe disease from Ab titre (C++)}
 \usage{
-vaccine_efficacy_severe_cpp(ab_titre, ef_infection, parameters, day)
+vaccine_efficacy_severe_cpp(nat, ef_infection, parameters, day)
 }
 \arguments{
-\item{ab_titre}{a vector of Ab titres}
+\item{nat}{a vector of NAT values}
 
 \item{ef_infection}{a vector of efficacy against infection from \code{\link{vaccine_efficacy_infection}}}
 

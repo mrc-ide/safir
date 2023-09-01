@@ -641,3 +641,51 @@ test_that("assign doses is working for phase 2", {
   )
 
 })
+
+
+test_that("allocation does not overallocate", {
+
+  # This test previously would overallocate when using a rmultinom sample as
+  # rmultinom is sampling with replacement.
+
+  # You need Multivariate hypergeometric distribution
+  # odin:::rmhyper conveniently already written
+  parameters <- list(
+    population = rep(10,10),
+    N_age = 10,
+    dose_period = c(NaN, 6, 4),
+    N_phase = 3,
+    correlated = FALSE
+  )
+
+  pop_ages <- rep(1:10,times=parameters$population)
+
+  n <- sum(parameters$population)
+
+  var_local <- list()
+  var_local$discrete_age <- IntegerVariable$new(pop_ages)
+  var_local <- create_vaccine_variables(variables = var_local,parameters = parameters)
+  initialize_vaccine_variables(variables = var_local,dose_time_init = list(rep(-1,n),rep(-1,n),rep(-1,n)),dose_num_init = rep(0,n))
+
+
+  # assigns partial doses (1)
+  events <- list(scheduled_dose = replicate(n = 10,expr = {TargetedEvent$new(n)}))
+  targeted <- target_pop(
+    dose = 1,variables = var_local,events = events,parameters = parameters,timestep = 14,dt = 1,strategy_matrix_step = rep(1,10)
+  )
+  # here we end up having to give 9 vaccine doses in the last allocation step
+  # which across 10 equal ages rmultinom is likely to allocate more than 1 to a
+  # age group
+  set.seed(1234L)
+  assign_doses(
+    doses_left = 99,
+    events = events,dose = 1,eligible = targeted,parameters = parameters
+  )
+  sched <- var_local$discrete_age$get_values(events$scheduled_dose[[1]]$get_scheduled())
+  expect_equal(
+    c(9,rep(10,9)),
+    sort(as.vector(table(sched)))
+  )
+
+
+})

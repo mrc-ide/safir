@@ -12,9 +12,6 @@
 // types for lambda functions used for calculations below
 using get_inf_ages_func = std::function<std::vector<double>(const individual_index_t&, Rcpp::List, const size_t)>;
 
-using calculate_nat_func = std::function<std::vector<double>(const individual_index_t&)>;
-
-
 //' @title C++ infection process for vaccine model (multi-dose, no types)
 //' @description this is an internal function, you should use the R interface
 //' for type checking, \code{\link{infection_process_cpp}}
@@ -30,6 +27,13 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
     const double dt
 ) {
 
+  // variables
+  Rcpp::Environment discrete_age_R6 = Rcpp::as<Rcpp::Environment>(variables["discrete_age"]);
+  Rcpp::XPtr<IntegerVariable> discrete_age(Rcpp::as<SEXP>(discrete_age_R6[".variable"]));
+
+  Rcpp::Environment states_R6 = Rcpp::as<Rcpp::Environment>(variables["states"]);
+  Rcpp::XPtr<CategoricalVariable> states(Rcpp::as<SEXP>(states_R6[".variable"]));
+
   // the states we need to pull
   std::vector<std::string> inf_states = {"IMild", "IAsymp", "ICase"};
 
@@ -43,58 +47,22 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
   SEXP beta_set = parameters["beta_set"];
   SEXP lambda_external_vector = parameters["lambda_external"];
 
-  // variables
-  Rcpp::Environment discrete_age_R6 = Rcpp::as<Rcpp::Environment>(variables["discrete_age"]);
-  Rcpp::XPtr<IntegerVariable> discrete_age(Rcpp::as<SEXP>(discrete_age_R6[".variable"]));
-
-  Rcpp::Environment states_R6 = Rcpp::as<Rcpp::Environment>(variables["states"]);
-  Rcpp::XPtr<CategoricalVariable> states(Rcpp::as<SEXP>(states_R6[".variable"]));
-
-  Rcpp::Environment ab_titre_R6 = Rcpp::as<Rcpp::Environment>(variables["ab_titre"]);
-  Rcpp::XPtr<DoubleVariable> ab_titre(Rcpp::as<SEXP>(ab_titre_R6[".variable"]));
-
-  // calculate NAT
-  calculate_nat_func calculate_nat;
-
-  if (variables.containsElementNamed("ab_titre_inf")) {
-
-    Rcpp::Environment ab_titre_inf_R6 = Rcpp::as<Rcpp::Environment>(variables["ab_titre_inf"]);
-    Rcpp::XPtr<DoubleVariable> ab_titre_inf(Rcpp::as<SEXP>(ab_titre_inf_R6[".variable"]));
-
-    calculate_nat = [ab_titre, ab_titre_inf](const individual_index_t& index) -> std::vector<double> {
-
-      std::vector<double> nat_vaccine = ab_titre->get_values(index);
-      std::vector<double> nat_infection = ab_titre_inf->get_values(index);
-
-      std::vector<double> nat(index.size());
-
-      for (auto i = 0u; i < index.size(); ++i) {
-        nat[i] = std::exp(nat_vaccine[i]) + std::exp(nat_infection[i]);
-        nat[i] = std::log(nat[i]);
-      }
-
-      return nat;
-    };
-  } else {
-    calculate_nat = [ab_titre](const individual_index_t& index) -> std::vector<double> {
-      return ab_titre->get_values(index);
-    };
-  }
+  calculate_nat_func calculate_nat = make_calculate_nat(variables, parameters);
 
   // infection ages (weighted by NAT effect or not)
   get_inf_ages_func get_inf_ages;
 
   if (Rcpp::as<bool>(parameters["nt_efficacy_transmission"])) {
-    get_inf_ages = [discrete_age, calculate_nat](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t timestep) -> std::vector<double> {
+    get_inf_ages = [discrete_age, calculate_nat](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t day) -> std::vector<double> {
       int N_age = Rcpp::as<int>(parameters["N_age"]);
       std::vector<int> ages = discrete_age->get_values(infectious_bset);
-      std::vector<double> nat_values = calculate_nat(infectious_bset);
-      std::vector<double> inf_wt = vaccine_efficacy_transmission_cpp(nat_values, parameters, timestep);
+      std::vector<double> nat = calculate_nat(infectious_bset, day);
+      std::vector<double> inf_wt = vaccine_efficacy_transmission_cpp(nat, parameters, day);
       std::vector<double> inf_ages = tab_bins_weighted(ages, inf_wt, N_age);
       return(inf_ages);
     };
   } else {
-    get_inf_ages = [discrete_age](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t timestep) -> std::vector<double> {
+    get_inf_ages = [discrete_age](const individual_index_t& infectious_bset, Rcpp::List parameters, const size_t day) -> std::vector<double> {
       int N_age = Rcpp::as<int>(parameters["N_age"]);
       std::vector<int> ages = discrete_age->get_values(infectious_bset);
       std::vector<double> inf_ages = tab_bins(ages, N_age);
@@ -139,8 +107,8 @@ Rcpp::XPtr<process_t> infection_process_vaccine_cpp_internal(
           std::vector<int> sus_ages = discrete_age->get_values(susceptible);
 
           // get vaccine efficacy
-          std::vector<double> ab_titre_susceptible = calculate_nat(susceptible);
-          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(ab_titre_susceptible, parameters, day);
+          std::vector<double> nat_susceptible = calculate_nat(susceptible, day);
+          std::vector<double> infection_efficacy = vaccine_efficacy_infection_cpp(nat_susceptible, parameters, day);
 
           // FoI on each susceptible person from infectives
           for (auto i = 0u; i < sus_ages.size(); ++i) {

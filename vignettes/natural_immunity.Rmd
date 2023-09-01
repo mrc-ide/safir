@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(safir)
-```
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -106,6 +102,7 @@ timesteps <- parameters$time_period/dt
 variables <- create_variables(pop = pop, parameters = parameters)
 variables <- create_vaccine_variables(variables = variables,parameters = parameters)
 variables <- create_natural_immunity_variables(variables = variables, parameters = parameters)
+variables <- create_independent_nat_variables(variables = variables, parameters = parameters)
 
 # create events
 events <- create_events(parameters = parameters)

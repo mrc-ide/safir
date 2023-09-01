@@ -31,10 +31,13 @@ test_that("c++ infection process (multiple doses, no types) testing with NAT aff
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
   ab_titre <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
 
+  vars <- list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf)
+
   set.seed(5436L)
-  inf_proc_no_nat <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_no_nat <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   inf_proc_no_nat(timestep = 100)
 
   no_nat <- exposure$get_scheduled()$to_vector()
@@ -44,7 +47,7 @@ test_that("c++ infection process (multiple doses, no types) testing with NAT aff
   exposure <- individual::TargetedEvent$new(population_size = n)
 
   set.seed(5436L)
-  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   inf_proc_nat(timestep = 100)
 
   nat_no_titre <- exposure$get_scheduled()$to_vector()
@@ -54,10 +57,13 @@ test_that("c++ infection process (multiple doses, no types) testing with NAT aff
   # make sure significantly less infections occur when using NAT effect with a large ab titre
   zdose <- log(10^rnorm(n = n, mean = log10(3), sd = parameters$std10))
   ab_titre <- individual::DoubleVariable$new(initial_values = zdose)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
 
+  vars <- list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf)
+
   set.seed(5436L)
-  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   inf_proc_nat(timestep = 100)
 
   nat_high_titre <- exposure$get_scheduled()$to_vector()
@@ -102,10 +108,13 @@ test_that("R/C++ infection process consistent with NAT onward infectiousness and
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
   ab_titre <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
 
+  vars <- list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf)
+
   set.seed(1967391L)
-  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   inf_proc_nat(timestep = 100)
 
   inf_R <- exposure$get_scheduled()$to_vector()
@@ -113,7 +122,7 @@ test_that("R/C++ infection process consistent with NAT onward infectiousness and
   # C++
   exposure <- individual::TargetedEvent$new(population_size = n)
   set.seed(1967391L)
-  inf_proc_nat <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine_cpp(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   execute_process(process = inf_proc_nat,timestep = 100)
 
   inf_cpp <- exposure$get_scheduled()$to_vector()
@@ -157,10 +166,13 @@ test_that("R/C++ infection process consistent with NAT onward infectiousness and
   states <- individual::CategoricalVariable$new(categories = valid_states,initial_values = state0)
   discrete_age <- individual::IntegerVariable$new(initial_values = age0)
   ab_titre <- individual::DoubleVariable$new(initial_values = ab_titre0)
+  ab_titre_inf <- individual::DoubleVariable$new(initial_values = ab_titre0)
   exposure <- individual::TargetedEvent$new(population_size = n)
 
+  vars <- list(states=states,discrete_age=discrete_age,ab_titre=ab_titre,ab_titre_inf=ab_titre_inf)
+
   set.seed(1967391L)
-  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   inf_proc_nat(timestep = 100)
 
   inf_R <- exposure$get_scheduled()$to_vector()
@@ -168,7 +180,7 @@ test_that("R/C++ infection process consistent with NAT onward infectiousness and
   # C++
   exposure <- individual::TargetedEvent$new(population_size = n)
   set.seed(1967391L)
-  inf_proc_nat <- infection_process_vaccine_cpp(parameters = parameters,variables = list(states=states,discrete_age=discrete_age,ab_titre=ab_titre),events = list(exposure=exposure),dt = dt)
+  inf_proc_nat <- infection_process_vaccine_cpp(parameters = parameters,variables = vars,events = list(exposure=exposure),dt = dt)
   execute_process(process = inf_proc_nat,timestep = 100)
 
   inf_cpp <- exposure$get_scheduled()$to_vector()

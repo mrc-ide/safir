@@ -1,6 +1,6 @@
 Package: safir
 Title: Individual-Based Model of COVID Transmission
-Version: 0.6.0
+Version: 0.6.1
 Authors@R: c(
             person(
                 given = "Sean L.",
@@ -24,7 +24,7 @@ Remotes:
     mrc-ide/squire,
     mrc-ide/nimue
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1.9000
+RoxygenNote: 7.2.3
 Suggests:
     testthat,
     mockery,
@@ -37,7 +37,8 @@ Imports:
     squire,
     nimue,
     utils,
-    data.table
+    data.table,
+    odin
 VignetteBuilder: knitr
 NeedsCompilation: yes
 SystemRequirements: C++14

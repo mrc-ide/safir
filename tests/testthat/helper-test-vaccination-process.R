@@ -19,7 +19,7 @@ dose_period <- c(NaN, 14, 7)
 vaccine_set <- rep(80,100)
 
 # vaccine strategy
-vaccine_coverage_mat <- strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
+vaccine_coverage_mat <- nimue::strategy_matrix(strategy = "Elderly",max_coverage = 0.8)
 next_dose_priority <- matrix(0,nrow = 2, ncol = 17)
 next_dose_priority[1, 15:17] <- 1
 next_dose_priority[2, 10:14] <- 1

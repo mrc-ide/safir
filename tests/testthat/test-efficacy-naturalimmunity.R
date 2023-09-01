@@ -144,9 +144,10 @@ test_that("efficacy functions work in R and C++", {
   vaccine_parameters <- get_vaccine_ab_titre_parameters(vaccine = "Pfizer")
   ab_titre <- log(10^rnorm(n = n, mean = log10(vaccine_parameters$mu_ab[1]),sd = vaccine_parameters$std10))
   ab_titre[sample.int(n = n,size = 20,replace = FALSE)] <- -Inf
+  nat <- exp(ab_titre)
 
-  ef_transmission_R <- vaccine_efficacy_infection(ab_titre = ab_titre,parameters = vaccine_parameters, day = 1)
-  ef_transmission_cpp <- vaccine_efficacy_infection_cpp(ab_titre = ab_titre,parameters = vaccine_parameters, day = 1)
+  ef_transmission_R <- vaccine_efficacy_infection(nat = nat, parameters = vaccine_parameters, day = 1)
+  ef_transmission_cpp <- vaccine_efficacy_infection_cpp(nat = nat, parameters = vaccine_parameters, day = 1)
 
   expect_equal(ef_transmission_R, ef_transmission_cpp)
 
